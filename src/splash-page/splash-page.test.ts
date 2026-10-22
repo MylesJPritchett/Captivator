@@ -46,4 +46,13 @@ describe("Input Fields", () => {
       { type: "Name" },
     ]);
   });
+
+  it("adding an Input Field of a type already present returns the Splash Page unchanged", () => {
+    const splashPage = splashPageReducer(starterSplashPage, {
+      type: "addInputField",
+      inputFieldType: "Email",
+    });
+
+    expect(splashPage).toBe(starterSplashPage);
+  });
 });
