@@ -1,7 +1,12 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { editTextBlock1, renderCaptivator } from "@/app/test-helpers";
+import {
+  appearanceOption,
+  chooseAppearance,
+  editTextBlock1,
+  renderCaptivator,
+} from "@/app/test-helpers";
 
 /** What a browser throws when its site storage is blocked. */
 function storageBlocked() {
@@ -54,16 +59,11 @@ describe("Captivator: storage blocked in this browser", () => {
       throw storageBlocked();
     });
     renderCaptivator();
-    const appearance = screen.getByRole("group", { name: "Appearance" });
-    expect(
-      within(appearance).getByRole("radio", { name: "System" }),
-    ).toBeChecked();
+    expect(appearanceOption("System")).toBeChecked();
 
-    await user.click(within(appearance).getByRole("radio", { name: "Dark" }));
+    await chooseAppearance(user, "Dark");
 
-    expect(
-      within(appearance).getByRole("radio", { name: "Dark" }),
-    ).toBeChecked();
+    expect(appearanceOption("Dark")).toBeChecked();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
