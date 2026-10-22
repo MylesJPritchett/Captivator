@@ -1,10 +1,22 @@
 import type { SplashPageAction } from "./reducer";
-import type { SplashPage } from "./types";
+import type { SplashPage, TextBlock } from "./types";
 
-export type TextBlockAction = {
-  type: "updateTextBlockText";
-  id: string;
-  text: string;
+export type TextBlockAction =
+  | {
+      type: "addTextBlock";
+      /** Chosen by the caller so the reducer stays pure. */
+      id: string;
+    }
+  | {
+      type: "updateTextBlockText";
+      id: string;
+      text: string;
+    };
+
+const newTextBlock: Omit<TextBlock, "id"> = {
+  text: "",
+  colour: "#ffffff",
+  size: 20,
 };
 
 export function textBlocksReducer(
@@ -12,6 +24,14 @@ export function textBlocksReducer(
   action: SplashPageAction,
 ): SplashPage {
   switch (action.type) {
+    case "addTextBlock":
+      return {
+        ...splashPage,
+        textBlocks: [
+          ...splashPage.textBlocks,
+          { ...newTextBlock, id: action.id },
+        ],
+      };
     case "updateTextBlockText":
       return {
         ...splashPage,

@@ -32,4 +32,19 @@ describe("Text Blocks", () => {
     expect(splashPage.inputFields).toEqual(starterSplashPage.inputFields);
     expect(starterSplashPage.textBlocks[0].text).toBe("Free WiFi");
   });
+
+  it("adding a Text Block appends one with the given id after the existing ones", () => {
+    const splashPage = splashPageReducer(starterSplashPage, {
+      type: "addTextBlock",
+      id: "second",
+    });
+
+    expect(splashPage.textBlocks).toHaveLength(2);
+    expect(splashPage.textBlocks[0]).toEqual(starterSplashPage.textBlocks[0]);
+    expect(splashPage.textBlocks[1].id).toBe("second");
+    expect(splashPage.textBlocks[1].colour).toMatch(hexColour);
+    expect(splashPage.textBlocks[1].size).toBeGreaterThanOrEqual(12);
+    expect(splashPage.textBlocks[1].size).toBeLessThanOrEqual(64);
+    expect(starterSplashPage.textBlocks).toHaveLength(1);
+  });
 });
