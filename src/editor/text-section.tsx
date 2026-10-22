@@ -1,4 +1,5 @@
 import { maxTextBlockSize, minTextBlockSize } from "@/splash-page";
+import { buttonClass, fieldClass } from "@/ui/controls";
 import { focusRing } from "@/ui/focus-ring";
 import { ColourControl } from "./colour-control";
 import { EditorSection } from "./editor-section";
@@ -15,7 +16,7 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
         return (
           <div
             key={textBlock.id}
-            className="flex flex-col gap-2 rounded-lg border border-zinc-200 p-3"
+            className="flex flex-col gap-2 rounded-lg border border-divider p-3"
           >
             <label htmlFor={textId} className="text-sm font-medium">
               {name} text
@@ -31,7 +32,7 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
                   text: event.target.value,
                 })
               }
-              className={`rounded-md border border-zinc-300 px-3 py-2 ${focusRing}`}
+              className={`px-3 py-2 ${fieldClass}`}
             />
             <ColourControl
               id={textBlockControlId(textBlock.id, "colour")}
@@ -77,7 +78,7 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
               onClick={() =>
                 dispatch({ type: "removeTextBlock", id: textBlock.id })
               }
-              className={`self-start rounded-md border border-zinc-300 px-3 py-1 text-sm hover:bg-zinc-50 ${focusRing}`}
+              className={`self-start px-3 py-1 text-sm ${buttonClass}`}
             >
               Remove {name}
             </button>
@@ -89,7 +90,7 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
         onClick={() =>
           dispatch({ type: "addTextBlock", id: crypto.randomUUID() })
         }
-        className={`self-start rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-50 ${focusRing}`}
+        className={`self-start px-3 py-2 text-sm font-medium ${buttonClass}`}
       >
         Add Text Block
       </button>

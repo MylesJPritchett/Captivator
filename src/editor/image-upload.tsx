@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import type { ImageUrl } from "@/splash-page";
+import { buttonClass } from "@/ui/controls";
 import { focusRing } from "@/ui/focus-ring";
 
 type ImageUploadProps = {
@@ -73,7 +74,7 @@ export function ImageUpload({
         <button
           type="button"
           onClick={remove.onRemove}
-          className={`mt-2 self-start rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-100 ${focusRing}`}
+          className={`mt-2 self-start px-3 py-2 text-sm font-medium ${buttonClass}`}
         >
           {remove.label}
         </button>

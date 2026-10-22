@@ -17,6 +17,41 @@ function contrast(a: string, b: string): number {
 }
 
 /**
+ * The colours an element is drawn in: its text colour, and the first opaque
+ * background behind it (its own, else its nearest ancestor's).
+ */
+async function colours(element: Locator) {
+  return element.evaluate((start) => {
+    const isOpaque = (colour: string) =>
+      colour !== "transparent" && !/rgba\(.*,\s*0\)$/.test(colour);
+    let background = "rgb(255, 255, 255)";
+    for (let node: Element | null = start; node; node = node.parentElement) {
+      const own = getComputedStyle(node).backgroundColor;
+      if (isOpaque(own)) {
+        background = own;
+        break;
+      }
+    }
+    // Tailwind's palette computes to `lab()`/`oklch()`; paint each colour to
+    // read it back as sRGB.
+    const context = document.createElement("canvas").getContext("2d", {
+      willReadFrequently: true,
+    })!;
+    const toRgb = (colour: string) => {
+      context.clearRect(0, 0, 1, 1);
+      context.fillStyle = colour;
+      context.fillRect(0, 0, 1, 1);
+      const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+      return `rgb(${r}, ${g}, ${b})`;
+    };
+    return {
+      text: toRgb(getComputedStyle(start).color),
+      background: toRgb(background),
+    };
+  });
+}
+
+/**
  * The colours a file input's button is drawn in: its text colour, and the
  * first opaque background behind it (its own, else its nearest ancestor's).
  */
@@ -54,6 +89,26 @@ test.describe("with a dark colour scheme", () => {
         editor.getByLabel(label),
       );
       expect(contrast(text, background), label).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  test("the Editor's buttons stay readable while hovered", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "touch Devices have no hover");
+    await page.goto("/");
+    const editor = page.getByRole("region", { name: "Editor" });
+    for (const name of [
+      "Add Text Block",
+      "Remove Text Block 1",
+      "Add Input Field",
+      "Reset to starter",
+    ]) {
+      const button = editor.getByRole("button", { name });
+      await button.hover();
+      const { text, background } = await colours(button);
+      expect(contrast(text, background), name).toBeGreaterThanOrEqual(4.5);
     }
   });
 });

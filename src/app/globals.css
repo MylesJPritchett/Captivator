@@ -16,14 +16,40 @@
   --control: #ffffff;
   --control-hover: #f4f4f5;
   --control-border: #d4d4d8;
+  /* Text on a disabled control: dimmer than normal, still legible. */
+  --control-disabled: #71717a;
+  /* The segmented control's track, and its chosen option on it. */
+  --control-track: #e4e4e7;
+  --control-selected: #ffffff;
+  /* The one emphasised action, e.g. "Add Input Field". */
+  --primary: #18181b;
+  --primary-hover: #3f3f46;
+  --primary-foreground: #ffffff;
+  /* Borders that group controls rather than outline one. */
+  --divider: #e4e4e7;
+  --muted: #52525b;
+  --warning: #92400e;
+  --danger: #b91c1c;
+  --focus: #2563eb;
 
   @variant dark {
     color-scheme: dark;
     --background: #0a0a0a;
     --foreground: #ededed;
     --control: #18181b;
-    --control-hover: #27272a;
-    --control-border: #52525b;
+    --control-hover: #3f3f46;
+    --control-border: #71717a;
+    --control-disabled: #8b8b94;
+    --control-track: #27272a;
+    --control-selected: #52525b;
+    --primary: #f4f4f5;
+    --primary-hover: #d4d4d8;
+    --primary-foreground: #18181b;
+    --divider: #3f3f46;
+    --muted: #a1a1aa;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --focus: #60a5fa;
   }
 }
 
@@ -33,6 +59,17 @@
   --color-control: var(--control);
   --color-control-hover: var(--control-hover);
   --color-control-border: var(--control-border);
+  --color-control-disabled: var(--control-disabled);
+  --color-control-track: var(--control-track);
+  --color-control-selected: var(--control-selected);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-divider: var(--divider);
+  --color-muted: var(--muted);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-focus: var(--focus);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
