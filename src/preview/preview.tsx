@@ -19,15 +19,21 @@ type PreviewProps = {
 export function Preview({ splashPage, device }: PreviewProps) {
   return (
     <DeviceFrame device={device}>
-      <div
-        className="flex h-full w-full overflow-y-auto"
-        style={backgroundStyle(splashPage.background)}
-      >
-        <div className="m-auto flex w-full max-w-[420px] flex-col items-center gap-4 px-6 py-10 text-center">
-          <PreviewLogo logo={splashPage.logo} />
-          <PreviewTextBlocks textBlocks={splashPage.textBlocks} />
-          <PreviewInputFields inputFields={splashPage.inputFields} />
-          <PreviewConnectButton connectButton={splashPage.connectButton} />
+      <div className="relative h-full w-full">
+        {/* The Background fills the whole frame behind the content. */}
+        <div
+          role="img"
+          aria-label="Background"
+          className="absolute inset-0"
+          style={backgroundStyle(splashPage.background)}
+        />
+        <div className="relative flex h-full w-full overflow-y-auto">
+          <div className="m-auto flex w-full max-w-[420px] flex-col items-center gap-4 px-6 py-10 text-center">
+            <PreviewLogo logo={splashPage.logo} />
+            <PreviewTextBlocks textBlocks={splashPage.textBlocks} />
+            <PreviewInputFields inputFields={splashPage.inputFields} />
+            <PreviewConnectButton connectButton={splashPage.connectButton} />
+          </div>
         </div>
       </div>
     </DeviceFrame>
