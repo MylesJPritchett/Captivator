@@ -31,12 +31,10 @@ export function BackgroundSection({
       />
       <ImageUpload
         label="Background image"
-        onUpload={(imageUrl) => {
-          // Release the old image's memory now it's been replaced.
-          if (splashPage.background.imageUrl)
-            URL.revokeObjectURL(splashPage.background.imageUrl);
-          dispatch({ type: "setBackgroundImage", imageUrl });
-        }}
+        imageUrl={splashPage.background.imageUrl}
+        onUpload={(imageUrl) =>
+          dispatch({ type: "setBackgroundImage", imageUrl })
+        }
       />
     </EditorSection>
   );
