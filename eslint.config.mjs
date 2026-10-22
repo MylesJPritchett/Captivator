@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Added for this repo: test and coverage output.
     "coverage/**",
     "playwright-report/**",
     "test-results/**",
