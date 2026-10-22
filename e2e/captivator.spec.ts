@@ -39,6 +39,29 @@ test("the Preview sits above the Editor on narrow screens and beside it on wide 
   expect(scrollWidth).toBeLessThanOrEqual(page.viewportSize()!.width);
 });
 
+test("on a laptop screen the whole Mobile Preview fits beside the Editor without scrolling", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "Narrow screens stack the Preview above the Editor");
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto("/");
+  const preview = page.getByRole("region", { name: "Preview" });
+
+  const mobile = await preview
+    .getByRole("figure", { name: "Mobile Preview" })
+    .boundingBox();
+  const connect = await preview
+    .getByRole("button", { name: "Connect" })
+    .boundingBox();
+  if (!mobile || !connect) throw new Error("Mobile Preview not rendered");
+
+  expect(mobile.y + mobile.height).toBeLessThanOrEqual(768);
+  expect(connect.y + connect.height).toBeLessThanOrEqual(768);
+  // Still the phone's 375:667 screen inside a 12px bezel.
+  expect((mobile.width - 24) / (mobile.height - 24)).toBeCloseTo(375 / 667, 2);
+});
+
 test("choosing Desktop swaps the tall phone frame for a wide frame with a centred column", async ({
   page,
 }) => {
