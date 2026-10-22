@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { starterSplashPage } from "@/splash-page";
+import { splashPageReducer, starterSplashPage } from "@/splash-page";
 
 const hexColour = /^#[0-9a-f]{6}$/i;
 
@@ -13,5 +13,23 @@ describe("starter Splash Page", () => {
     expect(starterSplashPage.connectButton.backgroundColour).toMatch(hexColour);
     expect(starterSplashPage.connectButton.textColour).toMatch(hexColour);
     expect(starterSplashPage.logo).toBeUndefined();
+  });
+});
+
+describe("Text Blocks", () => {
+  it("updating a Text Block's text changes only that Text Block's text", () => {
+    const [starterTextBlock] = starterSplashPage.textBlocks;
+
+    const splashPage = splashPageReducer(starterSplashPage, {
+      type: "updateTextBlockText",
+      id: starterTextBlock.id,
+      text: "Welcome to the Café",
+    });
+
+    expect(splashPage.textBlocks).toEqual([
+      { ...starterTextBlock, text: "Welcome to the Café" },
+    ]);
+    expect(splashPage.inputFields).toEqual(starterSplashPage.inputFields);
+    expect(starterSplashPage.textBlocks[0].text).toBe("Free WiFi");
   });
 });
