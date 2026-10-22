@@ -63,7 +63,7 @@ Module layout. Each area (Logo, Background, Text Blocks, Input Fields, Connect B
 - `src/editor/`: one Editor section per area, which dispatches actions; shared `ImageUpload` and `ColourControl`
 - `src/preview/`: renders a Splash Page for a given Device; the Device toggle and frames
 - `src/library/`: the Library list, with its New Splash Page button
-- `src/ui/`: pieces shared by the Editor and the Preview (segmented control, focus ring)
+- `src/ui/`: pieces shared by the Editor and the Preview (segmented control, focus ring, secondary button style)
 - `src/app/page.tsx`: the single route, holding the Library reducer and Device state and wiring the Library, Editor and Preview together
 
 ## Agent skills
