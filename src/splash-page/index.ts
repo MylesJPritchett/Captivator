@@ -4,7 +4,6 @@ export { splashPageReducer, type SplashPageAction } from "./reducer";
 export {
   libraryReducer,
   openSplashPage,
-  openSplashPageName,
   splashPageName,
   type LibraryAction,
 } from "./library";

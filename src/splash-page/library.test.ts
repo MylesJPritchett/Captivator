@@ -111,4 +111,76 @@ describe("Library", () => {
 
     expect(library.splashPages.map(({ name }) => name)).toEqual(["Bar", "Bar"]);
   });
+
+  it("Duplicate adds a copy of the Open Splash Page, images included, named Copy of its name at the bottom of the Library and opens it", () => {
+    const withImages: Library = {
+      ...cafeAndBar,
+      splashPages: [
+        {
+          id: "cafe",
+          name: "Café",
+          splashPage: {
+            ...cafe,
+            logo: "data:image/png;base64,logo",
+            background: {
+              kind: "image",
+              colour: "#ffffff",
+              imageUrl: "data:image/png;base64,background",
+            },
+          },
+        },
+        cafeAndBar.splashPages[1],
+      ],
+    };
+
+    const library = libraryReducer(withImages, { type: "duplicate" });
+
+    expect(library.splashPages).toHaveLength(3);
+    expect(library.splashPages.slice(0, 2)).toEqual(withImages.splashPages);
+    const copy = library.splashPages[2];
+    expect(copy).toMatchObject({
+      name: "Copy of Café",
+      splashPage: withImages.splashPages[0].splashPage,
+    });
+    expect(["cafe", "bar"]).not.toContain(copy.id);
+    expect(library.openSplashPageId).toBe(copy.id);
+  });
+
+  it("Delete removes the Open Splash Page and opens the Splash Page just above it", () => {
+    const library = libraryReducer(
+      { ...cafeAndBar, openSplashPageId: "bar" },
+      { type: "delete" },
+    );
+
+    expect(library).toEqual({
+      splashPages: [{ id: "cafe", name: "Café", splashPage: cafe }],
+      openSplashPageId: "cafe",
+    });
+  });
+
+  it("deleting the first Splash Page opens the next one down", () => {
+    const library = libraryReducer(cafeAndBar, { type: "delete" });
+
+    expect(library).toEqual({
+      splashPages: [{ id: "bar", name: "Bar", splashPage: bar }],
+      openSplashPageId: "bar",
+    });
+  });
+
+  it("deleting the only Splash Page leaves a single Starter Splash Page named Untitled Splash Page", () => {
+    const library = libraryReducer(
+      {
+        splashPages: [{ id: "cafe", name: "Café", splashPage: cafe }],
+        openSplashPageId: "cafe",
+      },
+      { type: "delete" },
+    );
+
+    expect(library.splashPages).toHaveLength(1);
+    expect(library.splashPages[0]).toMatchObject({
+      name: "Untitled Splash Page",
+      splashPage: starterSplashPage,
+    });
+    expect(library.openSplashPageId).toBe(library.splashPages[0].id);
+  });
 });

@@ -1,6 +1,6 @@
 import { splashPageReducer, type SplashPageAction } from "./reducer";
 import { starterSplashPage } from "./starter";
-import type { Library, SplashPage } from "./types";
+import type { Library, LibraryEntry, SplashPage } from "./types";
 
 /**
  * Every change to the Library. Any action other than the Library's own is a
@@ -10,6 +10,8 @@ export type LibraryAction =
   | { type: "new" }
   | { type: "open"; id: string }
   | { type: "rename"; name: string }
+  | { type: "duplicate" }
+  | { type: "delete" }
   | SplashPageAction;
 
 /** The name a new Splash Page starts with. */
@@ -48,6 +50,31 @@ export function libraryReducer(
         ),
       };
     }
+    case "duplicate": {
+      const open = openEntry(library);
+      const id = unusedId(library);
+      return {
+        splashPages: [
+          ...library.splashPages,
+          { id, name: `Copy of ${open.name}`, splashPage: open.splashPage },
+        ],
+        openSplashPageId: id,
+      };
+    }
+    case "delete": {
+      const index = library.splashPages.findIndex(
+        ({ id }) => id === library.openSplashPageId,
+      );
+      const splashPages = library.splashPages.filter((_, i) => i !== index);
+      // The Library is never empty.
+      if (splashPages.length === 0) {
+        return libraryReducer({ ...library, splashPages }, { type: "new" });
+      }
+      return {
+        splashPages,
+        openSplashPageId: splashPages[Math.max(index - 1, 0)].id,
+      };
+    }
     default:
       return withOpenSplashPage(
         library,
@@ -69,13 +96,8 @@ export function openSplashPage(library: Library): SplashPage {
   return openEntry(library).splashPage;
 }
 
-/** The name of the Open Splash Page, shown in the Library and the Editor. */
-export function openSplashPageName(library: Library): string {
-  return openEntry(library).name;
-}
-
-/** The Library's entry for the Open Splash Page. */
-function openEntry(library: Library) {
+/** The Open Splash Page's Library entry. */
+function openEntry(library: Library): LibraryEntry {
   const entry = library.splashPages.find(
     ({ id }) => id === library.openSplashPageId,
   );
