@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { splashPageReducer, starterSplashPage } from "@/splash-page";
+import {
+  splashPageReducer,
+  starterSplashPage,
+  type SplashPage,
+} from "@/splash-page";
 
 const hexColour = /^#[0-9a-f]{6}$/i;
 
@@ -54,5 +58,19 @@ describe("Input Fields", () => {
     });
 
     expect(splashPage).toBe(starterSplashPage);
+  });
+
+  it("adding a third Input Field returns the Splash Page unchanged", () => {
+    const twoInputFields: SplashPage = {
+      ...starterSplashPage,
+      inputFields: [{ type: "Email" }, { type: "Name" }],
+    };
+
+    const splashPage = splashPageReducer(twoInputFields, {
+      type: "addInputField",
+      inputFieldType: "Phone",
+    });
+
+    expect(splashPage).toBe(twoInputFields);
   });
 });
