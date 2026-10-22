@@ -122,6 +122,43 @@ test.describe("with a dark colour scheme", () => {
     }
   });
 
+  test("the Library and its buttons stay readable, also while hovered", async ({
+    page,
+    isMobile,
+  }) => {
+    await page.goto("/");
+    const editor = page.getByRole("region", { name: "Editor" });
+    const library = page.getByRole("navigation", { name: "Library" });
+    const buttons = [
+      editor.getByRole("button", { name: "Duplicate" }),
+      editor.getByRole("button", { name: "Delete" }),
+      library.getByRole("button", { name: "New Splash Page" }),
+      library.getByRole("button", { name: "My Splash Page" }),
+    ];
+    if (isMobile) {
+      const libraryButton = page.getByRole("button", { name: "Library" });
+      const { text, background } = await colours(libraryButton);
+      expect(contrast(text, background), "Library").toBeGreaterThanOrEqual(4.5);
+      await libraryButton.click();
+    }
+
+    for (const button of buttons) {
+      const name = await button.textContent();
+      const resting = await colours(button);
+      expect(
+        contrast(resting.text, resting.background),
+        `${name}`,
+      ).toBeGreaterThanOrEqual(4.5);
+      if (isMobile) continue;
+      await button.hover();
+      const hovered = await colours(button);
+      expect(
+        contrast(hovered.text, hovered.background),
+        `${name} hovered`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
   test("the Device toggle is dark, with readable options", async ({ page }) => {
     await page.goto("/");
     const options = page
