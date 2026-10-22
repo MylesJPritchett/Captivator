@@ -2,7 +2,13 @@
 
 import { useReducer, useState } from "react";
 import { Editor, jumpToEditorArea, jumpToTextBlock } from "@/editor";
-import { defaultDevice, DeviceToggle, Preview, type Device } from "@/preview";
+import {
+  defaultDevice,
+  DeviceToggle,
+  Preview,
+  type Device,
+  type PreviewTarget,
+} from "@/preview";
 import { splashPageReducer, starterSplashPage } from "@/splash-page";
 
 export default function Home() {
@@ -25,8 +31,7 @@ export default function Home() {
         <Preview
           splashPage={splashPage}
           device={device}
-          onJump={jumpToEditorArea}
-          onJumpToTextBlock={jumpToTextBlock}
+          onClickElement={jumpToEditorFor}
         />
       </section>
 
@@ -45,4 +50,10 @@ export default function Home() {
       </section>
     </main>
   );
+}
+
+/** Takes the Customer to the Editor controls for what they clicked in the Preview. */
+function jumpToEditorFor(target: PreviewTarget) {
+  if (target.element === "textBlock") jumpToTextBlock(target.id);
+  else jumpToEditorArea(target.element);
 }

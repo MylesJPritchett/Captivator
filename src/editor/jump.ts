@@ -1,6 +1,8 @@
+import type { TextBlock } from "@/splash-page";
+
 /** The glossary area each Editor section controls. */
 export type EditorArea =
-  "logo" | "background" | "text" | "inputFields" | "connectButton";
+  "logo" | "background" | "textBlocks" | "inputFields" | "connectButton";
 
 /** The attribute that marks an Editor section with the area it controls. */
 export const editorAreaAttribute = "data-editor-area";
@@ -19,7 +21,7 @@ export function jumpToEditorArea(area: EditorArea) {
 }
 
 /** The DOM id of a Text Block's text input in the Editor. */
-export function textBlockTextInputId(textBlockId: string) {
+export function textBlockTextInputId(textBlockId: TextBlock["id"]) {
   return `text-block-${textBlockId}-text`;
 }
 
@@ -27,7 +29,7 @@ export function textBlockTextInputId(textBlockId: string) {
  * Takes the Customer to one Text Block's controls: scrolls them into view and
  * focuses that Text Block's text input.
  */
-export function jumpToTextBlock(textBlockId: string) {
+export function jumpToTextBlock(textBlockId: TextBlock["id"]) {
   const input = document.getElementById(textBlockTextInputId(textBlockId));
   if (input) jumpTo(input.parentElement ?? input, input);
 }

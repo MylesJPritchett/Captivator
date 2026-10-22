@@ -10,7 +10,7 @@ export function PreviewTextBlocks({
   onClick,
 }: {
   textBlocks: TextBlock[];
-  onClick: (textBlockId: string) => void;
+  onClick: (textBlockId: TextBlock["id"]) => void;
 }) {
   return (
     <>

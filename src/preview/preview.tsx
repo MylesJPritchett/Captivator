@@ -1,5 +1,4 @@
 import type { MouseEvent } from "react";
-import type { EditorArea } from "@/editor";
 import type { SplashPage } from "@/splash-page";
 import { backgroundStyle } from "./background-style";
 import type { Device } from "./device";
@@ -7,31 +6,27 @@ import { DeviceFrame } from "./device-frame";
 import { PreviewConnectButton } from "./preview-connect-button";
 import { PreviewInputFields } from "./preview-input-fields";
 import { PreviewLogo } from "./preview-logo";
+import type { PreviewTarget } from "./preview-target";
 import { PreviewTextBlocks } from "./preview-text-blocks";
 
 type PreviewProps = {
   splashPage: SplashPage;
   device: Device;
-  /** Called when the Customer clicks an element, with the area it shows. */
-  onJump: (area: EditorArea) => void;
-  /** Called when the Customer clicks a Text Block, with its id. */
-  onJumpToTextBlock: (textBlockId: string) => void;
+  /** Called when the Customer clicks an element, with what they clicked. */
+  onClickElement: (target: PreviewTarget) => void;
 };
 
 /**
  * Renders a Splash Page as a Guest would see it on the given Device, in the
  * fixed centred order Logo → Text Blocks → Input Fields → Connect Button.
  */
-export function Preview({
-  splashPage,
-  device,
-  onJump,
-  onJumpToTextBlock,
-}: PreviewProps) {
-  // The Background, and the empty layout around the content, jump to the
+export function Preview({ splashPage, device, onClickElement }: PreviewProps) {
+  // The Background, and the empty layout around the content, count as the
   // Background only when the click lands on them, not on an element on top.
-  const jumpToBackground = (event: MouseEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget) onJump("background");
+  const clickBackground = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      onClickElement({ element: "background" });
+    }
   };
 
   return (
@@ -42,24 +37,27 @@ export function Preview({
         aria-label="Background"
         className="flex h-full w-full cursor-pointer overflow-y-auto"
         style={backgroundStyle(splashPage.background)}
-        onClick={jumpToBackground}
+        onClick={clickBackground}
       >
         <div
-          onClick={jumpToBackground}
+          onClick={clickBackground}
           className="m-auto flex w-full max-w-[420px] flex-col items-center gap-4 px-6 py-10 text-center"
         >
-          <PreviewLogo logo={splashPage.logo} onClick={() => onJump("logo")} />
+          <PreviewLogo
+            logo={splashPage.logo}
+            onClick={() => onClickElement({ element: "logo" })}
+          />
           <PreviewTextBlocks
             textBlocks={splashPage.textBlocks}
-            onClick={onJumpToTextBlock}
+            onClick={(id) => onClickElement({ element: "textBlock", id })}
           />
           <PreviewInputFields
             inputFields={splashPage.inputFields}
-            onClick={() => onJump("inputFields")}
+            onClick={() => onClickElement({ element: "inputFields" })}
           />
           <PreviewConnectButton
             connectButton={splashPage.connectButton}
-            onClick={() => onJump("connectButton")}
+            onClick={() => onClickElement({ element: "connectButton" })}
           />
         </div>
       </div>
