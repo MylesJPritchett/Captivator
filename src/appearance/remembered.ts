@@ -1,4 +1,4 @@
-import { defaultAppearance, type Appearance } from "./appearance";
+import { defaultAppearance, isAppearance, type Appearance } from "./appearance";
 
 /**
  * Where the Customer's Appearance is remembered in this browser, apart from
@@ -12,7 +12,7 @@ export function loadAppearance(storage: Storage): Appearance {
   try {
     // Throws if this browser blocks storage.
     const saved = storage.getItem(savedAppearanceKey);
-    return saved === "light" || saved === "dark" ? saved : defaultAppearance;
+    return isAppearance(saved) ? saved : defaultAppearance;
   } catch {
     return defaultAppearance;
   }
@@ -21,8 +21,9 @@ export function loadAppearance(storage: Storage): Appearance {
 /**
  * An inline script for the root layout's <head>, which puts the remembered
  * Appearance on <html> while the page is parsed, before first paint, so a
- * reload never flashes the other colour scheme. Reads like `loadAppearance`;
- * System needs no attribute, so it sets none.
+ * reload never flashes the other colour scheme. Reads like `loadAppearance`,
+ * with its own copy of the valid `appearances`: keep the two in step. System
+ * needs no attribute, so it sets none.
  */
 export const applyRememberedAppearanceScript = `try{var a=localStorage.getItem(${JSON.stringify(savedAppearanceKey)});if(a==="light"||a==="dark")document.documentElement.dataset.appearance=a}catch(e){}`;
 
