@@ -18,8 +18,8 @@ function contrast(a: string, b: string): number {
 
 /**
  * The colours an element, or one of its pseudo-elements, is drawn in: its text
- * colour, and the first opaque background behind it (its own, else its nearest
- * ancestor's).
+ * colour, its accent colour (`auto` when left to the browser), and the first
+ * opaque background behind it (its own, else its nearest ancestor's).
  */
 async function colours(element: Locator, pseudoElement?: string) {
   return element.evaluate((start, pseudo) => {
@@ -45,14 +45,18 @@ async function colours(element: Locator, pseudoElement?: string) {
       const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
       return `rgb(${r}, ${g}, ${b})`;
     };
-    return { text: toRgb(own.color), background: toRgb(background) };
+    return {
+      text: toRgb(own.color),
+      accent: own.accentColor === "auto" ? "auto" : toRgb(own.accentColor),
+      background: toRgb(background),
+    };
   }, pseudoElement);
 }
 
 test.describe("with a dark colour scheme", () => {
   test.use({ colorScheme: "dark" });
 
-  test("the Editor is dark and its image file inputs are readable", async ({
+  test("the Editor is dark and its file inputs and sliders are readable", async ({
     page,
   }) => {
     await page.goto("/");
@@ -70,6 +74,14 @@ test.describe("with a dark colour scheme", () => {
       );
       expect(contrast(text, background), label).toBeGreaterThanOrEqual(4.5);
     }
+
+    // A slider's fill is drawn in its accent colour; the browser's default
+    // needn't suit the Editor's colours.
+    const { accent, background } = await colours(
+      editor.getByLabel("Text Block 1 size"),
+    );
+    expect(accent).not.toBe("auto");
+    expect(contrast(accent, background)).toBeGreaterThanOrEqual(3);
   });
 
   test("the Editor's buttons stay readable while hovered", async ({

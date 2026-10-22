@@ -23,7 +23,7 @@ export function ColourControl({
         type="color"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className={`h-9 w-14 cursor-pointer rounded-md border border-control-border ${focusRing}`}
+        className={`h-9 w-14 cursor-pointer rounded-md border border-control-border bg-control ${focusRing}`}
       />
     </div>
   );

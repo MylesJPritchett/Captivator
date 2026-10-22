@@ -64,7 +64,7 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
                     size: Number(event.target.value),
                   })
                 }
-                className={`flex-1 ${focusRing}`}
+                className={`flex-1 accent-primary ${focusRing}`}
               />
               <output
                 htmlFor={sizeId}
