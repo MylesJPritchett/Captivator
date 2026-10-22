@@ -261,7 +261,7 @@ function chooseAppearance(page: Page, name: "Light" | "System" | "Dark") {
     .check();
 }
 
-test("choosing Dark Appearance makes the Editor dark in a light colour scheme", async ({
+test("choosing Dark Appearance makes the Editor and the Device toggle dark in a light colour scheme", async ({
   page,
 }) => {
   await page.emulateMedia({ colorScheme: "light" });
@@ -273,6 +273,13 @@ test("choosing Dark Appearance makes the Editor dark in a light colour scheme", 
   expect(luminance(pageBackground)).toBeLessThan(0.1);
   expect(luminance(button)).toBeLessThan(0.1);
   expect(luminance(text)).toBeGreaterThan(0.5);
+  const deviceOptions = page
+    .getByRole("group", { name: "Device" })
+    .locator("label");
+  await expect(deviceOptions).not.toHaveCount(0);
+  for (const option of await deviceOptions.all()) {
+    expect(luminance((await colours(option)).background)).toBeLessThan(0.2);
+  }
 });
 
 test("choosing Light Appearance makes the Editor light in a dark colour scheme", async ({
