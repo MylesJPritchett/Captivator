@@ -6,6 +6,7 @@ import { vi } from "vitest";
 import {
   savedLibraryKey,
   savedSplashPageKey,
+  type Library,
   type SplashPage,
 } from "@/splash-page";
 
@@ -99,9 +100,27 @@ export function storageFull() {
   return new DOMException("The quota has been exceeded.", "QuotaExceededError");
 }
 
-/** Seeds a saved Library value as is, as if saved on an earlier visit. */
-export async function seedSavedLibrary(saved: string) {
-  await set(savedLibraryKey, saved);
+/**
+ * Seeds a saved Library value as is, as if saved on an earlier visit, under
+ * the current key unless given another.
+ */
+export async function seedSavedLibrary(saved: string, key = savedLibraryKey) {
+  await set(key, saved);
+}
+
+/**
+ * A saved Library holding one Splash Page, open, as Captivator saves it; with
+ * any fields of the Library replaced by `overrides`.
+ */
+export function savedLibrary(
+  splashPage: SplashPage,
+  overrides: Partial<Library> = {},
+) {
+  return JSON.stringify({
+    splashPages: [{ id: "saved", name: "My Splash Page", splashPage }],
+    openSplashPageId: "saved",
+    ...overrides,
+  });
 }
 
 /**
@@ -109,10 +128,5 @@ export async function seedSavedLibrary(saved: string) {
  * earlier visit.
  */
 export async function seedSavedSplashPage(splashPage: SplashPage) {
-  await seedSavedLibrary(
-    JSON.stringify({
-      splashPages: [{ id: "saved", name: "My Splash Page", splashPage }],
-      openSplashPageId: "saved",
-    }),
-  );
+  await seedSavedLibrary(savedLibrary(splashPage));
 }

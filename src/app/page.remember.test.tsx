@@ -5,7 +5,9 @@ import {
   editTextBlock1,
   imageDataUrl,
   renderCaptivator,
-  savedSplashPageKey,
+  savedLibrary,
+  savedLibraryKey,
+  seedSavedLibrary,
   seedSavedSplashPage,
 } from "@/app/test-helpers";
 import type { SplashPage } from "@/splash-page";
@@ -78,32 +80,42 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
 
   it.each([
     ["isn't JSON", "{not json"],
-    ["isn't a Splash Page", JSON.stringify({ textBlocks: "Free WiFi" })],
+    ["isn't a Library", JSON.stringify({ textBlocks: "Free WiFi" })],
+    [
+      "has no Splash Pages",
+      JSON.stringify({ splashPages: [], openSplashPageId: "saved" }),
+    ],
+    [
+      "has no Splash Page with the open id",
+      savedLibrary(savedSplashPage, { openSplashPageId: "missing" }),
+    ],
     [
       "has a Text Block missing its size",
-      JSON.stringify({
+      savedLibrary({
         ...savedSplashPage,
-        textBlocks: [{ id: "t", text: "Welcome to the Café", colour: "#fff" }],
+        textBlocks: [
+          { id: "t", text: "Welcome to the Café", colour: "#fff" },
+        ] as SplashPage["textBlocks"],
       }),
     ],
     [
       "has more than two Input Fields",
-      JSON.stringify({
+      savedLibrary({
         ...savedSplashPage,
         inputFields: [{ type: "Name" }, { type: "Email" }, { type: "Phone" }],
       }),
     ],
     [
       "has two Input Fields of the same type",
-      JSON.stringify({
+      savedLibrary({
         ...savedSplashPage,
         inputFields: [{ type: "Email" }, { type: "Email" }],
       }),
     ],
   ])(
-    "a saved Splash Page that %s opens the Preview on the Starter Splash Page",
+    "a saved Library that %s opens the Preview on the Starter Splash Page",
     async (_, saved) => {
-      localStorage.setItem(savedSplashPageKey, saved);
+      await seedSavedLibrary(saved);
 
       const { preview } = await renderCaptivator();
 
@@ -114,10 +126,10 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
     },
   );
 
-  it("a Splash Page saved under an older version opens the Preview on the Starter Splash Page", async () => {
-    localStorage.setItem(
-      olderVersionKey(savedSplashPageKey),
-      JSON.stringify(savedSplashPage),
+  it("a Library saved under an older version opens the Preview on the Starter Splash Page", async () => {
+    await seedSavedLibrary(
+      savedLibrary(savedSplashPage),
+      olderVersionKey(savedLibraryKey),
     );
 
     const { preview } = await renderCaptivator();
