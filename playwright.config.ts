@@ -35,6 +35,7 @@ export default defineConfig({
   webServer: {
     command: `pnpm build && pnpm start --port ${PORT}`,
     url: baseURL,
+    // Locally, reuses any server already on :3000, even `pnpm dev`.
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },

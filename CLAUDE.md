@@ -24,6 +24,8 @@ This is Next.js 16 with the App Router. Read `AGENTS.md` before writing Next.js 
 | `pnpm test:coverage` | Vitest with v8 coverage (reported, never enforced)   |
 | `pnpm test:e2e`      | Playwright, Chromium, desktop + mobile; builds first |
 
+Locally, `pnpm test:e2e` reuses any server already listening on :3000, including `pnpm dev`. Stop it first if you need to test the production build.
+
 Before saying work is done, run `format:check`, `lint`, `typecheck` and `test`. Run `test:e2e` when you touch browser behaviour. On NixOS the downloaded Chromium can't run; set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to a system Chromium.
 
 ### Red-green-refactor
