@@ -84,4 +84,38 @@ describe("Library", () => {
       { id: "bar", name: "Bar", splashPage: bar },
     ]);
   });
+
+  it("Duplicate adds a copy of the Open Splash Page, images included, named Copy of its name at the bottom of the Library and opens it", () => {
+    const withImages: Library = {
+      ...cafeAndBar,
+      splashPages: [
+        {
+          id: "cafe",
+          name: "Café",
+          splashPage: {
+            ...cafe,
+            logo: "data:image/png;base64,logo",
+            background: {
+              kind: "image",
+              colour: "#ffffff",
+              imageUrl: "data:image/png;base64,background",
+            },
+          },
+        },
+        cafeAndBar.splashPages[1],
+      ],
+    };
+
+    const library = libraryReducer(withImages, { type: "duplicate" });
+
+    expect(library.splashPages).toHaveLength(3);
+    expect(library.splashPages.slice(0, 2)).toEqual(withImages.splashPages);
+    const copy = library.splashPages[2];
+    expect(copy).toMatchObject({
+      name: "Copy of Café",
+      splashPage: withImages.splashPages[0].splashPage,
+    });
+    expect(["cafe", "bar"]).not.toContain(copy.id);
+    expect(library.openSplashPageId).toBe(copy.id);
+  });
 });

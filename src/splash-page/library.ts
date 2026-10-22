@@ -1,13 +1,16 @@
 import { splashPageReducer, type SplashPageAction } from "./reducer";
 import { starterSplashPage } from "./starter";
-import type { Library, SplashPage } from "./types";
+import type { Library, LibraryEntry, SplashPage } from "./types";
 
 /**
  * Every change to the Library. Any action other than the Library's own is a
  * Splash Page action, for the Open Splash Page only.
  */
 export type LibraryAction =
-  { type: "new" } | { type: "open"; id: string } | SplashPageAction;
+  | { type: "new" }
+  | { type: "open"; id: string }
+  | { type: "duplicate" }
+  | SplashPageAction;
 
 /** The name a new Splash Page starts with. */
 export const untitledSplashPageName = "Untitled Splash Page";
@@ -36,6 +39,17 @@ export function libraryReducer(
       return library.splashPages.some(({ id }) => id === action.id)
         ? { ...library, openSplashPageId: action.id }
         : library;
+    case "duplicate": {
+      const open = openEntry(library);
+      const id = unusedId(library);
+      return {
+        splashPages: [
+          ...library.splashPages,
+          { id, name: `Copy of ${open.name}`, splashPage: open.splashPage },
+        ],
+        openSplashPageId: id,
+      };
+    }
     default:
       return withOpenSplashPage(
         library,
@@ -46,11 +60,16 @@ export function libraryReducer(
 
 /** The Splash Page the Editor and Preview are showing. */
 export function openSplashPage(library: Library): SplashPage {
+  return openEntry(library).splashPage;
+}
+
+/** The Open Splash Page's Library entry. */
+function openEntry(library: Library): LibraryEntry {
   const entry = library.splashPages.find(
     ({ id }) => id === library.openSplashPageId,
   );
   if (!entry) throw new Error("The Library has no Open Splash Page");
-  return entry.splashPage;
+  return entry;
 }
 
 /** The Library with the Open Splash Page replaced by `splashPage`. */
