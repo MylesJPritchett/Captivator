@@ -14,4 +14,17 @@ describe("Connect Button", () => {
     });
     expect(splashPage.textBlocks).toEqual(starterSplashPage.textBlocks);
   });
+
+  it("setting the Connect Button text colour changes only that colour", () => {
+    const splashPage = splashPageReducer(starterSplashPage, {
+      type: "setConnectButtonTextColour",
+      colour: "#111827",
+    });
+
+    expect(splashPage.connectButton).toEqual({
+      backgroundColour: starterSplashPage.connectButton.backgroundColour,
+      textColour: "#111827",
+    });
+    expect(splashPage.textBlocks).toEqual(starterSplashPage.textBlocks);
+  });
 });

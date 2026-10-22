@@ -1,10 +1,9 @@
 import type { SplashPageAction } from "./reducer";
 import type { Colour, SplashPage } from "./types";
 
-export type ConnectButtonAction = {
-  type: "setConnectButtonBackgroundColour";
-  colour: Colour;
-};
+export type ConnectButtonAction =
+  | { type: "setConnectButtonBackgroundColour"; colour: Colour }
+  | { type: "setConnectButtonTextColour"; colour: Colour };
 
 export function connectButtonReducer(
   splashPage: SplashPage,
@@ -17,6 +16,14 @@ export function connectButtonReducer(
         connectButton: {
           ...splashPage.connectButton,
           backgroundColour: action.colour,
+        },
+      };
+    case "setConnectButtonTextColour":
+      return {
+        ...splashPage,
+        connectButton: {
+          ...splashPage.connectButton,
+          textColour: action.colour,
         },
       };
     default:
