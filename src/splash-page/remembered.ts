@@ -1,3 +1,4 @@
+import { inputFieldTypes, maxInputFields } from "./input-fields";
 import { starterSplashPage } from "./starter";
 import type {
   Background,
@@ -94,7 +95,9 @@ function isBackground(value: unknown): value is Background {
     isObject(value) &&
     (value.kind === "colour" || value.kind === "image") &&
     isString(value.colour) &&
-    isOptionalString(value.imageUrl)
+    isOptionalString(value.imageUrl) &&
+    // An image Background always has an image to show.
+    (value.kind === "colour" || isString(value.imageUrl))
   );
 }
 
@@ -111,7 +114,17 @@ function isTextBlock(value: unknown): value is TextBlock {
 function isInputField(value: unknown): value is InputField {
   return (
     isObject(value) &&
-    (value.type === "Name" || value.type === "Email" || value.type === "Phone")
+    inputFieldTypes.includes(value.type as InputField["type"])
+  );
+}
+
+/** At most `maxInputFields` Input Fields, never two of the same type. */
+function isInputFields(value: unknown): value is InputField[] {
+  return (
+    Array.isArray(value) &&
+    value.length <= maxInputFields &&
+    value.every(isInputField) &&
+    new Set(value.map((inputField) => inputField.type)).size === value.length
   );
 }
 
@@ -123,7 +136,10 @@ function isConnectButton(value: unknown): value is ConnectButton {
   );
 }
 
-/** Whether a parsed save has the shape of a Splash Page. */
+/**
+ * Whether a parsed save has the shape of a Splash Page and keeps the
+ * reducer's domain rules.
+ */
 function isSplashPage(value: unknown): value is SplashPage {
   return (
     isObject(value) &&
@@ -131,8 +147,7 @@ function isSplashPage(value: unknown): value is SplashPage {
     isBackground(value.background) &&
     Array.isArray(value.textBlocks) &&
     value.textBlocks.every(isTextBlock) &&
-    Array.isArray(value.inputFields) &&
-    value.inputFields.every(isInputField) &&
+    isInputFields(value.inputFields) &&
     isConnectButton(value.connectButton)
   );
 }

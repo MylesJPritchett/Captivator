@@ -2,9 +2,13 @@ import type { SplashPageAction } from "./reducer";
 import type { InputFieldType, SplashPage } from "./types";
 
 /** A Splash Page has at most this many Input Fields. */
-const maxInputFields = 2;
+export const maxInputFields = 2;
 
-const inputFieldTypes: readonly InputFieldType[] = ["Name", "Email", "Phone"];
+export const inputFieldTypes: readonly InputFieldType[] = [
+  "Name",
+  "Email",
+  "Phone",
+];
 
 /**
  * The Input Field types that can be added to this Splash Page: those not yet

@@ -84,6 +84,27 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
         textBlocks: [{ id: "t", text: "Welcome to the Café", colour: "#fff" }],
       }),
     ],
+    [
+      "has more than two Input Fields",
+      JSON.stringify({
+        ...savedSplashPage,
+        inputFields: [{ type: "Name" }, { type: "Email" }, { type: "Phone" }],
+      }),
+    ],
+    [
+      "has two Input Fields of the same type",
+      JSON.stringify({
+        ...savedSplashPage,
+        inputFields: [{ type: "Email" }, { type: "Email" }],
+      }),
+    ],
+    [
+      "has an image Background with no image",
+      JSON.stringify({
+        ...savedSplashPage,
+        background: { kind: "image", colour: "#000000" },
+      }),
+    ],
   ])(
     "a saved Splash Page that %s opens the Preview on the Starter Splash Page",
     (_, saved) => {
