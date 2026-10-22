@@ -1,7 +1,12 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { pickColour, renderCaptivator } from "@/app/test-helpers";
+import {
+  imageFile,
+  pickColour,
+  renderCaptivator,
+  stubObjectUrls,
+} from "@/app/test-helpers";
 
 describe("Captivator: Editor and Preview", () => {
   it("the Preview shows the starter Splash Page", () => {
@@ -30,11 +35,32 @@ describe("Captivator: Editor and Preview", () => {
     // A Guest sees them enabled, so the Preview mustn't grey them out.
     expect(email).toBeEnabled();
     expect(connectButton).toBeEnabled();
+  });
 
-    // Keyboard focus skips them: from the Device toggle it goes to the Editor.
-    screen.getByRole("radio", { name: "Mobile" }).focus();
-    await user.tab();
-    expect(preview).not.toContainElement(document.activeElement as HTMLElement);
+  describe("with a Logo, Text Blocks, Input Fields and the Connect Button all shown", () => {
+    stubObjectUrls();
+
+    it("the Preview's elements are pointer-only: Tab goes from the Device toggle straight to the first Editor control", async () => {
+      const user = userEvent.setup();
+      const { preview, editor } = renderCaptivator();
+      await user.upload(
+        within(editor).getByLabelText("Logo image"),
+        imageFile("cafe-logo.png"),
+      );
+      expect(within(preview).getByRole("img", { name: "Logo" })).toBeVisible();
+      expect(within(preview).getByText("Free WiFi")).toBeVisible();
+      expect(
+        within(preview).getByRole("textbox", { name: "Email" }),
+      ).toBeVisible();
+      expect(
+        within(preview).getByRole("button", { name: "Connect" }),
+      ).toBeVisible();
+
+      screen.getByRole("radio", { name: "Mobile" }).focus();
+      await user.tab();
+
+      expect(within(editor).getByLabelText("Logo image")).toHaveFocus();
+    });
   });
 
   it("tells the Customer the design isn't saved on refresh", () => {
