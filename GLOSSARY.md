@@ -49,5 +49,5 @@ A live rendering of the Splash Page as a Guest would see it on the chosen Device
 _Avoid_: Canvas, mockup, render
 
 **Device**:
-The screen size the Preview simulates: Mobile or Desktop.
+The screen size the Preview simulates: Mobile or Desktop. The Customer toggles between them; the Preview shows one at a time.
 _Avoid_: Viewport, breakpoint, mode
