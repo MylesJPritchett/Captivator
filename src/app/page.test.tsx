@@ -70,4 +70,50 @@ describe("Captivator: Device toggle", () => {
       within(preview).getByRole("figure", { name: "Mobile Preview" }),
     ).toBeInTheDocument();
   });
+
+  it("choosing Desktop shows the Desktop frame, and choosing Mobile switches back", async () => {
+    const user = userEvent.setup();
+    const { preview } = renderCaptivator();
+
+    await user.click(screen.getByRole("radio", { name: "Desktop" }));
+
+    expect(screen.getByRole("radio", { name: "Desktop" })).toBeChecked();
+    expect(
+      within(preview).getByRole("figure", { name: "Desktop Preview" }),
+    ).toBeInTheDocument();
+    expect(
+      within(preview).queryByRole("figure", { name: "Mobile Preview" }),
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("radio", { name: "Mobile" }));
+
+    expect(
+      within(preview).getByRole("figure", { name: "Mobile Preview" }),
+    ).toBeInTheDocument();
+    expect(
+      within(preview).queryByRole("figure", { name: "Desktop Preview" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("switching Device leaves the Splash Page unchanged", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+
+    const textBlockText = within(editor).getByRole("textbox", {
+      name: "Text Block 1 text",
+    });
+    await user.clear(textBlockText);
+    await user.type(textBlockText, "Welcome to the Café");
+
+    await user.click(screen.getByRole("radio", { name: "Desktop" }));
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("radio", { name: "Mobile" }));
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
+    expect(textBlockText).toHaveValue("Welcome to the Café");
+  });
 });
