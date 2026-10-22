@@ -53,7 +53,9 @@ describe("Captivator: Editor and Preview", () => {
     await user.clear(textBlockText);
     await user.type(textBlockText, "Welcome to the Café");
 
-    expect(within(preview).getByText("Welcome to the Café")).toBeInTheDocument();
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
     expect(within(preview).queryByText("Free WiFi")).not.toBeInTheDocument();
   });
 });
