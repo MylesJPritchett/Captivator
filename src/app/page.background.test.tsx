@@ -25,7 +25,8 @@ function renderCaptivator() {
   return {
     preview,
     editor: screen.getByRole("region", { name: "Editor" }),
-    background: () => within(preview).getByRole("img", { name: "Background" }),
+    background: () =>
+      within(preview).getByRole("group", { name: "Background" }),
   };
 }
 
