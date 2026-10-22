@@ -18,6 +18,10 @@ _Avoid_: Visitor, end user, user
 The branded page a Guest sees when joining the WiFi; the thing a Customer designs.
 _Avoid_: Captive portal, landing page, template
 
+**Starter Splash Page**:
+The ready-made Splash Page the Editor opens on, and what Reset returns to.
+_Avoid_: Default, template, blank page
+
 **Logo**:
 A single image the Customer uploads to brand the Splash Page.
 _Avoid_: Image, brand image
