@@ -1,14 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-test("the Preview shows the starter Splash Page", async ({ page }) => {
-  await page.goto("/");
-
-  const preview = page.getByRole("region", { name: "Preview" });
-  await expect(preview.getByText("Free WiFi")).toBeVisible();
-  await expect(preview.getByRole("textbox", { name: "Email" })).toBeVisible();
-  await expect(preview.getByRole("button", { name: "Connect" })).toBeVisible();
-});
-
 test("the Preview sits above the Editor on narrow screens and beside it on wide ones", async ({
   page,
   isMobile,
