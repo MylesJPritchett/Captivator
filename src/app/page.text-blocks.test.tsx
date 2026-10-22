@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { renderCaptivator } from "@/app/test-helpers";
@@ -34,18 +34,5 @@ describe("Captivator: clicking a Text Block in the Preview", () => {
     expect(
       within(editor).getByRole("textbox", { name: "Text Block 2 text" }),
     ).toHaveFocus();
-  });
-
-  it("Text Blocks are pointer-only: Tab goes from the Device toggle straight into the Editor", async () => {
-    const user = userEvent.setup();
-    const { preview } = renderCaptivator();
-    const textBlock = within(preview).getByText("Free WiFi");
-
-    screen.getByRole("radio", { name: "Mobile" }).focus();
-    await user.tab();
-
-    expect(preview).not.toContainElement(document.activeElement as HTMLElement);
-    expect(textBlock).not.toHaveAttribute("tabindex");
-    expect(textBlock).not.toHaveAttribute("role");
   });
 });

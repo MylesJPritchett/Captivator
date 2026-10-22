@@ -4,8 +4,6 @@ import Home from "@/app/page";
 
 /** Renders Captivator and returns its Preview and Editor regions. */
 export function renderCaptivator() {
-  // jsdom has no scrollIntoView, which click-to-jump calls; make it a no-op.
-  Element.prototype.scrollIntoView ??= () => {};
   render(<Home />);
   const preview = screen.getByRole("region", { name: "Preview" });
   return {

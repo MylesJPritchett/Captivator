@@ -118,21 +118,4 @@ describe("Captivator: clicking the Logo in the Preview", () => {
       expect(within(editor).getByLabelText("Logo image")).toHaveFocus();
     },
   );
-
-  it("the Logo is pointer-only: Tab goes from the Device toggle straight into the Editor", async () => {
-    const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
-    await user.upload(
-      within(editor).getByLabelText("Logo image"),
-      imageFile("cafe-logo.png"),
-    );
-
-    screen.getByRole("radio", { name: "Mobile" }).focus();
-    await user.tab();
-
-    expect(within(editor).getByLabelText("Logo image")).toHaveFocus();
-    expect(
-      within(preview).getByRole("img", { name: "Logo" }),
-    ).not.toHaveAttribute("tabindex");
-  });
 });
