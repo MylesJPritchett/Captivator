@@ -1,3 +1,5 @@
+import { focusWithinRing } from "./focus-ring";
+
 type SegmentedControlProps<Value extends string> = {
   /** Names the radio group for assistive technology. */
   legend: string;
@@ -30,7 +32,7 @@ export function SegmentedControl<Value extends string>({
         {options.map((option) => (
           <label
             key={option.value}
-            className="relative cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium text-muted has-[:checked]:bg-control-selected has-[:checked]:text-foreground has-[:checked]:shadow has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-focus"
+            className={`relative cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium text-muted has-[:checked]:bg-control-selected has-[:checked]:text-foreground has-[:checked]:shadow ${focusWithinRing}`}
           >
             <input
               type="radio"
