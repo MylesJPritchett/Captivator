@@ -3,6 +3,6 @@ export { defaultAppearance, type Appearance } from "./appearance";
 export {
   applyRememberedAppearanceScript,
   loadAppearance,
-  rememberedAppearanceKey,
+  savedAppearanceKey,
   saveAppearance,
 } from "./remembered";

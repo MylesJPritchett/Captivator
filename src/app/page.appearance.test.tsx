@@ -2,7 +2,7 @@ import { cleanup, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { renderCaptivator } from "@/app/test-helpers";
-import { rememberedAppearanceKey } from "@/appearance";
+import { savedAppearanceKey } from "@/appearance";
 
 function appearance() {
   return screen.getByRole("group", { name: "Appearance" });
@@ -57,7 +57,7 @@ describe("Captivator: Appearance", () => {
   ])(
     "a remembered Appearance that %s opens on System Appearance",
     (_, saved) => {
-      localStorage.setItem(rememberedAppearanceKey, saved);
+      localStorage.setItem(savedAppearanceKey, saved);
 
       renderCaptivator();
 
