@@ -168,4 +168,15 @@ describe("Captivator: the Library", () => {
       within(preview).queryByText(/My Splash Page/),
     ).not.toBeInTheDocument();
   });
+
+  it("after New Splash Page, focus moves to the Name field", async () => {
+    const user = userEvent.setup();
+    const { editor } = await renderCaptivator();
+
+    await user.click(
+      within(library()).getByRole("button", { name: "New Splash Page" }),
+    );
+
+    expect(within(editor).getByRole("textbox", { name: "Name" })).toHaveFocus();
+  });
 });

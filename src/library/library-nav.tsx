@@ -10,15 +10,21 @@ import { focusRing } from "@/ui/focus-ring";
 export function LibraryNav({
   library,
   dispatch,
+  onNew,
 }: {
   library: Library;
   dispatch: Dispatch<LibraryAction>;
+  /** Called once a new Splash Page is open. */
+  onNew: () => void;
 }) {
   return (
     <nav aria-label="Library" className="flex flex-col gap-3">
       <button
         type="button"
-        onClick={() => dispatch({ type: "new" })}
+        onClick={() => {
+          dispatch({ type: "new" });
+          onNew();
+        }}
         className={`rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-100 ${focusRing}`}
       >
         New Splash Page

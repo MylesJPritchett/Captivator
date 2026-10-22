@@ -41,3 +41,8 @@ export function NameField({
     </div>
   );
 }
+
+/** Moves focus to the Name field, ready to name the Open Splash Page. */
+export function focusNameField() {
+  document.getElementById(nameFieldId)?.focus();
+}

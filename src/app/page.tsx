@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useReducer, useState } from "react";
-import { Editor, jumpToEditorArea, jumpToTextBlock } from "@/editor";
+import {
+  Editor,
+  focusNameField,
+  jumpToEditorArea,
+  jumpToTextBlock,
+} from "@/editor";
 import {
   defaultDevice,
   DeviceToggle,
@@ -63,7 +68,11 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
   return (
     <>
       <div className="w-full lg:sticky lg:top-8 lg:w-56 lg:shrink-0">
-        <LibraryNav library={library} dispatch={dispatch} />
+        <LibraryNav
+          library={library}
+          dispatch={dispatch}
+          onNew={focusNameField}
+        />
       </div>
 
       <section
