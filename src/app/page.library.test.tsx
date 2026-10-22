@@ -112,10 +112,12 @@ describe("Captivator: the Library", () => {
     ).toBeInTheDocument();
   });
 
-  it("the Name field shows the open Splash Page's name, and renaming it there shows the new name in the Library", async () => {
+  it("the Splash Page name field shows the open Splash Page's name, and renaming it there shows the new name in the Library", async () => {
     const user = userEvent.setup();
     const { editor } = await renderCaptivator();
-    const name = within(editor).getByRole("textbox", { name: "Name" });
+    const name = within(editor).getByRole("textbox", {
+      name: "Splash Page name",
+    });
     expect(name).toHaveValue("My Splash Page");
 
     await user.clear(name);
@@ -125,10 +127,12 @@ describe("Captivator: the Library", () => {
     expect(openName()).toEqual(["Corner Café"]);
   });
 
-  it("clearing the Name field names the Splash Page Untitled Splash Page, which the Name field shows once the Customer moves on", async () => {
+  it("clearing the Splash Page name field names the Splash Page Untitled Splash Page, which the Splash Page name field shows once the Customer moves on", async () => {
     const user = userEvent.setup();
     const { editor } = await renderCaptivator();
-    const name = within(editor).getByRole("textbox", { name: "Name" });
+    const name = within(editor).getByRole("textbox", {
+      name: "Splash Page name",
+    });
 
     await user.clear(name);
 
@@ -140,13 +144,15 @@ describe("Captivator: the Library", () => {
     expect(name).toHaveValue("Untitled Splash Page");
   });
 
-  it("opening another Splash Page shows its name in the Name field", async () => {
+  it("opening another Splash Page shows its name in the Splash Page name field", async () => {
     const user = userEvent.setup();
     const { editor } = await renderCaptivator();
     await user.click(
       within(library()).getByRole("button", { name: "New Splash Page" }),
     );
-    const name = within(editor).getByRole("textbox", { name: "Name" });
+    const name = within(editor).getByRole("textbox", {
+      name: "Splash Page name",
+    });
     await user.type(name, " Bar");
 
     await user.click(
@@ -160,17 +166,19 @@ describe("Captivator: the Library", () => {
     ]);
   });
 
-  it("opening another Splash Page shows its name in the Name field, even when it's the name just typed without its spaces", async () => {
+  it("opening another Splash Page shows its name in the Splash Page name field, even when it's the name just typed without its spaces", async () => {
     const user = userEvent.setup();
     const { editor } = await renderCaptivator();
     await user.click(
       within(library()).getByRole("button", { name: "New Splash Page" }),
     );
-    const name = within(editor).getByRole("textbox", { name: "Name" });
+    const name = within(editor).getByRole("textbox", {
+      name: "Splash Page name",
+    });
     await user.clear(name);
     await user.type(name, "My Splash Page ");
 
-    // Some browsers, such as Safari, don't take focus from the Name field when
+    // Some browsers, such as Safari, don't take focus from the Splash Page name field when
     // a button is clicked, so open the Splash Page without moving focus.
     fireEvent.click(
       within(library()).getAllByRole("button", { name: "My Splash Page" })[0],
@@ -184,7 +192,9 @@ describe("Captivator: the Library", () => {
   it("the open Splash Page's name never appears in the Preview", async () => {
     const user = userEvent.setup();
     const { editor, preview } = await renderCaptivator();
-    const name = within(editor).getByRole("textbox", { name: "Name" });
+    const name = within(editor).getByRole("textbox", {
+      name: "Splash Page name",
+    });
 
     await user.clear(name);
     await user.type(name, "Corner Café");
@@ -195,7 +205,7 @@ describe("Captivator: the Library", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("after New Splash Page, focus moves to the Name field", async () => {
+  it("after New Splash Page, focus moves to the Splash Page name field", async () => {
     const user = userEvent.setup();
     const { editor } = await renderCaptivator();
 
@@ -203,7 +213,9 @@ describe("Captivator: the Library", () => {
       within(library()).getByRole("button", { name: "New Splash Page" }),
     );
 
-    expect(within(editor).getByRole("textbox", { name: "Name" })).toHaveFocus();
+    expect(
+      within(editor).getByRole("textbox", { name: "Splash Page name" }),
+    ).toHaveFocus();
   });
 
   it("a long name is given in full to screen readers in the Library", async () => {
@@ -212,7 +224,9 @@ describe("Captivator: the Library", () => {
     const longName =
       "The Corner Café on the High Street, Free WiFi for Every Guest";
 
-    const name = within(editor).getByRole("textbox", { name: "Name" });
+    const name = within(editor).getByRole("textbox", {
+      name: "Splash Page name",
+    });
     await user.clear(name);
     await user.type(name, longName);
 

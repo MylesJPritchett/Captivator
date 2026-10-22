@@ -55,7 +55,7 @@ describe("Captivator: Editor and Preview", () => {
       await user.tab();
 
       expect(
-        within(editor).getByRole("textbox", { name: "Name" }),
+        within(editor).getByRole("textbox", { name: "Splash Page name" }),
       ).toHaveFocus();
     });
   });

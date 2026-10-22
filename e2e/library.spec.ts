@@ -16,7 +16,7 @@ test("a second, renamed Splash Page is still in the Library and open with its ed
 
   await showLibrary(page, isMobile);
   await library.getByRole("button", { name: "New Splash Page" }).click();
-  const name = editor.getByRole("textbox", { name: "Name" });
+  const name = editor.getByRole("textbox", { name: "Splash Page name" });
   await expect(name).toBeFocused();
   await name.fill("Corner Café");
   await editor
@@ -49,7 +49,7 @@ test("a long name is shortened in the Library without widening it", async ({
 
   await page
     .getByRole("region", { name: "Editor" })
-    .getByRole("textbox", { name: "Name" })
+    .getByRole("textbox", { name: "Splash Page name" })
     .fill(longName);
   await showLibrary(page, isMobile);
 

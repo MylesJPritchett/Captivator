@@ -2,7 +2,7 @@ import { useState, type Dispatch } from "react";
 import { splashPageName, type LibraryAction } from "@/splash-page";
 import { focusRing } from "@/ui/focus-ring";
 
-/** The id of the Name field, so focus can be moved to it. */
+/** The id of the Splash Page name field, so focus can be moved to it. */
 export const nameFieldId = "splash-page-name";
 
 /**
@@ -33,7 +33,7 @@ export function NameField({
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor={nameFieldId} className="text-sm font-medium">
-        Name
+        Splash Page name
       </label>
       <input
         id={nameFieldId}
@@ -50,7 +50,7 @@ export function NameField({
   );
 }
 
-/** Moves focus to the Name field, ready to name the Open Splash Page. */
+/** Moves focus to the Splash Page name field, ready to name it. */
 export function focusNameField() {
   document.getElementById(nameFieldId)?.focus();
 }
