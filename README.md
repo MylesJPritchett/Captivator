@@ -64,7 +64,9 @@ CI (GitHub Actions) runs format check, lint, typecheck, Vitest and Playwright on
 
 ## Deploying
 
-The site is hosted on Netlify at <https://captivator.netlify.app/>. Netlify builds it from this repo: `netlify.toml` sets the build command and Node 24, and Netlify's Next.js runtime does the rest. To deploy a copy of your own, connect the repo to a new site in the Netlify UI.
+The site is hosted on Netlify at <https://captivator.netlify.app/>. Every push to `main` deploys it automatically, and every pull request gets a Deploy Preview at `https://deploy-preview-<PR number>--captivator.netlify.app`, linked in a comment from Netlify on the PR.
+
+`netlify.toml` sets the build command and Node 24, and Netlify's Next.js runtime does the rest. To deploy a copy of your own, connect the repo to a new site in the Netlify UI.
 
 ## Docs
 
