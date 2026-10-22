@@ -1,6 +1,6 @@
 import { get, set } from "idb-keyval";
 import { inputFieldTypes, maxInputFields } from "./input-fields";
-import { starterLibrary } from "./starter";
+import { libraryOf, starterLibrary } from "./starter";
 import type {
   Background,
   ConnectButton,
@@ -26,15 +26,33 @@ export const savedLibraryKey = "captivator.library.v1";
 
 /**
  * The remembered Library, or a Library holding one Starter Splash Page if
- * there is none or it can't be read. Never rejects.
+ * there is none or it can't be read. With no Library saved yet, a Splash Page
+ * ADR-0003 remembered in `legacyStorage` becomes its only Splash Page.
+ * Never rejects.
  */
-export async function loadLibrary(): Promise<Library> {
+export async function loadLibrary(legacyStorage: Storage): Promise<Library> {
   try {
     // Rejects if this browser blocks storage.
     const saved: unknown = await get(savedLibraryKey);
+    if (saved === undefined) return carryOver(legacyStorage);
     if (typeof saved !== "string") return starterLibrary;
     const parsed: unknown = JSON.parse(saved);
     return isLibrary(parsed) ? parsed : starterLibrary;
+  } catch {
+    return starterLibrary;
+  }
+}
+
+/**
+ * A Library holding the Splash Page ADR-0003 remembered in `legacyStorage`,
+ * or one Starter Splash Page if there is none or it can't be read.
+ */
+function carryOver(legacyStorage: Storage): Library {
+  try {
+    const saved = legacyStorage.getItem(savedSplashPageKey);
+    if (saved === null) return starterLibrary;
+    const parsed: unknown = JSON.parse(saved);
+    return isSplashPage(parsed) ? libraryOf(parsed) : starterLibrary;
   } catch {
     return starterLibrary;
   }

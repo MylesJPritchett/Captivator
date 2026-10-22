@@ -27,7 +27,7 @@ export default function Home() {
   const [initialLibrary, setInitialLibrary] = useState<Library>();
   useEffect(() => {
     let mounted = true;
-    void loadLibrary().then((library) => {
+    void loadLibrary(localStorage).then((library) => {
       if (mounted) setInitialLibrary(library);
     });
     return () => {

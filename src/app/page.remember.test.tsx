@@ -7,6 +7,7 @@ import {
   renderCaptivator,
   savedLibrary,
   savedLibraryKey,
+  savedSplashPageKey,
   seedSavedLibrary,
   seedSavedSplashPage,
 } from "@/app/test-helpers";
@@ -146,6 +147,23 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
     expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
     expect(
       within(preview).getByRole("textbox", { name: "Email" }),
+    ).toBeInTheDocument();
+  });
+
+  it("a Splash Page remembered in localStorage on an earlier visit (ADR-0003) opens in the Preview, images and all", async () => {
+    localStorage.setItem(savedSplashPageKey, JSON.stringify(savedSplashPage));
+
+    const { preview, background } = await renderCaptivator();
+
+    expect(within(preview).getByRole("img", { name: "Logo" })).toHaveAttribute(
+      "src",
+      imageDataUrl("cafe-logo.png"),
+    );
+    expect(background()).toHaveStyle({
+      backgroundImage: `url("${imageDataUrl("venue.png")}")`,
+    });
+    expect(
+      within(preview).getByText("Welcome to the Café"),
     ).toBeInTheDocument();
   });
 
