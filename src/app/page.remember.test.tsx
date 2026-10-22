@@ -29,6 +29,11 @@ const savedSplashPage: SplashPage = {
   connectButton: { backgroundColour: "#00ff00", textColour: "#000000" },
 };
 
+/** The key one version before `key`, e.g. "….v0" for "….v1". */
+function olderVersionKey(key: string) {
+  return key.replace(/\.v(\d+)$/, (_, version) => `.v${Number(version) - 1}`);
+}
+
 describe("Captivator: remembering the Splash Page in this browser", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -121,7 +126,7 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
 
   it("a Splash Page saved under an older version opens the Preview on the Starter Splash Page", () => {
     localStorage.setItem(
-      "captivator.splashPage.v0",
+      olderVersionKey(savedSplashPageKey),
       JSON.stringify(savedSplashPage),
     );
 

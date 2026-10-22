@@ -13,7 +13,7 @@ import type {
  * version whenever the Splash Page's shape changes; older saves are then
  * ignored rather than migrated.
  */
-const storageKey = "captivator.splashPage.v1";
+export const savedSplashPageKey = "captivator.splashPage.v1";
 
 /**
  * The remembered Splash Page, or the Starter Splash Page if there is none or
@@ -22,7 +22,7 @@ const storageKey = "captivator.splashPage.v1";
 export function loadSplashPage(storage: Storage): SplashPage {
   try {
     // Throws if this browser blocks storage.
-    const saved = storage.getItem(storageKey);
+    const saved = storage.getItem(savedSplashPageKey);
     if (saved === null) return starterSplashPage;
     const parsed: unknown = JSON.parse(saved);
     return isSplashPage(parsed) ? parsed : starterSplashPage;
@@ -47,13 +47,16 @@ export function saveSplashPage(
   splashPage: SplashPage,
 ): SaveResult {
   try {
-    storage.setItem(storageKey, JSON.stringify(splashPage));
+    storage.setItem(savedSplashPageKey, JSON.stringify(splashPage));
     return "saved";
   } catch (error) {
     if (!isQuotaExceeded(error)) return "not saved";
   }
   try {
-    storage.setItem(storageKey, JSON.stringify(withoutImages(splashPage)));
+    storage.setItem(
+      savedSplashPageKey,
+      JSON.stringify(withoutImages(splashPage)),
+    );
     return "saved without images";
   } catch {
     return "not saved";
