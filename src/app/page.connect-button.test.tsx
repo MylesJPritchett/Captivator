@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 import { pickColour, renderCaptivator } from "@/app/test-helpers";
 
 describe("Captivator: Connect Button", () => {
-  it("changing the Connect Button background colour in the Editor updates the Preview", () => {
-    const { preview, editor } = renderCaptivator();
+  it("changing the Connect Button background colour in the Editor updates the Preview", async () => {
+    const { preview, editor } = await renderCaptivator();
 
     pickColour(
       within(editor).getByLabelText("Connect Button background colour"),
@@ -17,8 +17,8 @@ describe("Captivator: Connect Button", () => {
     ).toHaveStyle({ backgroundColor: "#10b981" });
   });
 
-  it("changing the Connect Button text colour in the Editor updates the Preview, and the label stays Connect", () => {
-    const { preview, editor } = renderCaptivator();
+  it("changing the Connect Button text colour in the Editor updates the Preview, and the label stays Connect", async () => {
+    const { preview, editor } = await renderCaptivator();
 
     pickColour(
       within(editor).getByLabelText("Connect Button text colour"),
@@ -36,7 +36,7 @@ describe("Captivator: Connect Button", () => {
 describe("Captivator: clicking the Connect Button in the Preview", () => {
   it("focuses the first control in the Editor's Connect Button section", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     await user.click(within(preview).getByRole("button", { name: "Connect" }));
 

@@ -28,7 +28,7 @@ describe("Captivator: Reset to starter", () => {
   it("confirming Reset by keyboard returns the Preview to the Starter Splash Page and keeps the Device", async () => {
     const user = userEvent.setup();
     vi.spyOn(window, "confirm").mockReturnValue(true);
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     await editSplashPage(user, editor);
     await user.click(screen.getByRole("radio", { name: "Desktop" }));
 
@@ -49,7 +49,7 @@ describe("Captivator: Reset to starter", () => {
   it("cancelling the Reset confirmation leaves the Splash Page unchanged", async () => {
     const user = userEvent.setup();
     vi.spyOn(window, "confirm").mockReturnValue(false);
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     await editSplashPage(user, editor);
 
     await user.click(

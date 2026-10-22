@@ -53,7 +53,7 @@ describe("Captivator: images too large to remember", () => {
 
   it("uploading a Background image too large to remember tells the Customer, and the Preview still shows it", async () => {
     const user = userEvent.setup();
-    const { editor, background } = renderCaptivator();
+    const { editor, background } = await renderCaptivator();
 
     await user.upload(
       within(editor).getByLabelText("Background image"),
@@ -70,7 +70,7 @@ describe("Captivator: images too large to remember", () => {
 
   it("a Logo too large to remember still shows in the Preview, and is gone after Captivator is rendered again", async () => {
     const user = userEvent.setup();
-    const { editor, preview } = renderCaptivator();
+    const { editor, preview } = await renderCaptivator();
 
     await user.upload(
       within(editor).getByLabelText("Logo image"),
@@ -86,7 +86,7 @@ describe("Captivator: images too large to remember", () => {
     );
 
     cleanup();
-    const rendered = renderCaptivator();
+    const rendered = await renderCaptivator();
 
     expect(
       within(rendered.preview).queryByRole("img", { name: "Logo" }),
@@ -95,7 +95,7 @@ describe("Captivator: images too large to remember", () => {
 
   it("telling the Customer their images are too large doesn't move focus", async () => {
     const user = userEvent.setup();
-    const { editor } = renderCaptivator();
+    const { editor } = await renderCaptivator();
     const backgroundImage = within(editor).getByLabelText("Background image");
 
     await user.upload(backgroundImage, imageFile("venue.png", largeImageBytes));
@@ -108,7 +108,7 @@ describe("Captivator: images too large to remember", () => {
 
   it("replacing a Background image too large to remember with one that fits clears the message", async () => {
     const user = userEvent.setup();
-    const { editor } = renderCaptivator();
+    const { editor } = await renderCaptivator();
     const backgroundImage = within(editor).getByLabelText("Background image");
     await user.upload(backgroundImage, imageFile("venue.png", largeImageBytes));
     await waitFor(() =>
@@ -127,7 +127,7 @@ describe("Captivator: images too large to remember", () => {
 
   it("after images too large to remember, rendering Captivator again shows the text and colours without the images", async () => {
     const user = userEvent.setup();
-    const { editor } = renderCaptivator();
+    const { editor } = await renderCaptivator();
     await user.upload(
       within(editor).getByLabelText("Logo image"),
       imageFile("cafe-logo.png", largeImageBytes),
@@ -143,7 +143,7 @@ describe("Captivator: images too large to remember", () => {
     );
 
     cleanup();
-    const { preview, background } = renderCaptivator();
+    const { preview, background } = await renderCaptivator();
 
     expect(
       within(preview).getByText("Welcome to the Café"),

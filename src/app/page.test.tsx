@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 import { imageFile, pickColour, renderCaptivator } from "@/app/test-helpers";
 
 describe("Captivator: Editor and Preview", () => {
-  it("the Preview shows the starter Splash Page", () => {
-    const { preview } = renderCaptivator();
+  it("the Preview shows the starter Splash Page", async () => {
+    const { preview } = await renderCaptivator();
 
     expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
     expect(
@@ -18,7 +18,7 @@ describe("Captivator: Editor and Preview", () => {
 
   it("the Preview's Input Fields and Connect Button are inert, but not shown as disabled", async () => {
     const user = userEvent.setup();
-    const { preview } = renderCaptivator();
+    const { preview } = await renderCaptivator();
     const email = within(preview).getByRole("textbox", { name: "Email" });
     const connectButton = within(preview).getByRole("button", {
       name: "Connect",
@@ -35,7 +35,7 @@ describe("Captivator: Editor and Preview", () => {
   describe("with a Logo, Text Blocks, Input Fields and the Connect Button all shown", () => {
     it("the Preview's elements are pointer-only: Tab goes from the Device toggle straight to the first Editor control", async () => {
       const user = userEvent.setup();
-      const { preview, editor } = renderCaptivator();
+      const { preview, editor } = await renderCaptivator();
       await user.upload(
         within(editor).getByLabelText("Logo image"),
         imageFile("cafe-logo.png"),
@@ -58,8 +58,8 @@ describe("Captivator: Editor and Preview", () => {
     });
   });
 
-  it("tells the Customer the design is saved in this browser", () => {
-    const { editor } = renderCaptivator();
+  it("tells the Customer the design is saved in this browser", async () => {
+    const { editor } = await renderCaptivator();
 
     expect(
       within(editor).getByText("Your design is saved in this browser."),
@@ -68,7 +68,7 @@ describe("Captivator: Editor and Preview", () => {
 
   it("editing a Text Block's text in the Editor updates the Preview", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     const textBlockText = within(editor).getByRole("textbox", {
       name: "Text Block 1 text",
@@ -84,7 +84,7 @@ describe("Captivator: Editor and Preview", () => {
 
   it("adding a Text Block in the Editor shows it in the Preview after the existing ones", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     await user.click(
       within(editor).getByRole("button", { name: "Add Text Block" }),
@@ -108,8 +108,8 @@ describe("Captivator: Editor and Preview", () => {
     ).toBeTruthy();
   });
 
-  it("changing a Text Block's colour in the Editor recolours it in the Preview", () => {
-    const { preview, editor } = renderCaptivator();
+  it("changing a Text Block's colour in the Editor recolours it in the Preview", async () => {
+    const { preview, editor } = await renderCaptivator();
 
     pickColour(within(editor).getByLabelText("Text Block 1 colour"), "#ff0000");
 
@@ -118,8 +118,8 @@ describe("Captivator: Editor and Preview", () => {
     });
   });
 
-  it("changing a Text Block's size with its slider resizes it in the Preview and shows the size", () => {
-    const { preview, editor } = renderCaptivator();
+  it("changing a Text Block's size with its slider resizes it in the Preview and shows the size", async () => {
+    const { preview, editor } = await renderCaptivator();
 
     const size = within(editor).getByRole("slider", {
       name: "Text Block 1 size",
@@ -138,7 +138,7 @@ describe("Captivator: Editor and Preview", () => {
 
   it("a Text Block with empty text is left out of the Preview", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     expect(within(preview).getAllByRole("paragraph")).toHaveLength(1);
 
     await user.clear(
@@ -150,7 +150,7 @@ describe("Captivator: Editor and Preview", () => {
 
   it("removing the only Text Block removes it from the Preview", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     await user.click(
       within(editor).getByRole("button", { name: "Remove Text Block 1" }),
@@ -164,8 +164,8 @@ describe("Captivator: Editor and Preview", () => {
 });
 
 describe("Captivator: Device toggle", () => {
-  it("the Preview opens on Mobile", () => {
-    const { preview } = renderCaptivator();
+  it("the Preview opens on Mobile", async () => {
+    const { preview } = await renderCaptivator();
 
     expect(screen.getByRole("radio", { name: "Mobile" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Desktop" })).not.toBeChecked();
@@ -176,7 +176,7 @@ describe("Captivator: Device toggle", () => {
 
   it("choosing Desktop shows the Desktop frame, and choosing Mobile switches back", async () => {
     const user = userEvent.setup();
-    const { preview } = renderCaptivator();
+    const { preview } = await renderCaptivator();
 
     await user.click(screen.getByRole("radio", { name: "Desktop" }));
 
@@ -200,7 +200,7 @@ describe("Captivator: Device toggle", () => {
 
   it("switching Device leaves the Splash Page unchanged", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     const textBlockText = within(editor).getByRole("textbox", {
       name: "Text Block 1 text",

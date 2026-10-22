@@ -13,12 +13,12 @@ describe("Captivator: storage blocked in this browser", () => {
     vi.restoreAllMocks();
   });
 
-  it("when the saved Splash Page can't be read, Captivator opens on the Starter Splash Page", () => {
+  it("when the saved Splash Page can't be read, Captivator opens on the Starter Splash Page", async () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw storageBlocked();
     });
 
-    const { preview } = renderCaptivator();
+    const { preview } = await renderCaptivator();
 
     expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
   });
@@ -28,7 +28,7 @@ describe("Captivator: storage blocked in this browser", () => {
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
       throw storageBlocked();
     });
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     await editTextBlock1(user, editor, "Welcome to the Café");
 
@@ -45,7 +45,7 @@ describe("Captivator: storage blocked in this browser", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("when storage is too full for even the text and colours, the Customer is told the design can't be saved", () => {
+  it("when storage is too full for even the text and colours, the Customer is told the design can't be saved", async () => {
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
       throw new DOMException(
         "The quota has been exceeded.",
@@ -53,7 +53,7 @@ describe("Captivator: storage blocked in this browser", () => {
       );
     });
 
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
     expect(

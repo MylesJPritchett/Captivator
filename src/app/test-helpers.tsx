@@ -4,9 +4,10 @@ import Home from "@/app/page";
 import { savedSplashPageKey, type SplashPage } from "@/splash-page";
 
 /** Renders Captivator and returns its Preview and Editor regions. */
-export function renderCaptivator() {
+export async function renderCaptivator() {
   render(<Home />);
-  const preview = screen.getByRole("region", { name: "Preview" });
+  // The Editor and Preview wait for the saved Splash Page to load.
+  const preview = await screen.findByRole("region", { name: "Preview" });
   return {
     preview,
     editor: screen.getByRole("region", { name: "Editor" }),
