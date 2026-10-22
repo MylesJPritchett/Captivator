@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { renderCaptivator } from "@/app/test-helpers";
@@ -29,5 +29,23 @@ describe("Captivator: the Library on narrow screens", () => {
 
     await user.keyboard(" ");
     expect(libraryButton()).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("opening a Splash Page from the Library hides the Library again", async () => {
+    const user = userEvent.setup();
+    await renderCaptivator();
+    const library = screen.getByRole("navigation", { name: "Library" });
+
+    await user.click(libraryButton());
+    await user.click(
+      within(library).getByRole("button", { name: "New Splash Page" }),
+    );
+    expect(libraryButton()).toHaveAttribute("aria-expanded", "false");
+
+    await user.click(libraryButton());
+    await user.click(
+      within(library).getByRole("button", { name: "My Splash Page" }),
+    );
+    expect(libraryButton()).toHaveAttribute("aria-expanded", "false");
   });
 });

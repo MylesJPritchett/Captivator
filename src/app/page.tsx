@@ -76,7 +76,14 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
           Library
         </button>
         <div id={libraryId} className={libraryShown ? "" : "hidden lg:block"}>
-          <LibraryNav library={library} dispatch={dispatch} />
+          <LibraryNav
+            library={library}
+            dispatch={(action) => {
+              dispatch(action);
+              // Opening a Splash Page takes the narrow-screen Library away.
+              setLibraryShown(false);
+            }}
+          />
         </div>
       </div>
 
