@@ -29,4 +29,19 @@ describe("Captivator: Connect Button", () => {
       within(preview).getByRole("button", { name: "Connect" }),
     ).toHaveStyle({ backgroundColor: "#10b981" });
   });
+
+  it("changing the Connect Button text colour in the Editor updates the Preview, and the label stays Connect", () => {
+    const { preview, editor } = renderCaptivator();
+
+    pickColour(
+      within(editor).getByLabelText("Connect Button text colour"),
+      "#111827",
+    );
+
+    const connectButton = within(preview).getByRole("button", {
+      name: "Connect",
+    });
+    expect(connectButton).toHaveStyle({ color: "#111827" });
+    expect(connectButton).toHaveTextContent(/^Connect$/);
+  });
 });
