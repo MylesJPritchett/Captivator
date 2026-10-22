@@ -112,6 +112,19 @@ test.describe("with a dark colour scheme", () => {
     }
   });
 
+  test("the Device toggle is dark, with readable options", async ({ page }) => {
+    await page.goto("/");
+    const options = page
+      .getByRole("group", { name: "Device" })
+      .locator("label");
+    await expect(options).not.toHaveCount(0);
+    for (const option of await options.all()) {
+      const { text, background } = await colours(option);
+      expect(luminance(background)).toBeLessThan(0.2);
+      expect(contrast(text, background)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
   test("a disabled Editor button looks disabled yet stays legible", async ({
     page,
   }) => {
