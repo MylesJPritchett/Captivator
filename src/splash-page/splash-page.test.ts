@@ -52,6 +52,20 @@ describe("Text Blocks", () => {
     expect(starterSplashPage.textBlocks).toHaveLength(1);
   });
 
+  it("updating a Text Block's colour changes only that Text Block's colour", () => {
+    const [starterTextBlock] = starterSplashPage.textBlocks;
+
+    const splashPage = splashPageReducer(starterSplashPage, {
+      type: "updateTextBlockColour",
+      id: starterTextBlock.id,
+      colour: "#ff0000",
+    });
+
+    expect(splashPage.textBlocks).toEqual([
+      { ...starterTextBlock, colour: "#ff0000" },
+    ]);
+  });
+
   it("removing the last Text Block leaves a Splash Page with no Text Blocks", () => {
     const splashPage = splashPageReducer(starterSplashPage, {
       type: "removeTextBlock",

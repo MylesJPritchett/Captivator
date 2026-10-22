@@ -1,5 +1,5 @@
 import type { SplashPageAction } from "./reducer";
-import type { SplashPage, TextBlock } from "./types";
+import type { Colour, SplashPage, TextBlock } from "./types";
 
 export type TextBlockAction =
   | {
@@ -13,6 +13,11 @@ export type TextBlockAction =
       text: string;
     }
   | {
+      type: "updateTextBlockColour";
+      id: string;
+      colour: Colour;
+    }
+  | {
       type: "removeTextBlock";
       id: string;
     };
@@ -22,6 +27,19 @@ const newTextBlock: Omit<TextBlock, "id"> = {
   colour: "#ffffff",
   size: 20,
 };
+
+function updateTextBlock(
+  splashPage: SplashPage,
+  id: string,
+  changes: Partial<Omit<TextBlock, "id">>,
+): SplashPage {
+  return {
+    ...splashPage,
+    textBlocks: splashPage.textBlocks.map((textBlock) =>
+      textBlock.id === id ? { ...textBlock, ...changes } : textBlock,
+    ),
+  };
+}
 
 export function textBlocksReducer(
   splashPage: SplashPage,
@@ -37,14 +55,9 @@ export function textBlocksReducer(
         ],
       };
     case "updateTextBlockText":
-      return {
-        ...splashPage,
-        textBlocks: splashPage.textBlocks.map((textBlock) =>
-          textBlock.id === action.id
-            ? { ...textBlock, text: action.text }
-            : textBlock,
-        ),
-      };
+      return updateTextBlock(splashPage, action.id, { text: action.text });
+    case "updateTextBlockColour":
+      return updateTextBlock(splashPage, action.id, { colour: action.colour });
     case "removeTextBlock":
       return {
         ...splashPage,
