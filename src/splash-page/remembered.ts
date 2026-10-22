@@ -29,9 +29,48 @@ export function loadSplashPage(storage: Storage): SplashPage {
   }
 }
 
-/** Remembers the whole Splash Page, replacing any earlier one. */
-export function saveSplashPage(storage: Storage, splashPage: SplashPage) {
-  storage.setItem(storageKey, JSON.stringify(splashPage));
+/**
+ * How much of the Splash Page was remembered: all of it, or, when this
+ * browser's storage is full, everything except its Logo and Background image.
+ */
+export type SaveResult = "saved" | "saved without images";
+
+/**
+ * Remembers the whole Splash Page, replacing any earlier one. If storage is
+ * full, remembers it without its images instead (ADR-0003).
+ */
+export function saveSplashPage(
+  storage: Storage,
+  splashPage: SplashPage,
+): SaveResult {
+  try {
+    storage.setItem(storageKey, JSON.stringify(splashPage));
+    return "saved";
+  } catch (error) {
+    if (!isQuotaExceeded(error)) throw error;
+    storage.setItem(storageKey, JSON.stringify(withoutImages(splashPage)));
+    return "saved without images";
+  }
+}
+
+/** The Splash Page without its Logo or Background image. */
+function withoutImages(splashPage: SplashPage): SplashPage {
+  return {
+    ...splashPage,
+    logo: undefined,
+    // The colour always sits underneath, so it's what shows instead.
+    background: { kind: "colour", colour: splashPage.background.colour },
+  };
+}
+
+/** Whether a storage write failed because storage is full. */
+function isQuotaExceeded(error: unknown) {
+  return (
+    error instanceof DOMException &&
+    (error.name === "QuotaExceededError" ||
+      // Older Firefox
+      error.name === "NS_ERROR_DOM_QUOTA_REACHED")
+  );
 }
 
 type Fields = Record<string, unknown>;

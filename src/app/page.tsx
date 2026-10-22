@@ -7,6 +7,7 @@ import {
   loadSplashPage,
   saveSplashPage,
   splashPageReducer,
+  type SaveResult,
   type SplashPage,
 } from "@/splash-page";
 
@@ -36,8 +37,10 @@ function Captivator({ initialSplashPage }: { initialSplashPage: SplashPage }) {
   );
   const [device, setDevice] = useState<Device>(defaultDevice);
 
+  const [saveResult, setSaveResult] = useState<SaveResult>("saved");
   useEffect(() => {
-    saveSplashPage(localStorage, splashPage);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reporting how much of the Splash Page browser-only storage could hold
+    setSaveResult(saveSplashPage(localStorage, splashPage));
   }, [splashPage]);
 
   return (
@@ -60,9 +63,15 @@ function Captivator({ initialSplashPage }: { initialSplashPage: SplashPage }) {
         <h2 id="editor-heading" className="text-2xl font-bold">
           Editor
         </h2>
-        <p className="text-sm text-zinc-600">
-          Your design is saved in this browser.
-        </p>
+        <div role="status" className="flex flex-col gap-1 text-sm">
+          <p className="text-zinc-600">Your design is saved in this browser.</p>
+          {saveResult === "saved without images" && (
+            <p className="text-amber-800">
+              Your images are too large to remember in this browser; text and
+              colours are still saved.
+            </p>
+          )}
+        </div>
         <Editor splashPage={splashPage} dispatch={dispatch} />
       </section>
     </>
