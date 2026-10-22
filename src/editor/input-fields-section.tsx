@@ -16,6 +16,31 @@ export function InputFieldsSection({
 
   return (
     <EditorSection title="Input Fields">
+      {splashPage.inputFields.length > 0 && (
+        <ul className="flex flex-col gap-2">
+          {splashPage.inputFields.map((inputField) => (
+            <li
+              key={inputField.type}
+              className="flex items-center justify-between rounded-md border border-zinc-200 px-3 py-2"
+            >
+              <span className="text-sm">{inputField.type}</span>
+              <button
+                type="button"
+                aria-label={`Remove ${inputField.type} Input Field`}
+                onClick={() =>
+                  dispatch({
+                    type: "removeInputField",
+                    inputFieldType: inputField.type,
+                  })
+                }
+                className="rounded-md border border-zinc-300 px-2 py-1 text-sm"
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
       {newType && (
         <div className="flex items-end gap-2">
           <div className="flex flex-1 flex-col gap-1">

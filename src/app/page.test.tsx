@@ -100,4 +100,18 @@ describe("Captivator: Editor and Preview", () => {
       within(editor).queryByRole("button", { name: "Add Input Field" }),
     ).not.toBeInTheDocument();
   });
+
+  it("removing an Input Field in the Editor removes it from the Preview", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+
+    await user.click(
+      within(editor).getByRole("button", { name: "Remove Email Input Field" }),
+    );
+
+    expect(within(preview).queryByRole("textbox")).not.toBeInTheDocument();
+    expect(
+      within(preview).getByRole("button", { name: "Connect" }),
+    ).toBeInTheDocument();
+  });
 });
