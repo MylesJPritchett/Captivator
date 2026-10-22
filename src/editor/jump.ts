@@ -18,6 +18,20 @@ export function jumpToEditorArea(area: EditorArea) {
   if (section && control) jumpTo(section, control);
 }
 
+/** The DOM id of a Text Block's text input in the Editor. */
+export function textBlockTextInputId(textBlockId: string) {
+  return `text-block-${textBlockId}-text`;
+}
+
+/**
+ * Takes the Customer to one Text Block's controls: scrolls them into view and
+ * focuses that Text Block's text input.
+ */
+export function jumpToTextBlock(textBlockId: string) {
+  const input = document.getElementById(textBlockTextInputId(textBlockId));
+  if (input) jumpTo(input.parentElement ?? input, input);
+}
+
 /**
  * Scrolls `target` into view, smoothly unless the Customer prefers reduced
  * motion, then moves focus to `control` without a second, instant scroll.

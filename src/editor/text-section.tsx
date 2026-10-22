@@ -2,6 +2,7 @@ import { maxTextBlockSize, minTextBlockSize } from "@/splash-page";
 import { focusRing } from "@/ui/focus-ring";
 import { ColourControl } from "./colour-control";
 import { EditorSection } from "./editor-section";
+import { textBlockTextInputId } from "./jump";
 import type { EditorSectionProps } from "./types";
 
 export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
@@ -15,11 +16,14 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
             key={textBlock.id}
             className="flex flex-col gap-2 rounded-lg border border-zinc-200 p-3"
           >
-            <label htmlFor={`${idPrefix}-text`} className="text-sm font-medium">
+            <label
+              htmlFor={textBlockTextInputId(textBlock.id)}
+              className="text-sm font-medium"
+            >
               {name} text
             </label>
             <input
-              id={`${idPrefix}-text`}
+              id={textBlockTextInputId(textBlock.id)}
               type="text"
               value={textBlock.text}
               onChange={(event) =>

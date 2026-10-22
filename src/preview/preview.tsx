@@ -13,13 +13,20 @@ type PreviewProps = {
   device: Device;
   /** Called when the Customer clicks an element, with the area it shows. */
   onJump: (area: EditorArea) => void;
+  /** Called when the Customer clicks a Text Block, with its id. */
+  onJumpToTextBlock: (textBlockId: string) => void;
 };
 
 /**
  * Renders a Splash Page as a Guest would see it on the given Device, in the
  * fixed centred order Logo → Text Blocks → Input Fields → Connect Button.
  */
-export function Preview({ splashPage, device, onJump }: PreviewProps) {
+export function Preview({
+  splashPage,
+  device,
+  onJump,
+  onJumpToTextBlock,
+}: PreviewProps) {
   return (
     <DeviceFrame device={device}>
       {/* The Background fills the whole frame, with the content on top. */}
@@ -31,7 +38,10 @@ export function Preview({ splashPage, device, onJump }: PreviewProps) {
       >
         <div className="m-auto flex w-full max-w-[420px] flex-col items-center gap-4 px-6 py-10 text-center">
           <PreviewLogo logo={splashPage.logo} onClick={() => onJump("logo")} />
-          <PreviewTextBlocks textBlocks={splashPage.textBlocks} />
+          <PreviewTextBlocks
+            textBlocks={splashPage.textBlocks}
+            onClick={onJumpToTextBlock}
+          />
           <PreviewInputFields inputFields={splashPage.inputFields} />
           <PreviewConnectButton connectButton={splashPage.connectButton} />
         </div>

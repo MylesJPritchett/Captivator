@@ -1,7 +1,7 @@
 "use client";
 
 import { useReducer, useState } from "react";
-import { Editor, jumpToEditorArea } from "@/editor";
+import { Editor, jumpToEditorArea, jumpToTextBlock } from "@/editor";
 import { defaultDevice, DeviceToggle, Preview, type Device } from "@/preview";
 import { splashPageReducer, starterSplashPage } from "@/splash-page";
 
@@ -26,6 +26,7 @@ export default function Home() {
           splashPage={splashPage}
           device={device}
           onJump={jumpToEditorArea}
+          onJumpToTextBlock={jumpToTextBlock}
         />
       </section>
 

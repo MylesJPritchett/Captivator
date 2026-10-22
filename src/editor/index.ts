@@ -1,2 +1,2 @@
 export { Editor } from "./editor";
-export { jumpToEditorArea, type EditorArea } from "./jump";
+export { jumpToEditorArea, jumpToTextBlock, type EditorArea } from "./jump";
