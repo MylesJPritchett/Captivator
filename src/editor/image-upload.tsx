@@ -18,8 +18,8 @@ type ImageUploadProps = {
 };
 
 /**
- * A labelled file input that accepts image files only. Anything else shows a
- * friendly inline error and calls nothing.
+ * A labelled file input that accepts image files only. Anything else, or an
+ * image that can't be read, shows a friendly inline error and calls nothing.
  */
 export function ImageUpload({
   label,
@@ -56,6 +56,10 @@ export function ImageUpload({
           setError(undefined);
           const reader = new FileReader();
           reader.onload = () => onUpload(reader.result as ImageUrl);
+          reader.onerror = () =>
+            setError(
+              `"${file.name}" couldn't be read. Try choosing it again, or choose another image.`,
+            );
           reader.readAsDataURL(file);
         }}
         className={`text-sm file:mr-3 file:rounded-md file:border file:border-zinc-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium hover:file:bg-zinc-100 ${focusRing}`}
