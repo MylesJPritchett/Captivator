@@ -1,4 +1,5 @@
 import { maxTextBlockSize, minTextBlockSize } from "@/splash-page";
+import { ColourControl } from "./colour-control";
 import { EditorSection } from "./editor-section";
 import type { EditorSectionProps } from "./types";
 
@@ -29,27 +30,18 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
               }
               className="rounded-md border border-zinc-300 px-3 py-2"
             />
-            <div className="flex items-center gap-2">
-              <label
-                htmlFor={`${idPrefix}-colour`}
-                className="text-sm font-medium"
-              >
-                {name} colour
-              </label>
-              <input
-                id={`${idPrefix}-colour`}
-                type="color"
-                value={textBlock.colour}
-                onChange={(event) =>
-                  dispatch({
-                    type: "updateTextBlockColour",
-                    id: textBlock.id,
-                    colour: event.target.value,
-                  })
-                }
-                className="h-8 w-12 cursor-pointer rounded border border-zinc-300"
-              />
-            </div>
+            <ColourControl
+              id={`${idPrefix}-colour`}
+              label={`${name} colour`}
+              value={textBlock.colour}
+              onChange={(colour) =>
+                dispatch({
+                  type: "updateTextBlockColour",
+                  id: textBlock.id,
+                  colour,
+                })
+              }
+            />
             <div className="flex items-center gap-2">
               <label
                 htmlFor={`${idPrefix}-size`}

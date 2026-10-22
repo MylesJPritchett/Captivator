@@ -1,4 +1,5 @@
 import type { Background } from "@/splash-page";
+import { ColourControl } from "./colour-control";
 import { EditorSection } from "./editor-section";
 import { ImageUpload } from "./image-upload";
 import type { EditorSectionProps } from "./types";
@@ -37,23 +38,12 @@ export function BackgroundSection({
           ))}
         </div>
       </fieldset>
-      <div className="flex items-center justify-between gap-3">
-        <label htmlFor="background-colour" className="text-sm font-medium">
-          Background colour
-        </label>
-        <input
-          id="background-colour"
-          type="color"
-          value={splashPage.background.colour}
-          onChange={(event) =>
-            dispatch({
-              type: "setBackgroundColour",
-              colour: event.target.value,
-            })
-          }
-          className="h-9 w-14 cursor-pointer rounded-md border border-zinc-300"
-        />
-      </div>
+      <ColourControl
+        id="background-colour"
+        label="Background colour"
+        value={splashPage.background.colour}
+        onChange={(colour) => dispatch({ type: "setBackgroundColour", colour })}
+      />
       <ImageUpload
         label="Background image"
         onUpload={(imageUrl) => {
