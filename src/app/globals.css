@@ -2,11 +2,24 @@
 
 /*
  * The one switch for the colour scheme. Everything dark, from `color-scheme`
- * and the tokens below to `dark:` utilities, keys off this variant. To drive
- * it from the Customer's choice instead, swap the media query for a selector,
- * e.g. `&:where([data-appearance="dark"], [data-appearance="dark"] *)`.
+ * and the tokens below to `dark:` utilities, keys off this variant. It follows
+ * the Customer's Appearance, set as `data-appearance` on `<html>`: "dark"
+ * always, "light" never, and "system" (or none yet) the system colour scheme,
+ * through the media query so it follows a change while the page is open.
  */
-@custom-variant dark (@media (prefers-color-scheme: dark));
+@custom-variant dark {
+  &:where([data-appearance="dark"], [data-appearance="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(
+      :root:not([data-appearance="light"]),
+      :root:not([data-appearance="light"]) *
+    ) {
+      @slot;
+    }
+  }
+}
 
 :root {
   /* Tells the browser to draw native controls in the matching style. */
@@ -47,6 +60,14 @@
     --danger: #f87171;
     --focus: #60a5fa;
   }
+}
+
+@theme {
+  /*
+   * The page header's height, as `h-header`. The Mobile Preview's frame
+   * subtracts it too, to fit the viewport beside the Editor.
+   */
+  --spacing-header: 3.5rem;
 }
 
 @theme inline {

@@ -41,6 +41,24 @@ export async function editTextBlock1(
   await user.type(textBlockText, text);
 }
 
+/** The Appearance radio group, outside the Editor and the Preview. */
+export function appearanceGroup() {
+  return screen.getByRole("group", { name: "Appearance" });
+}
+
+/** The Appearance option with this name, e.g. "Dark". */
+export function appearanceOption(name: "Light" | "System" | "Dark") {
+  return within(appearanceGroup()).getByRole("radio", { name });
+}
+
+/** Chooses an Appearance by clicking its option. */
+export async function chooseAppearance(
+  user: UserEvent,
+  name: "Light" | "System" | "Dark",
+) {
+  await user.click(appearanceOption(name));
+}
+
 /**
  * user-event can't drive a native colour input, so pick the colour the way
  * the browser reports it: a change event carrying the new hex value.

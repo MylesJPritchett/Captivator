@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useReducer, useState } from "react";
+import { AppearanceToggle, useAppearance } from "@/appearance";
 import { Editor, jumpToEditorArea, jumpToTextBlock } from "@/editor";
 import {
   defaultDevice,
@@ -27,12 +28,19 @@ export default function Home() {
     setInitialSplashPage(loadSplashPage(localStorage));
   }, []);
 
+  const [appearance, chooseAppearance] = useAppearance();
+
   return (
-    <main className="flex flex-1 flex-col gap-6 p-4 lg:flex-row lg:items-start lg:gap-10 lg:p-8">
-      {initialSplashPage && (
-        <Captivator initialSplashPage={initialSplashPage} />
-      )}
-    </main>
+    <>
+      <header className="flex h-header shrink-0 items-center border-b border-divider px-4 lg:px-8">
+        <AppearanceToggle appearance={appearance} onChange={chooseAppearance} />
+      </header>
+      <main className="flex flex-1 flex-col gap-6 p-4 lg:flex-row lg:items-start lg:gap-10 lg:p-8">
+        {initialSplashPage && (
+          <Captivator initialSplashPage={initialSplashPage} />
+        )}
+      </main>
+    </>
   );
 }
 
