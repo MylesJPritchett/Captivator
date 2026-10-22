@@ -8,17 +8,25 @@ export type EditorArea =
 /** The attribute that marks an Editor section with the area it controls. */
 export const editorAreaAttribute = "data-editor-area";
 
-const focusable =
-  'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+/** Every kind of control the Editor sections use. */
+const control = "input, select, button";
 
 /**
  * Takes the Customer to the Editor section for an area: scrolls it into view
- * and focuses its first control.
+ * and focuses its first control, where Tab would land. In a radio group that
+ * is the checked radio, not the first one.
  */
 export function jumpToEditorArea(area: EditorArea) {
   const section = document.querySelector(`[${editorAreaAttribute}="${area}"]`);
-  const control = section?.querySelector<HTMLElement>(focusable);
-  if (section && control) jumpTo(section, control);
+  const first = section?.querySelector<HTMLElement>(control);
+  if (!section || !first) return;
+  const checkedRadio =
+    first instanceof HTMLInputElement && first.type === "radio"
+      ? section.querySelector<HTMLInputElement>(
+          `input[type="radio"][name="${first.name}"]:checked`,
+        )
+      : null;
+  jumpTo(section, checkedRadio ?? first);
 }
 
 /**
