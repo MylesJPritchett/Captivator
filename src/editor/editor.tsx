@@ -2,6 +2,7 @@ import { BackgroundSection } from "./background-section";
 import { ConnectButtonSection } from "./connect-button-section";
 import { InputFieldsSection } from "./input-fields-section";
 import { LogoSection } from "./logo-section";
+import { ResetButton } from "./reset-button";
 import { TextSection } from "./text-section";
 import type { EditorSectionProps } from "./types";
 
@@ -17,6 +18,7 @@ export function Editor(props: EditorSectionProps) {
       <TextSection {...props} />
       <InputFieldsSection {...props} />
       <ConnectButtonSection {...props} />
+      <ResetButton dispatch={props.dispatch} />
     </div>
   );
 }
