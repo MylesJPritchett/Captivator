@@ -58,11 +58,11 @@ describe("Captivator: Editor and Preview", () => {
     });
   });
 
-  it("tells the Customer the design is saved in this browser", async () => {
+  it("tells the Customer their Splash Pages are saved in this browser", async () => {
     const { editor } = await renderCaptivator();
 
     expect(
-      within(editor).getByText("Your design is saved in this browser."),
+      within(editor).getByText("Your Splash Pages are saved in this browser."),
     ).toBeVisible();
   });
 

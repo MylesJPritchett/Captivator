@@ -95,7 +95,7 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
             </p>
           ) : (
             <p className="text-zinc-600">
-              Your design is saved in this browser.
+              Your Splash Pages are saved in this browser.
             </p>
           )}
           {saveResult === "saved without images" && (

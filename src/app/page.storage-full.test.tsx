@@ -112,7 +112,7 @@ describe("Captivator: images too large to remember", () => {
       expect(savedNote(editor)).not.toHaveTextContent(imagesTooLarge),
     );
     expect(savedNote(editor)).toHaveTextContent(
-      "Your design is saved in this browser.",
+      "Your Splash Pages are saved in this browser.",
     );
   });
 
