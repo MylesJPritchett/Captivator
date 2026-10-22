@@ -4,10 +4,9 @@ import type { InputFieldType, SplashPage } from "./types";
 /** A Splash Page has at most this many Input Fields. */
 const maxInputFields = 2;
 
-export type InputFieldAction = {
-  type: "addInputField";
-  inputFieldType: InputFieldType;
-};
+export type InputFieldAction =
+  | { type: "addInputField"; inputFieldType: InputFieldType }
+  | { type: "removeInputField"; inputFieldType: InputFieldType };
 
 export function inputFieldsReducer(
   splashPage: SplashPage,
@@ -29,6 +28,13 @@ export function inputFieldsReducer(
           ...splashPage.inputFields,
           { type: action.inputFieldType },
         ],
+      };
+    case "removeInputField":
+      return {
+        ...splashPage,
+        inputFields: splashPage.inputFields.filter(
+          (inputField) => inputField.type !== action.inputFieldType,
+        ),
       };
     default:
       return splashPage;

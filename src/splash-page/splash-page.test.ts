@@ -73,4 +73,31 @@ describe("Input Fields", () => {
 
     expect(splashPage).toBe(twoInputFields);
   });
+
+  it("removing the last Input Field leaves a Splash Page with none", () => {
+    const splashPage = splashPageReducer(starterSplashPage, {
+      type: "removeInputField",
+      inputFieldType: "Email",
+    });
+
+    expect(splashPage.inputFields).toEqual([]);
+  });
+
+  it("removing an Input Field frees its type to be added again", () => {
+    const twoInputFields: SplashPage = {
+      ...starterSplashPage,
+      inputFields: [{ type: "Email" }, { type: "Name" }],
+    };
+
+    const removed = splashPageReducer(twoInputFields, {
+      type: "removeInputField",
+      inputFieldType: "Email",
+    });
+    const readded = splashPageReducer(removed, {
+      type: "addInputField",
+      inputFieldType: "Email",
+    });
+
+    expect(readded.inputFields).toEqual([{ type: "Name" }, { type: "Email" }]);
+  });
 });
