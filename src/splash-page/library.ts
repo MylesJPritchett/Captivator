@@ -7,7 +7,10 @@ import type { Library, SplashPage } from "./types";
  * Splash Page action, for the Open Splash Page only.
  */
 export type LibraryAction =
-  { type: "new" } | { type: "open"; id: string } | SplashPageAction;
+  | { type: "new" }
+  | { type: "open"; id: string }
+  | { type: "delete" }
+  | SplashPageAction;
 
 /** The name a new Splash Page starts with. */
 export const untitledSplashPageName = "Untitled Splash Page";
@@ -36,6 +39,16 @@ export function libraryReducer(
       return library.splashPages.some(({ id }) => id === action.id)
         ? { ...library, openSplashPageId: action.id }
         : library;
+    case "delete": {
+      const index = library.splashPages.findIndex(
+        ({ id }) => id === library.openSplashPageId,
+      );
+      const splashPages = library.splashPages.filter((_, i) => i !== index);
+      return {
+        splashPages,
+        openSplashPageId: splashPages[index - 1].id,
+      };
+    }
     default:
       return withOpenSplashPage(
         library,

@@ -84,4 +84,16 @@ describe("Library", () => {
       { id: "bar", name: "Bar", splashPage: bar },
     ]);
   });
+
+  it("Delete removes the Open Splash Page and opens the Splash Page just above it", () => {
+    const library = libraryReducer(
+      { ...cafeAndBar, openSplashPageId: "bar" },
+      { type: "delete" },
+    );
+
+    expect(library).toEqual({
+      splashPages: [{ id: "cafe", name: "Café", splashPage: cafe }],
+      openSplashPageId: "cafe",
+    });
+  });
 });
