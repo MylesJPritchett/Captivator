@@ -2,7 +2,7 @@ import { maxTextBlockSize, minTextBlockSize } from "@/splash-page";
 import { focusRing } from "@/ui/focus-ring";
 import { ColourControl } from "./colour-control";
 import { EditorSection } from "./editor-section";
-import { textBlockTextInputId } from "./jump";
+import { textBlockControlId } from "./text-block-control-id";
 import type { EditorSectionProps } from "./types";
 
 export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
@@ -10,20 +10,18 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
     <EditorSection title="Text" area="textBlocks">
       {splashPage.textBlocks.map((textBlock, index) => {
         const name = `Text Block ${index + 1}`;
-        const idPrefix = `text-block-${textBlock.id}`;
+        const textId = textBlockControlId(textBlock.id, "text");
+        const sizeId = textBlockControlId(textBlock.id, "size");
         return (
           <div
             key={textBlock.id}
             className="flex flex-col gap-2 rounded-lg border border-zinc-200 p-3"
           >
-            <label
-              htmlFor={textBlockTextInputId(textBlock.id)}
-              className="text-sm font-medium"
-            >
+            <label htmlFor={textId} className="text-sm font-medium">
               {name} text
             </label>
             <input
-              id={textBlockTextInputId(textBlock.id)}
+              id={textId}
               type="text"
               value={textBlock.text}
               onChange={(event) =>
@@ -36,7 +34,7 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
               className={`rounded-md border border-zinc-300 px-3 py-2 ${focusRing}`}
             />
             <ColourControl
-              id={`${idPrefix}-colour`}
+              id={textBlockControlId(textBlock.id, "colour")}
               label={`${name} colour`}
               value={textBlock.colour}
               onChange={(colour) =>
@@ -48,14 +46,11 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
               }
             />
             <div className="flex items-center gap-2">
-              <label
-                htmlFor={`${idPrefix}-size`}
-                className="text-sm font-medium"
-              >
+              <label htmlFor={sizeId} className="text-sm font-medium">
                 {name} size
               </label>
               <input
-                id={`${idPrefix}-size`}
+                id={sizeId}
                 type="range"
                 min={minTextBlockSize}
                 max={maxTextBlockSize}
@@ -71,7 +66,7 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
                 className={`flex-1 ${focusRing}`}
               />
               <output
-                htmlFor={`${idPrefix}-size`}
+                htmlFor={sizeId}
                 className="w-12 text-right text-sm tabular-nums"
               >
                 {textBlock.size}px

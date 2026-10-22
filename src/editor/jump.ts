@@ -1,4 +1,5 @@
 import type { TextBlock } from "@/splash-page";
+import { textBlockControlId } from "./text-block-control-id";
 
 /** The glossary area each Editor section controls. */
 export type EditorArea =
@@ -20,17 +21,14 @@ export function jumpToEditorArea(area: EditorArea) {
   if (section && control) jumpTo(section, control);
 }
 
-/** The DOM id of a Text Block's text input in the Editor. */
-export function textBlockTextInputId(textBlockId: TextBlock["id"]) {
-  return `text-block-${textBlockId}-text`;
-}
-
 /**
  * Takes the Customer to one Text Block's controls: scrolls them into view and
  * focuses that Text Block's text input.
  */
 export function jumpToTextBlock(textBlockId: TextBlock["id"]) {
-  const input = document.getElementById(textBlockTextInputId(textBlockId));
+  const input = document.getElementById(
+    textBlockControlId(textBlockId, "text"),
+  );
   if (input) jumpTo(input.parentElement ?? input, input);
 }
 
