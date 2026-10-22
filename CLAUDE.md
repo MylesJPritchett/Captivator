@@ -53,9 +53,9 @@ Test only at these three seams. Don't add others without agreeing it with the de
 
 ### Architecture
 
-- [ADR-0001](docs/adr/0001-client-only-no-persistence.md): client-only. No backend: no API routes, database or auth. The Splash Page is remembered only in this browser, per ADR-0003.
+- [ADR-0001](docs/adr/0001-client-only-no-persistence.md): client-only. No backend: no API routes, database or auth. The Library is remembered only in this browser, per ADR-0004.
 - [ADR-0002](docs/adr/0002-splash-page-state-as-pure-reducer.md): the whole Splash Page is one plain, serialisable object changed only by a pure reducer. The reducer is the authority for domain rules; the UI reflects it.
-- [ADR-0003](docs/adr/0003-remember-splash-page-in-localstorage.md): the Splash Page, images as data URLs, is remembered in this browser's `localStorage` under a versioned key. Older or unreadable saves open on the Starter Splash Page.
+- [ADR-0004](docs/adr/0004-remember-library-in-indexeddb.md): the whole Library, images as data URLs inside its Splash Pages, is remembered in this browser's IndexedDB (through `idb-keyval`) as one value under a versioned key. Older or unreadable saves open on a Library holding one Starter Splash Page. It replaces [ADR-0003](docs/adr/0003-remember-splash-page-in-localstorage.md)'s `localStorage`, whose saved Splash Page is carried over once. Tests use `fake-indexeddb`.
 
 Module layout. Each area (Logo, Background, Text Blocks, Input Fields, Connect Button) has its own file in each of the first three:
 
