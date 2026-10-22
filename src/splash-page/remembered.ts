@@ -1,6 +1,6 @@
 import { get, set } from "idb-keyval";
 import { inputFieldTypes, maxInputFields } from "./input-fields";
-import { libraryOf, starterLibrary } from "./starter";
+import { libraryOfMySplashPage, starterLibrary } from "./starter";
 import type {
   Background,
   ConnectButton,
@@ -58,7 +58,7 @@ async function carryOver(legacyStorage: Storage): Promise<Library> {
   if (saved === null) return starterLibrary;
   const parsed = parseJson(saved);
   if (!isSplashPage(parsed)) return starterLibrary;
-  const library = libraryOf(parsed);
+  const library = libraryOfMySplashPage(parsed);
   if ((await saveLibrary(library)) !== "not saved") {
     legacyStorage.removeItem(savedSplashPageKey);
   }

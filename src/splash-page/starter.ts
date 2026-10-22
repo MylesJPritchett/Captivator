@@ -18,8 +18,11 @@ export const starterSplashPage: SplashPage = {
 /** The name a Library's first Splash Page starts with. */
 export const firstSplashPageName = "My Splash Page";
 
+/** The name a new Splash Page starts with. */
+export const untitledSplashPageName = "Untitled Splash Page";
+
 /** Starts a Library holding one Splash Page, named "My Splash Page" and open. */
-export function libraryOf(splashPage: SplashPage): Library {
+export function libraryOfMySplashPage(splashPage: SplashPage): Library {
   const id = "my-splash-page";
   return {
     splashPages: [{ id, name: firstSplashPageName, splashPage }],
@@ -28,4 +31,4 @@ export function libraryOf(splashPage: SplashPage): Library {
 }
 
 /** The Library the Editor opens on the first time: one Starter Splash Page. */
-export const starterLibrary: Library = libraryOf(starterSplashPage);
+export const starterLibrary: Library = libraryOfMySplashPage(starterSplashPage);

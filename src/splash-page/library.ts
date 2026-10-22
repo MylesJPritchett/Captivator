@@ -1,5 +1,5 @@
 import { splashPageReducer, type SplashPageAction } from "./reducer";
-import { starterSplashPage } from "./starter";
+import { starterSplashPage, untitledSplashPageName } from "./starter";
 import type { Library, LibraryEntry, SplashPage } from "./types";
 
 /**
@@ -13,9 +13,6 @@ export type LibraryAction =
   | { type: "duplicate" }
   | { type: "delete" }
   | SplashPageAction;
-
-/** The name a new Splash Page starts with. */
-export const untitledSplashPageName = "Untitled Splash Page";
 
 /**
  * The only way the Library changes (ADR-0002), and the authority for its
