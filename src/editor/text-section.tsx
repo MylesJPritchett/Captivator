@@ -6,7 +6,7 @@ import type { EditorSectionProps } from "./types";
 
 export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
   return (
-    <EditorSection title="Text">
+    <EditorSection title="Text" area="text">
       {splashPage.textBlocks.map((textBlock, index) => {
         const name = `Text Block ${index + 1}`;
         const idPrefix = `text-block-${textBlock.id}`;

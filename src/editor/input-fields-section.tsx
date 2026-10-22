@@ -16,7 +16,7 @@ export function InputFieldsSection({
       : addableTypes[0];
 
   return (
-    <EditorSection title="Input Fields">
+    <EditorSection title="Input Fields" area="inputFields">
       {splashPage.inputFields.length > 0 && (
         <ul className="flex flex-col gap-2">
           {splashPage.inputFields.map((inputField) => (

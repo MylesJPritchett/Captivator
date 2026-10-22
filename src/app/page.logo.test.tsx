@@ -1,4 +1,4 @@
-import { within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import {
@@ -98,5 +98,41 @@ describe("Captivator: Logo", () => {
       "src",
       "blob:cafe-logo.png",
     );
+  });
+});
+
+describe("Captivator: clicking the Logo in the Preview", () => {
+  it.each(["Mobile", "Desktop"])(
+    "on the %s Device, focuses the first control in the Editor's Logo section",
+    async (device) => {
+      const user = userEvent.setup();
+      const { preview, editor } = renderCaptivator();
+      await user.upload(
+        within(editor).getByLabelText("Logo image"),
+        imageFile("cafe-logo.png"),
+      );
+      await user.click(screen.getByRole("radio", { name: device }));
+
+      await user.click(within(preview).getByRole("img", { name: "Logo" }));
+
+      expect(within(editor).getByLabelText("Logo image")).toHaveFocus();
+    },
+  );
+
+  it("the Logo is pointer-only: Tab goes from the Device toggle straight into the Editor", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+    await user.upload(
+      within(editor).getByLabelText("Logo image"),
+      imageFile("cafe-logo.png"),
+    );
+
+    screen.getByRole("radio", { name: "Mobile" }).focus();
+    await user.tab();
+
+    expect(within(editor).getByLabelText("Logo image")).toHaveFocus();
+    expect(
+      within(preview).getByRole("img", { name: "Logo" }),
+    ).not.toHaveAttribute("tabindex");
   });
 });

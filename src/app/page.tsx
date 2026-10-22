@@ -1,7 +1,7 @@
 "use client";
 
 import { useReducer, useState } from "react";
-import { Editor } from "@/editor";
+import { Editor, jumpToEditorArea } from "@/editor";
 import { defaultDevice, DeviceToggle, Preview, type Device } from "@/preview";
 import { splashPageReducer, starterSplashPage } from "@/splash-page";
 
@@ -22,7 +22,11 @@ export default function Home() {
           Preview
         </h2>
         <DeviceToggle device={device} onChange={setDevice} />
-        <Preview splashPage={splashPage} device={device} />
+        <Preview
+          splashPage={splashPage}
+          device={device}
+          onJump={jumpToEditorArea}
+        />
       </section>
 
       <section

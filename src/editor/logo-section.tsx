@@ -4,7 +4,7 @@ import type { EditorSectionProps } from "./types";
 
 export function LogoSection({ splashPage, dispatch }: EditorSectionProps) {
   return (
-    <EditorSection title="Logo">
+    <EditorSection title="Logo" area="logo">
       <ImageUpload
         label="Logo image"
         imageUrl={splashPage.logo}
