@@ -10,17 +10,25 @@ export const nameFieldId = "splash-page-name";
  * Preview.
  */
 export function NameField({
+  splashPageId,
   name,
   dispatch,
 }: {
+  /** The Open Splash Page's id, so opening another shows its name. */
+  splashPageId: string;
   name: string;
   dispatch: Dispatch<LibraryAction>;
 }) {
-  // What the Customer typed, which may differ from the name by the spaces and
-  // blankness that renaming tidies away. Anything else, such as opening
-  // another Splash Page, shows the name itself.
-  const [draft, setDraft] = useState(name);
-  if (splashPageName(draft) !== name) setDraft(name);
+  // What the Customer typed into this Splash Page's name, which may differ
+  // from the name by the spaces and blankness that renaming tidies away.
+  // Anything else, such as opening another Splash Page, shows the name itself.
+  const [draft, setDraft] = useState({ splashPageId, text: name });
+  if (
+    draft.splashPageId !== splashPageId ||
+    splashPageName(draft.text) !== name
+  ) {
+    setDraft({ splashPageId, text: name });
+  }
 
   return (
     <div className="flex flex-col gap-2">
@@ -30,12 +38,12 @@ export function NameField({
       <input
         id={nameFieldId}
         type="text"
-        value={draft}
+        value={draft.text}
         onChange={(event) => {
-          setDraft(event.target.value);
+          setDraft({ splashPageId, text: event.target.value });
           dispatch({ type: "rename", name: event.target.value });
         }}
-        onBlur={() => setDraft(name)}
+        onBlur={() => setDraft({ splashPageId, text: name })}
         className={`rounded-md border border-zinc-300 px-3 py-2 ${focusRing}`}
       />
     </div>

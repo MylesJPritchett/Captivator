@@ -1,4 +1,4 @@
-import { cleanup, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import {
@@ -158,6 +158,27 @@ describe("Captivator: the Library", () => {
       "My Splash Page",
       "Untitled Splash Page Bar",
     ]);
+  });
+
+  it("opening another Splash Page shows its name in the Name field, even when it's the name just typed without its spaces", async () => {
+    const user = userEvent.setup();
+    const { editor } = await renderCaptivator();
+    await user.click(
+      within(library()).getByRole("button", { name: "New Splash Page" }),
+    );
+    const name = within(editor).getByRole("textbox", { name: "Name" });
+    await user.clear(name);
+    await user.type(name, "My Splash Page ");
+
+    // Some browsers, such as Safari, don't take focus from the Name field when
+    // a button is clicked, so open the Splash Page without moving focus.
+    fireEvent.click(
+      within(library()).getAllByRole("button", { name: "My Splash Page" })[0],
+    );
+
+    expect(openName()).toEqual(["My Splash Page"]);
+    expect(name).toHaveFocus();
+    expect(name).toHaveValue("My Splash Page");
   });
 
   it("the open Splash Page's name never appears in the Preview", async () => {

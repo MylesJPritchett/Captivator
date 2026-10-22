@@ -19,7 +19,7 @@ import { focusRing } from "@/ui/focus-ring";
 import {
   libraryReducer,
   loadLibrary,
-  openSplashPage,
+  openEntry,
   saveLibrary,
   type Library,
   type SaveResult,
@@ -50,10 +50,7 @@ export default function Home() {
 
 function Captivator({ initialLibrary }: { initialLibrary: Library }) {
   const [library, dispatch] = useReducer(libraryReducer, initialLibrary);
-  const splashPage = openSplashPage(library);
-  const openEntry = library.splashPages.find(
-    ({ id }) => id === library.openSplashPageId,
-  );
+  const open = openEntry(library);
   const [device, setDevice] = useState<Device>(defaultDevice);
   // Narrow screens hide the Library behind a button; wide ones always show it.
   const [libraryShown, setLibraryShown] = useState(false);
@@ -105,7 +102,7 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
         </h2>
         <DeviceToggle device={device} onChange={setDevice} />
         <Preview
-          splashPage={splashPage}
+          splashPage={open.splashPage}
           device={device}
           onClickElement={jumpToEditorFor}
         />
@@ -136,11 +133,7 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
             </p>
           )}
         </div>
-        <Editor
-          name={openEntry?.name ?? ""}
-          splashPage={splashPage}
-          dispatch={dispatch}
-        />
+        <Editor open={open} dispatch={dispatch} />
       </section>
     </>
   );

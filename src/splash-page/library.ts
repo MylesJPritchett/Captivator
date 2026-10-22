@@ -97,7 +97,7 @@ export function openSplashPage(library: Library): SplashPage {
 }
 
 /** The Open Splash Page's Library entry. */
-function openEntry(library: Library): LibraryEntry {
+export function openEntry(library: Library): LibraryEntry {
   const entry = library.splashPages.find(
     ({ id }) => id === library.openSplashPageId,
   );

@@ -3,6 +3,7 @@ export { starterSplashPage, starterLibrary } from "./starter";
 export { splashPageReducer, type SplashPageAction } from "./reducer";
 export {
   libraryReducer,
+  openEntry,
   openSplashPage,
   splashPageName,
   type LibraryAction,
