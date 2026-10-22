@@ -50,4 +50,22 @@ describe("Captivator: Reset to starter", () => {
       within(preview).getByRole("figure", { name: "Desktop Preview" }),
     ).toBeInTheDocument();
   });
+
+  it("cancelling the Reset confirmation leaves the Splash Page unchanged", async () => {
+    const user = userEvent.setup();
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    const { preview, editor } = renderCaptivator();
+    await editSplashPage(user, editor);
+
+    await user.click(
+      within(editor).getByRole("button", { name: "Reset to starter" }),
+    );
+
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
+    expect(within(preview).queryByText("Free WiFi")).not.toBeInTheDocument();
+    expect(previewInputFieldNames(preview)).toEqual(["Email", "Name"]);
+  });
 });
