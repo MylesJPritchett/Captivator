@@ -14,8 +14,6 @@ Users should (at a minimum) be able to:
     Add up to two input fields, choosing from Name, Email and Phone.
     Customise the Connect button’s background colour and text colour.
 
-
 Show changes instantly in a live preview, with mobile and desktop views. Keep the editor intuitive for non-technical customers.
-
 
 It is built in Next.js using typescript.
