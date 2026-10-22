@@ -1,9 +1,10 @@
 import type { SplashPageAction } from "./reducer";
-import type { Colour, SplashPage } from "./types";
+import type { Background, Colour, SplashPage } from "./types";
 
 export type BackgroundAction =
   | { type: "setBackgroundColour"; colour: Colour }
-  | { type: "setBackgroundImage"; imageUrl: string };
+  | { type: "setBackgroundImage"; imageUrl: string }
+  | { type: "setBackgroundKind"; kind: Background["kind"] };
 
 export function backgroundReducer(
   splashPage: SplashPage,
@@ -27,6 +28,11 @@ export function backgroundReducer(
           kind: "image",
           imageUrl: action.imageUrl,
         },
+      };
+    case "setBackgroundKind":
+      return {
+        ...splashPage,
+        background: { ...splashPage.background, kind: action.kind },
       };
     default:
       return splashPage;

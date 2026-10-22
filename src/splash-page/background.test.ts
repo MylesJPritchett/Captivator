@@ -36,4 +36,22 @@ describe("Background", () => {
       imageUrl: "blob:venue",
     });
   });
+
+  it("switching the Background between colour and image never loses either value", () => {
+    const showingColour = splashPageReducer(withImageShowing, {
+      type: "setBackgroundKind",
+      kind: "colour",
+    });
+    expect(showingColour.background).toEqual({
+      kind: "colour",
+      colour: "#1e3a8a",
+      imageUrl: "blob:venue",
+    });
+
+    const showingImageAgain = splashPageReducer(showingColour, {
+      type: "setBackgroundKind",
+      kind: "image",
+    });
+    expect(showingImageAgain.background).toEqual(withImageShowing.background);
+  });
 });
