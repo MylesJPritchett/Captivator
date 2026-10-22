@@ -1,4 +1,5 @@
 import { within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { pickColour, renderCaptivator } from "@/app/test-helpers";
 
@@ -29,5 +30,18 @@ describe("Captivator: Connect Button", () => {
     });
     expect(connectButton).toHaveStyle({ color: "#111827" });
     expect(connectButton).toHaveTextContent(/^Connect$/);
+  });
+});
+
+describe("Captivator: clicking the Connect Button in the Preview", () => {
+  it("focuses the first control in the Editor's Connect Button section", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+
+    await user.click(within(preview).getByRole("button", { name: "Connect" }));
+
+    expect(
+      within(editor).getByLabelText("Connect Button background colour"),
+    ).toHaveFocus();
   });
 });

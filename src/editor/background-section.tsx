@@ -15,7 +15,7 @@ export function BackgroundSection({
   dispatch,
 }: EditorSectionProps) {
   return (
-    <EditorSection title="Background">
+    <EditorSection title="Background" area="background">
       <SegmentedControl
         legend="Background shows"
         name="background-kind"

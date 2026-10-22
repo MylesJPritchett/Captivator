@@ -60,3 +60,16 @@ describe("Captivator: Input Fields", () => {
     ).toBeInTheDocument();
   });
 });
+
+describe("Captivator: clicking an Input Field in the Preview", () => {
+  it("focuses the first control in the Editor's Input Fields section", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+
+    await user.click(within(preview).getByRole("textbox", { name: "Email" }));
+
+    expect(
+      within(editor).getByRole("button", { name: "Remove Email Input Field" }),
+    ).toHaveFocus();
+  });
+});

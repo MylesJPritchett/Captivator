@@ -7,7 +7,7 @@ export function ConnectButtonSection({
   dispatch,
 }: EditorSectionProps) {
   return (
-    <EditorSection title="Connect Button">
+    <EditorSection title="Connect Button" area="connectButton">
       <ColourControl
         id="connect-button-background-colour"
         label="Connect Button background colour"

@@ -1,4 +1,15 @@
 import { defineConfig, devices } from "@playwright/test";
+import { execFileSync } from "node:child_process";
+import { existsSync } from "node:fs";
+
+function nixosChromium(): string | undefined {
+  if (!existsSync("/etc/NIXOS")) return undefined;
+  try {
+    return execFileSync("which", ["chromium"], { encoding: "utf8" }).trim();
+  } catch {
+    return undefined;
+  }
+}
 
 // Override with PLAYWRIGHT_PORT to avoid reusing another server on :3000.
 const PORT = Number(process.env.PLAYWRIGHT_PORT) || 3000;
@@ -15,10 +26,11 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "on-first-retry",
-    // Optional: point at a system Chromium where Playwright's download can't
-    // run (e.g. NixOS). Unset in CI, so the bundled browser is used there.
+    // Playwright's downloaded Chromium can't run on NixOS, so use the system
+    // one there. Elsewhere (including CI) the bundled browser is used.
     launchOptions: {
-      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || undefined,
+      executablePath:
+        process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || nixosChromium(),
     },
   },
   // Chromium only, at both Device sizes the Preview supports.

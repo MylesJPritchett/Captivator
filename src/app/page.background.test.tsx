@@ -89,3 +89,45 @@ describe("Captivator: Background", () => {
     expect(background()).toHaveStyle({ backgroundColor: "#1e3a8a" });
   });
 });
+
+describe("Captivator: clicking the Background in the Preview", () => {
+  it("away from other elements, focuses the first control in the Editor's Background section", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+
+    await user.click(
+      within(preview).getByRole("group", { name: "Background" }),
+    );
+
+    expect(within(editor).getByRole("radio", { name: "Colour" })).toHaveFocus();
+  });
+
+  it("with the Background set to an image, focuses the checked option, where Tab would land", async () => {
+    const user = userEvent.setup();
+    const { editor, background } = renderCaptivator();
+    await user.upload(
+      within(editor).getByLabelText("Background image"),
+      imageFile("venue.png"),
+    );
+    await user.click(within(editor).getByRole("radio", { name: "Image" }));
+    // Move focus away so the click below has to bring it back.
+    within(editor).getByLabelText("Background colour").focus();
+
+    await user.click(background());
+
+    expect(within(editor).getByRole("radio", { name: "Image" })).toHaveFocus();
+  });
+
+  it("clicking the Logo on the Background still focuses the Editor's Logo section", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+    await user.upload(
+      within(editor).getByLabelText("Logo image"),
+      imageFile("cafe-logo.png"),
+    );
+
+    await user.click(within(preview).getByRole("img", { name: "Logo" }));
+
+    expect(within(editor).getByLabelText("Logo image")).toHaveFocus();
+  });
+});
