@@ -16,17 +16,25 @@ describe("Captivator: Editor and Preview", () => {
     ).toBeInTheDocument();
   });
 
-  it("the Preview's Input Fields and Connect Button are inert", async () => {
+  it("the Preview's Input Fields and Connect Button are inert, but not shown as disabled", async () => {
     const user = userEvent.setup();
     const { preview } = renderCaptivator();
-
     const email = within(preview).getByRole("textbox", { name: "Email" });
+    const connectButton = within(preview).getByRole("button", {
+      name: "Connect",
+    });
+
     await user.type(email, "guest@example.com");
 
     expect(email).toHaveValue("");
-    expect(
-      within(preview).getByRole("button", { name: "Connect" }),
-    ).toBeDisabled();
+    // A Guest sees them enabled, so the Preview mustn't grey them out.
+    expect(email).toBeEnabled();
+    expect(connectButton).toBeEnabled();
+
+    // Keyboard focus skips them: from the Device toggle it goes to the Editor.
+    screen.getByRole("radio", { name: "Mobile" }).focus();
+    await user.tab();
+    expect(preview).not.toContainElement(document.activeElement as HTMLElement);
   });
 
   it("tells the Customer the design isn't saved on refresh", () => {
