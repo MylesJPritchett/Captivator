@@ -1,7 +1,7 @@
-import { waitFor, within } from "@testing-library/react";
+import { cleanup, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { renderCaptivator } from "@/app/test-helpers";
+import { imageFile, pickColour, renderCaptivator } from "@/app/test-helpers";
 
 /** Saves longer than this fail, as if this browser's storage were full. */
 const storageLimit = 2_000;
@@ -60,6 +60,74 @@ describe("Captivator: images too large to remember", () => {
       expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
     );
     expect(background()).toHaveStyle({
+      backgroundImage: `url("${largeImageDataUrl}")`,
+    });
+  });
+
+  it("telling the Customer their images are too large doesn't move focus", async () => {
+    const user = userEvent.setup();
+    const { editor } = renderCaptivator();
+    const backgroundImage = within(editor).getByLabelText("Background image");
+
+    await user.upload(backgroundImage, largeImageFile("venue.png"));
+
+    await waitFor(() =>
+      expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
+    );
+    expect(backgroundImage).toHaveFocus();
+  });
+
+  it("replacing a Background image too large to remember with one that fits clears the message", async () => {
+    const user = userEvent.setup();
+    const { editor } = renderCaptivator();
+    const backgroundImage = within(editor).getByLabelText("Background image");
+    await user.upload(backgroundImage, largeImageFile("venue.png"));
+    await waitFor(() =>
+      expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
+    );
+
+    await user.upload(backgroundImage, imageFile("small-venue.png"));
+
+    await waitFor(() =>
+      expect(savedNote(editor)).not.toHaveTextContent(imagesTooLarge),
+    );
+    expect(savedNote(editor)).toHaveTextContent(
+      "Your design is saved in this browser.",
+    );
+  });
+
+  it("after images too large to remember, rendering Captivator again shows the text and colours without the images", async () => {
+    const user = userEvent.setup();
+    const { editor } = renderCaptivator();
+    await user.upload(
+      within(editor).getByLabelText("Logo image"),
+      largeImageFile("cafe-logo.png"),
+    );
+    pickColour(within(editor).getByLabelText("Background colour"), "#123456");
+    await user.upload(
+      within(editor).getByLabelText("Background image"),
+      largeImageFile("venue.png"),
+    );
+    const textBlockText = within(editor).getByRole("textbox", {
+      name: "Text Block 1 text",
+    });
+    await user.clear(textBlockText);
+    await user.type(textBlockText, "Welcome to the Café");
+    await waitFor(() =>
+      expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
+    );
+
+    cleanup();
+    const { preview, background } = renderCaptivator();
+
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
+    expect(
+      within(preview).queryByRole("img", { name: "Logo" }),
+    ).not.toBeInTheDocument();
+    expect(background()).toHaveStyle({ backgroundColor: "#123456" });
+    expect(background()).not.toHaveStyle({
       backgroundImage: `url("${largeImageDataUrl}")`,
     });
   });
