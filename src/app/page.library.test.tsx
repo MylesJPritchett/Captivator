@@ -179,4 +179,19 @@ describe("Captivator: the Library", () => {
 
     expect(within(editor).getByRole("textbox", { name: "Name" })).toHaveFocus();
   });
+
+  it("a long name is given in full to screen readers in the Library", async () => {
+    const user = userEvent.setup();
+    const { editor } = await renderCaptivator();
+    const longName =
+      "The Corner Café on the High Street, Free WiFi for Every Guest";
+
+    const name = within(editor).getByRole("textbox", { name: "Name" });
+    await user.clear(name);
+    await user.type(name, longName);
+
+    expect(
+      within(library()).getByRole("button", { name: longName }),
+    ).toHaveAttribute("aria-current", "true");
+  });
 });
