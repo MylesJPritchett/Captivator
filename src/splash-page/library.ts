@@ -7,9 +7,7 @@ import type { Library, SplashPage } from "./types";
  * Splash Page action, for the Open Splash Page only.
  */
 export type LibraryAction =
-  | { type: "new" }
-  | { type: "open"; id: string }
-  | SplashPageAction;
+  { type: "new" } | { type: "open"; id: string } | SplashPageAction;
 
 /** The name a new Splash Page starts with. */
 export const untitledSplashPageName = "Untitled Splash Page";

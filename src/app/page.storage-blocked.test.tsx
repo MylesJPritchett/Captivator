@@ -40,7 +40,9 @@ describe("Captivator: storage blocked in this browser", () => {
       expect(within(editor).getByText(cantBeSaved)).toBeInTheDocument(),
     );
     expect(
-      within(editor).queryByText("Your Splash Pages are saved in this browser."),
+      within(editor).queryByText(
+        "Your Splash Pages are saved in this browser.",
+      ),
     ).not.toBeInTheDocument();
   });
 
