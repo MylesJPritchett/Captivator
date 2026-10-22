@@ -9,12 +9,12 @@ import {
   type Device,
   type PreviewTarget,
 } from "@/preview";
+import { LibraryNav } from "@/library";
 import {
+  libraryReducer,
   loadLibrary,
   openSplashPage,
   saveLibrary,
-  splashPageReducer,
-  withOpenSplashPage,
   type Library,
   type SaveResult,
 } from "@/splash-page";
@@ -43,28 +43,28 @@ export default function Home() {
 }
 
 function Captivator({ initialLibrary }: { initialLibrary: Library }) {
-  const [splashPage, dispatch] = useReducer(
-    splashPageReducer,
-    initialLibrary,
-    openSplashPage,
-  );
+  const [library, dispatch] = useReducer(libraryReducer, initialLibrary);
+  const splashPage = openSplashPage(library);
   const [device, setDevice] = useState<Device>(defaultDevice);
 
   const [saveResult, setSaveResult] = useState<SaveResult>("saved");
   useEffect(() => {
     // Saves go through in order; report only the latest one's result.
     let latest = true;
-    const library = withOpenSplashPage(initialLibrary, splashPage);
     void saveLibrary(library).then((result) => {
       if (latest) setSaveResult(result);
     });
     return () => {
       latest = false;
     };
-  }, [initialLibrary, splashPage]);
+  }, [library]);
 
   return (
     <>
+      <div className="w-full lg:sticky lg:top-8 lg:w-56 lg:shrink-0">
+        <LibraryNav library={library} dispatch={dispatch} />
+      </div>
+
       <section
         aria-labelledby="preview-heading"
         className="flex flex-col items-center gap-4 lg:sticky lg:top-8 lg:flex-1"
