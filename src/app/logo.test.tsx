@@ -79,4 +79,25 @@ describe("Captivator: Logo", () => {
       within(editor).queryByRole("button", { name: "Remove Logo" }),
     ).not.toBeInTheDocument();
   });
+
+  it("choosing a file that isn't an image shows an error and leaves the Logo unchanged", async () => {
+    // Let the Customer pick any file, as a browser's "All files" option does.
+    const user = userEvent.setup({ applyAccept: false });
+    const { preview, editor } = renderCaptivator();
+    const logoImage = within(editor).getByLabelText("Logo image");
+    await user.upload(logoImage, imageFile("cafe-logo.png"));
+
+    await user.upload(
+      logoImage,
+      new File(["%PDF"], "menu.pdf", { type: "application/pdf" }),
+    );
+
+    expect(within(editor).getByRole("alert")).toHaveTextContent(
+      /isn't an image/i,
+    );
+    expect(within(preview).getByRole("img", { name: "Logo" })).toHaveAttribute(
+      "src",
+      "blob:cafe-logo.png",
+    );
+  });
 });
