@@ -1,5 +1,6 @@
 import { BackgroundSection } from "./background-section";
 import { ConnectButtonSection } from "./connect-button-section";
+import { DuplicateButton } from "./duplicate-button";
 import { InputFieldsSection } from "./input-fields-section";
 import { LogoSection } from "./logo-section";
 import { ResetButton } from "./reset-button";
@@ -18,7 +19,10 @@ export function Editor(props: EditorSectionProps) {
       <TextSection {...props} />
       <InputFieldsSection {...props} />
       <ConnectButtonSection {...props} />
-      <ResetButton dispatch={props.dispatch} />
+      <div className="flex flex-wrap gap-2">
+        <ResetButton dispatch={props.dispatch} />
+        <DuplicateButton dispatch={props.dispatch} />
+      </div>
     </div>
   );
 }

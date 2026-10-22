@@ -1,7 +1,12 @@
 import { cleanup, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { editTextBlock1, renderCaptivator } from "@/app/test-helpers";
+import {
+  editTextBlock1,
+  imageDataUrl,
+  imageFile,
+  renderCaptivator,
+} from "@/app/test-helpers";
 
 /** The Library, down the left side of the screen. */
 function library() {
@@ -105,5 +110,42 @@ describe("Captivator: the Library", () => {
     expect(
       within(preview).getByText("Welcome to the Café"),
     ).toBeInTheDocument();
+  });
+
+  it("Duplicate opens a Copy of the Open Splash Page with the same design, and editing the copy leaves the original unchanged", async () => {
+    const user = userEvent.setup();
+    const { editor, preview } = await renderCaptivator();
+    await editTextBlock1(user, editor, "Welcome to the Café");
+    await user.upload(
+      within(editor).getByLabelText("Logo image"),
+      imageFile("cafe-logo.png"),
+    );
+    await within(preview).findByRole("img", { name: "Logo" });
+
+    within(editor).getByRole("button", { name: "Duplicate" }).focus();
+    await user.keyboard("{Enter}");
+
+    expect(libraryNames()).toEqual([
+      "My Splash Page",
+      "Copy of My Splash Page",
+    ]);
+    expect(openName()).toEqual(["Copy of My Splash Page"]);
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
+    expect(within(preview).getByRole("img", { name: "Logo" })).toHaveAttribute(
+      "src",
+      imageDataUrl("cafe-logo.png"),
+    );
+
+    await editTextBlock1(user, editor, "Happy hour");
+    await user.click(
+      within(library()).getByRole("button", { name: "My Splash Page" }),
+    );
+
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
+    expect(within(preview).queryByText("Happy hour")).not.toBeInTheDocument();
   });
 });
