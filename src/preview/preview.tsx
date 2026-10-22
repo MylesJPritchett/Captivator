@@ -1,3 +1,4 @@
+import type { MouseEvent } from "react";
 import type { EditorArea } from "@/editor";
 import type { SplashPage } from "@/splash-page";
 import { backgroundStyle } from "./background-style";
@@ -20,16 +21,26 @@ type PreviewProps = {
  * fixed centred order Logo → Text Blocks → Input Fields → Connect Button.
  */
 export function Preview({ splashPage, device, onJump }: PreviewProps) {
+  // The Background, and the empty layout around the content, jump to the
+  // Background only when the click lands on them, not on an element on top.
+  const jumpToBackground = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) onJump("background");
+  };
+
   return (
     <DeviceFrame device={device}>
       {/* The Background fills the whole frame, with the content on top. */}
       <div
         role="group"
         aria-label="Background"
-        className="flex h-full w-full overflow-y-auto"
+        className="flex h-full w-full cursor-pointer overflow-y-auto"
         style={backgroundStyle(splashPage.background)}
+        onClick={jumpToBackground}
       >
-        <div className="m-auto flex w-full max-w-[420px] flex-col items-center gap-4 px-6 py-10 text-center">
+        <div
+          onClick={jumpToBackground}
+          className="m-auto flex w-full max-w-[420px] flex-col items-center gap-4 px-6 py-10 text-center"
+        >
           <PreviewLogo logo={splashPage.logo} onClick={() => onJump("logo")} />
           <PreviewTextBlocks textBlocks={splashPage.textBlocks} />
           <PreviewInputFields
