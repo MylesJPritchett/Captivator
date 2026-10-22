@@ -1,19 +1,47 @@
 "use client";
 
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { Editor } from "@/editor";
 import { defaultDevice, DeviceToggle, Preview, type Device } from "@/preview";
-import { splashPageReducer, starterSplashPage } from "@/splash-page";
+import {
+  loadSplashPage,
+  saveSplashPage,
+  splashPageReducer,
+  type SplashPage,
+} from "@/splash-page";
 
 export default function Home() {
-  const [splashPage, dispatch] = useReducer(
-    splashPageReducer,
-    starterSplashPage,
-  );
-  const [device, setDevice] = useState<Device>(defaultDevice);
+  // The remembered Splash Page lives in this browser's localStorage, which
+  // only exists after mount (the route is prerendered). Until it's read,
+  // render nothing rather than flash the Starter Splash Page.
+  const [initialSplashPage, setInitialSplashPage] = useState<SplashPage>();
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reading browser-only storage once after mount
+    setInitialSplashPage(loadSplashPage(localStorage));
+  }, []);
 
   return (
     <main className="flex flex-1 flex-col gap-6 p-4 lg:flex-row lg:items-start lg:gap-10 lg:p-8">
+      {initialSplashPage && (
+        <Captivator initialSplashPage={initialSplashPage} />
+      )}
+    </main>
+  );
+}
+
+function Captivator({ initialSplashPage }: { initialSplashPage: SplashPage }) {
+  const [splashPage, dispatch] = useReducer(
+    splashPageReducer,
+    initialSplashPage,
+  );
+  const [device, setDevice] = useState<Device>(defaultDevice);
+
+  useEffect(() => {
+    saveSplashPage(localStorage, splashPage);
+  }, [splashPage]);
+
+  return (
+    <>
       <section
         aria-labelledby="preview-heading"
         className="flex flex-col items-center gap-4 lg:sticky lg:top-8 lg:flex-1"
@@ -38,6 +66,6 @@ export default function Home() {
         </p>
         <Editor splashPage={splashPage} dispatch={dispatch} />
       </section>
-    </main>
+    </>
   );
 }
