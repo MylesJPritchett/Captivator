@@ -53,8 +53,9 @@ Test only at these three seams. Don't add others without agreeing it with the de
 
 ### Architecture
 
-- [ADR-0001](docs/adr/0001-client-only-no-persistence.md): client-only. No API routes, database, auth or persistence.
+- [ADR-0001](docs/adr/0001-client-only-no-persistence.md): client-only. No backend: no API routes, database or auth. The Splash Page is remembered only in this browser, per ADR-0003.
 - [ADR-0002](docs/adr/0002-splash-page-state-as-pure-reducer.md): the whole Splash Page is one plain, serialisable object changed only by a pure reducer. The reducer is the authority for domain rules; the UI reflects it.
+- [ADR-0003](docs/adr/0003-remember-splash-page-in-localstorage.md): the Splash Page, images as data URLs, is remembered in this browser's `localStorage` under a versioned key. Older or unreadable saves open on the Starter Splash Page.
 
 Intended module layout (create these test-first; they don't exist yet):
 
