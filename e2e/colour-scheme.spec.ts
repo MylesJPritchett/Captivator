@@ -112,6 +112,25 @@ test.describe("with a dark colour scheme", () => {
     }
   });
 
+  test("a disabled Editor button looks disabled yet stays legible", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const button = page
+      .getByRole("region", { name: "Editor" })
+      .getByRole("button", { name: "Add Text Block" });
+    const enabled = await colours(button);
+    // No Editor button is disabled today; disable one to check the shared
+    // disabled style that any of them would get.
+    await button.evaluate((element) => element.setAttribute("disabled", ""));
+    const disabled = await colours(button);
+
+    expect(disabled.text).not.toBe(enabled.text);
+    expect(contrast(disabled.text, disabled.background)).toBeGreaterThanOrEqual(
+      3,
+    );
+  });
+
   test("the Editor's status and error messages are readable", async ({
     page,
   }) => {
