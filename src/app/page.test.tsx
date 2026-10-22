@@ -76,4 +76,28 @@ describe("Captivator: Editor and Preview", () => {
       previewInputFields.map((field) => field.getAttribute("placeholder")),
     ).toEqual(["Email", "Name"]);
   });
+
+  it("the add Input Field control offers only unused types, and goes once there are two Input Fields", async () => {
+    const user = userEvent.setup();
+    const { editor } = renderCaptivator();
+
+    const typeOptions = within(
+      within(editor).getByRole("combobox", { name: "Input Field type" }),
+    ).getAllByRole("option");
+    expect(typeOptions.map((option) => option.textContent)).toEqual([
+      "Name",
+      "Phone",
+    ]);
+
+    await user.click(
+      within(editor).getByRole("button", { name: "Add Input Field" }),
+    );
+
+    expect(
+      within(editor).queryByRole("combobox", { name: "Input Field type" }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(editor).queryByRole("button", { name: "Add Input Field" }),
+    ).not.toBeInTheDocument();
+  });
 });
