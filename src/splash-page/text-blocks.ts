@@ -1,24 +1,84 @@
 import type { SplashPageAction } from "./reducer";
-import type { SplashPage } from "./types";
+import type { Colour, SplashPage, TextBlock } from "./types";
 
-export type TextBlockAction = {
-  type: "updateTextBlockText";
-  id: string;
-  text: string;
+export type TextBlockAction =
+  | {
+      type: "addTextBlock";
+      /** Chosen by the caller so the reducer stays pure. */
+      id: string;
+    }
+  | {
+      type: "updateTextBlockText";
+      id: string;
+      text: string;
+    }
+  | {
+      type: "updateTextBlockColour";
+      id: string;
+      colour: Colour;
+    }
+  | {
+      type: "updateTextBlockSize";
+      id: string;
+      /** In px; clamped to minTextBlockSize–maxTextBlockSize. */
+      size: number;
+    }
+  | {
+      type: "removeTextBlock";
+      id: string;
+    };
+
+export const minTextBlockSize = 12;
+export const maxTextBlockSize = 64;
+
+const newTextBlock: Omit<TextBlock, "id"> = {
+  text: "New text",
+  colour: "#ffffff",
+  size: 20,
 };
+
+function updateTextBlock(
+  splashPage: SplashPage,
+  id: string,
+  changes: Partial<Omit<TextBlock, "id">>,
+): SplashPage {
+  return {
+    ...splashPage,
+    textBlocks: splashPage.textBlocks.map((textBlock) =>
+      textBlock.id === id ? { ...textBlock, ...changes } : textBlock,
+    ),
+  };
+}
 
 export function textBlocksReducer(
   splashPage: SplashPage,
   action: SplashPageAction,
 ): SplashPage {
   switch (action.type) {
-    case "updateTextBlockText":
+    case "addTextBlock":
       return {
         ...splashPage,
-        textBlocks: splashPage.textBlocks.map((textBlock) =>
-          textBlock.id === action.id
-            ? { ...textBlock, text: action.text }
-            : textBlock,
+        textBlocks: [
+          ...splashPage.textBlocks,
+          { ...newTextBlock, id: action.id },
+        ],
+      };
+    case "updateTextBlockText":
+      return updateTextBlock(splashPage, action.id, { text: action.text });
+    case "updateTextBlockColour":
+      return updateTextBlock(splashPage, action.id, { colour: action.colour });
+    case "updateTextBlockSize":
+      return updateTextBlock(splashPage, action.id, {
+        size: Math.min(
+          maxTextBlockSize,
+          Math.max(minTextBlockSize, action.size),
+        ),
+      });
+    case "removeTextBlock":
+      return {
+        ...splashPage,
+        textBlocks: splashPage.textBlocks.filter(
+          (textBlock) => textBlock.id !== action.id,
         ),
       };
     default:
