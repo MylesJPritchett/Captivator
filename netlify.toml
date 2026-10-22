@@ -3,4 +3,5 @@
   command = "pnpm build"
 
 [build.environment]
+  # Netlify also reads .nvmrc, the source of truth; keep this in sync with it.
   NODE_VERSION = "24"
