@@ -31,7 +31,7 @@ export type TextBlockAction =
 export const minTextBlockSize = 12;
 export const maxTextBlockSize = 64;
 
-const newTextBlock: Omit<TextBlock, "id"> = {
+const defaultTextBlockValues: Omit<TextBlock, "id"> = {
   text: "New text",
   colour: "#ffffff",
   size: 20,
@@ -60,7 +60,7 @@ export function textBlocksReducer(
         ...splashPage,
         textBlocks: [
           ...splashPage.textBlocks,
-          { ...newTextBlock, id: action.id },
+          { ...defaultTextBlockValues, id: action.id },
         ],
       };
     case "updateTextBlockText":

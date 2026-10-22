@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { addableInputFieldTypes, type InputFieldType } from "@/splash-page";
+import { focusRing } from "@/ui/focus-ring";
 import { EditorSection } from "./editor-section";
 import type { EditorSectionProps } from "./types";
 
@@ -33,7 +34,7 @@ export function InputFieldsSection({
                     inputFieldType: inputField.type,
                   })
                 }
-                className="rounded-md border border-zinc-300 px-2 py-1 text-sm"
+                className={`rounded-md border border-zinc-300 px-2 py-1 text-sm ${focusRing}`}
               >
                 Remove
               </button>
@@ -56,7 +57,7 @@ export function InputFieldsSection({
               onChange={(event) =>
                 setChosenType(event.target.value as InputFieldType)
               }
-              className="rounded-md border border-zinc-300 px-3 py-2"
+              className={`rounded-md border border-zinc-300 px-3 py-2 ${focusRing}`}
             >
               {addableTypes.map((type) => (
                 <option key={type} value={type}>
@@ -70,7 +71,7 @@ export function InputFieldsSection({
             onClick={() =>
               dispatch({ type: "addInputField", inputFieldType: newType })
             }
-            className="rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white"
+            className={`rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white ${focusRing}`}
           >
             Add Input Field
           </button>

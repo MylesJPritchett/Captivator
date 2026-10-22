@@ -1,15 +1,7 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import Home from "@/app/page";
-
-function renderCaptivator() {
-  render(<Home />);
-  return {
-    preview: screen.getByRole("region", { name: "Preview" }),
-    editor: screen.getByRole("region", { name: "Editor" }),
-  };
-}
+import { pickColour, renderCaptivator } from "@/app/test-helpers";
 
 describe("Captivator: Editor and Preview", () => {
   it("the Preview shows the starter Splash Page", () => {
@@ -24,17 +16,25 @@ describe("Captivator: Editor and Preview", () => {
     ).toBeInTheDocument();
   });
 
-  it("the Preview's Input Fields and Connect Button are inert", async () => {
+  it("the Preview's Input Fields and Connect Button are inert, but not shown as disabled", async () => {
     const user = userEvent.setup();
     const { preview } = renderCaptivator();
-
     const email = within(preview).getByRole("textbox", { name: "Email" });
+    const connectButton = within(preview).getByRole("button", {
+      name: "Connect",
+    });
+
     await user.type(email, "guest@example.com");
 
     expect(email).toHaveValue("");
-    expect(
-      within(preview).getByRole("button", { name: "Connect" }),
-    ).toBeDisabled();
+    // A Guest sees them enabled, so the Preview mustn't grey them out.
+    expect(email).toBeEnabled();
+    expect(connectButton).toBeEnabled();
+
+    // Keyboard focus skips them: from the Device toggle it goes to the Editor.
+    screen.getByRole("radio", { name: "Mobile" }).focus();
+    await user.tab();
+    expect(preview).not.toContainElement(document.activeElement as HTMLElement);
   });
 
   it("tells the Customer the design isn't saved on refresh", () => {
@@ -88,10 +88,7 @@ describe("Captivator: Editor and Preview", () => {
   it("changing a Text Block's colour in the Editor recolours it in the Preview", () => {
     const { preview, editor } = renderCaptivator();
 
-    // user-event can't drive a native colour picker, so set its value directly.
-    fireEvent.change(within(editor).getByLabelText("Text Block 1 colour"), {
-      target: { value: "#ff0000" },
-    });
+    pickColour(within(editor).getByLabelText("Text Block 1 colour"), "#ff0000");
 
     expect(within(preview).getByText("Free WiFi")).toHaveStyle({
       color: "#ff0000",

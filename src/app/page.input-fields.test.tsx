@@ -1,15 +1,7 @@
-import { render, screen, within } from "@testing-library/react";
+import { within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import Home from "@/app/page";
-
-function renderCaptivator() {
-  render(<Home />);
-  return {
-    preview: screen.getByRole("region", { name: "Preview" }),
-    editor: screen.getByRole("region", { name: "Editor" }),
-  };
-}
+import { renderCaptivator } from "@/app/test-helpers";
 
 describe("Captivator: Input Fields", () => {
   it("adding an Input Field in the Editor shows it in the Preview with its type as placeholder", async () => {

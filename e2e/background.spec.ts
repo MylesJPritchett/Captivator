@@ -1,8 +1,8 @@
 import path from "node:path";
 import { expect, test, type Locator } from "@playwright/test";
 
-// A real 1200×800 PNG.
-const venuePhoto = path.join(__dirname, "fixtures", "logo.png");
+// A real 1200×800 PNG: a plain green stand-in for a photo of the venue.
+const venuePhoto = path.join(__dirname, "fixtures", "venue.png");
 
 async function expectToFill(background: Locator, frame: Locator) {
   const backgroundBox = await background.boundingBox();
