@@ -1,0 +1,168 @@
+import path from "node:path";
+import { expect, test } from "@playwright/test";
+
+test("the Connect Button reads Connect, exactly as written", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  // innerText includes CSS text transforms, so this is what a Guest reads.
+  await expect(
+    page
+      .getByRole("region", { name: "Preview" })
+      .getByRole("button", { name: "Connect" }),
+  ).toHaveText("Connect", { useInnerText: true });
+});
+
+test("the Preview sits above the Editor on narrow screens and beside it on wide ones", async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto("/");
+
+  const preview = await page
+    .getByRole("region", { name: "Preview" })
+    .boundingBox();
+  const editor = await page
+    .getByRole("region", { name: "Editor" })
+    .boundingBox();
+  if (!preview || !editor) throw new Error("Preview or Editor not rendered");
+
+  if (isMobile) {
+    expect(editor.y).toBeGreaterThanOrEqual(preview.y + preview.height);
+  } else {
+    expect(editor.x).toBeGreaterThanOrEqual(preview.x + preview.width);
+  }
+  // No horizontal scrolling on either screen size.
+  const scrollWidth = await page.evaluate(
+    () => document.documentElement.scrollWidth,
+  );
+  expect(scrollWidth).toBeLessThanOrEqual(page.viewportSize()!.width);
+});
+
+test("on a laptop screen the whole Mobile Preview fits beside the Editor without scrolling", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "Narrow screens stack the Preview above the Editor");
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto("/");
+  const preview = page.getByRole("region", { name: "Preview" });
+
+  const mobile = await preview
+    .getByRole("figure", { name: "Mobile Preview" })
+    .boundingBox();
+  const connect = await preview
+    .getByRole("button", { name: "Connect" })
+    .boundingBox();
+  if (!mobile || !connect) throw new Error("Mobile Preview not rendered");
+
+  expect(mobile.y + mobile.height).toBeLessThanOrEqual(768);
+  expect(connect.y + connect.height).toBeLessThanOrEqual(768);
+  // Still the phone's 375:667 screen inside a 12px bezel.
+  expect((mobile.width - 24) / (mobile.height - 24)).toBeCloseTo(375 / 667, 2);
+});
+
+test("every Editor control shows the same visible keyboard focus style as the Device toggle", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const editor = page.getByRole("region", { name: "Editor" });
+  // Upload a Logo so its Remove Logo button is there to reach too.
+  await editor
+    .getByLabel("Logo image")
+    .setInputFiles(path.join(__dirname, "fixtures", "logo.png"));
+
+  // The focus ring of whatever has keyboard focus. A segmented control's
+  // radio is hidden, so its ring is drawn on the radio's label.
+  const focusRing = () =>
+    page.evaluate(() => {
+      const focused = document.activeElement as HTMLElement;
+      const ringed =
+        focused instanceof HTMLInputElement && focused.type === "radio"
+          ? focused.closest("label")!
+          : focused;
+      const style = getComputedStyle(ringed);
+      return {
+        control:
+          focused.getAttribute("aria-label") ??
+          (focused as HTMLInputElement).labels?.[0]?.textContent ??
+          focused.textContent,
+        inEditor: !!focused.closest('[aria-labelledby="editor-heading"]'),
+        isDeviceToggle: (focused as HTMLInputElement).name === "device",
+        ring: `${style.outlineStyle} ${style.outlineWidth} ${style.outlineColor}`,
+      };
+    });
+
+  let deviceToggleRing: string | undefined;
+  const editorRings: { control: string | null; ring: string }[] = [];
+  for (let step = 0; step < 50; step++) {
+    await page.keyboard.press("Tab");
+    const { control, inEditor, isDeviceToggle, ring } = await focusRing();
+    if (isDeviceToggle) deviceToggleRing = ring;
+    if (inEditor) editorRings.push({ control, ring });
+    else if (editorRings.length > 0) break;
+  }
+
+  expect(deviceToggleRing).toMatch(/^solid 2px /);
+  expect(editorRings.length).toBeGreaterThan(10);
+  for (const { control, ring } of editorRings) {
+    expect(ring, `focus style of ${control}`).toBe(deviceToggleRing);
+  }
+});
+
+test("choosing Desktop swaps the tall phone frame for a wide frame with a centred column", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const preview = page.getByRole("region", { name: "Preview" });
+
+  const mobile = await preview
+    .getByRole("figure", { name: "Mobile Preview" })
+    .boundingBox();
+  if (!mobile) throw new Error("Mobile frame not rendered");
+  expect(mobile.height).toBeGreaterThan(mobile.width);
+
+  await page.getByRole("radio", { name: "Desktop" }).check();
+
+  const desktopFrame = preview.getByRole("figure", { name: "Desktop Preview" });
+  const desktop = await desktopFrame.boundingBox();
+  if (!desktop) throw new Error("Desktop frame not rendered");
+  expect(desktop.width).toBeGreaterThan(desktop.height);
+
+  // The content sits in a narrow column centred in the frame.
+  const connect = await desktopFrame
+    .getByRole("button", { name: "Connect" })
+    .boundingBox();
+  if (!connect) throw new Error("Connect Button not rendered");
+  expect(connect.width).toBeLessThan(desktop.width / 2);
+  expect(
+    Math.abs(connect.x + connect.width / 2 - (desktop.x + desktop.width / 2)),
+  ).toBeLessThan(4);
+
+  // The Background fills the frame, not only the column.
+  const backgroundNearEdge = await page.evaluate(
+    ([x, y]) => {
+      let element = document.elementFromPoint(x, y);
+      while (element) {
+        const colour = getComputedStyle(element).backgroundColor;
+        if (colour !== "rgba(0, 0, 0, 0)") return colour;
+        element = element.parentElement;
+      }
+      return null;
+    },
+    [desktop.x + desktop.width * 0.1, desktop.y + desktop.height * 0.85],
+  );
+  expect(backgroundNearEdge).toBe("rgb(30, 58, 138)");
+
+  // The scaled Desktop screen never widens the page.
+  const scrollWidth = await page.evaluate(
+    () => document.documentElement.scrollWidth,
+  );
+  expect(scrollWidth).toBeLessThanOrEqual(page.viewportSize()!.width);
+
+  await page.getByRole("radio", { name: "Mobile" }).check();
+  await expect(
+    preview.getByRole("figure", { name: "Mobile Preview" }),
+  ).toBeVisible();
+});
