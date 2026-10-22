@@ -8,9 +8,10 @@ import {
   imageFile,
   pickColour,
   renderCaptivator,
+  savedSplashPageKey,
   storageFull,
 } from "@/app/test-helpers";
-import { savesSettled } from "@/splash-page";
+import { savesSettled, starterSplashPage } from "@/splash-page";
 
 /** Saves longer than this fail, as if this browser's storage were full. */
 const storageLimit = 2_000;
@@ -176,6 +177,24 @@ describe("Captivator: images too large to remember", () => {
     expect(background()).not.toHaveStyle({
       backgroundImage: `url("${largeImageDataUrl}")`,
     });
+  });
+
+  it("a Splash Page remembered in localStorage with images too large to remember is still carried over once, then removed from localStorage", async () => {
+    localStorage.setItem(
+      savedSplashPageKey,
+      JSON.stringify({
+        ...starterSplashPage,
+        background: {
+          kind: "image",
+          colour: "#123456",
+          imageUrl: largeImageDataUrl,
+        },
+      }),
+    );
+
+    await renderCaptivator();
+
+    expect(localStorage.getItem(savedSplashPageKey)).toBeNull();
   });
 
   it("after one Splash Page's images are too large to remember, editing another Splash Page is still saved", async () => {

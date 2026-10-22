@@ -49,8 +49,8 @@ export async function loadLibrary(legacyStorage: Storage): Promise<Library> {
 /**
  * A Library holding the Splash Page ADR-0003 remembered in `legacyStorage`,
  * or one Starter Splash Page if there is none or it can't be read. Once the
- * Library holding it is saved, the Splash Page is removed from
- * `legacyStorage`, so it's carried over only once (ADR-0004).
+ * Library holding it is saved, even without images, the Splash Page is
+ * removed from `legacyStorage`, so it's carried over only once (ADR-0004).
  */
 async function carryOver(legacyStorage: Storage): Promise<Library> {
   // Throws if this browser blocks storage.
@@ -59,7 +59,7 @@ async function carryOver(legacyStorage: Storage): Promise<Library> {
   const parsed = parseJson(saved);
   if (!isSplashPage(parsed)) return starterLibrary;
   const library = libraryOf(parsed);
-  if ((await saveLibrary(library)) === "saved") {
+  if ((await saveLibrary(library)) !== "not saved") {
     legacyStorage.removeItem(savedSplashPageKey);
   }
   return library;
