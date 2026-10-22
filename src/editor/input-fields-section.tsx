@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { addableInputFieldTypes, type InputFieldType } from "@/splash-page";
-import { focusRing } from "@/ui/focus-ring";
+import { fieldClass, outlinedButtonClass } from "./controls";
 import { EditorSection } from "./editor-section";
 import type { EditorSectionProps } from "./types";
 
@@ -22,7 +22,7 @@ export function InputFieldsSection({
           {splashPage.inputFields.map((inputField) => (
             <li
               key={inputField.type}
-              className="flex items-center justify-between rounded-md border border-zinc-200 px-3 py-2"
+              className="flex items-center justify-between rounded-md border border-divider px-3 py-2"
             >
               <span className="text-sm">{inputField.type}</span>
               <button
@@ -34,7 +34,7 @@ export function InputFieldsSection({
                     inputFieldType: inputField.type,
                   })
                 }
-                className={`rounded-md border border-zinc-300 px-2 py-1 text-sm ${focusRing}`}
+                className={`px-2 py-1 text-sm ${outlinedButtonClass}`}
               >
                 Remove
               </button>
@@ -57,7 +57,7 @@ export function InputFieldsSection({
               onChange={(event) =>
                 setChosenType(event.target.value as InputFieldType)
               }
-              className={`rounded-md border border-zinc-300 px-3 py-2 ${focusRing}`}
+              className={`px-3 py-2 ${fieldClass}`}
             >
               {addableTypes.map((type) => (
                 <option key={type} value={type}>
@@ -71,7 +71,7 @@ export function InputFieldsSection({
             onClick={() =>
               dispatch({ type: "addInputField", inputFieldType: newType })
             }
-            className={`rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white ${focusRing}`}
+            className={`px-3 py-2 text-sm font-medium ${outlinedButtonClass}`}
           >
             Add Input Field
           </button>
