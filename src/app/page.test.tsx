@@ -24,6 +24,25 @@ describe("Captivator: Editor and Preview", () => {
     ).toBeInTheDocument();
   });
 
+  it("the Preview's Input Fields and Connect Button are inert", async () => {
+    const user = userEvent.setup();
+    const { preview } = renderCaptivator();
+
+    const email = within(preview).getByRole("textbox", { name: "Email" });
+    await user.type(email, "guest@example.com");
+
+    expect(email).toHaveValue("");
+    expect(
+      within(preview).getByRole("button", { name: "Connect" }),
+    ).toBeDisabled();
+  });
+
+  it("tells the Customer the design isn't saved on refresh", () => {
+    renderCaptivator();
+
+    expect(screen.getByText(/not saved/i)).toBeVisible();
+  });
+
   it("editing a Text Block's text in the Editor updates the Preview", async () => {
     const user = userEvent.setup();
     const { preview, editor } = renderCaptivator();

@@ -31,6 +31,10 @@ export default function Home() {
         <h2 id="editor-heading" className="text-2xl font-bold">
           Editor
         </h2>
+        <p className="text-sm text-zinc-600">
+          Your design is not saved. Refreshing the page starts again from the
+          starter Splash Page.
+        </p>
         <Editor splashPage={splashPage} dispatch={dispatch} />
       </section>
     </main>
