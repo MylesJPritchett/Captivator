@@ -55,7 +55,7 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
   });
 
   it("a saved Splash Page opens in the Preview, including its Logo and Background image", async () => {
-    seedSavedSplashPage(savedSplashPage);
+    await seedSavedSplashPage(savedSplashPage);
 
     const { preview, background } = await renderCaptivator();
 
@@ -153,7 +153,7 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
 
   it("a removed Logo stays removed after Captivator is rendered again", async () => {
     const user = userEvent.setup();
-    seedSavedSplashPage(savedSplashPage);
+    await seedSavedSplashPage(savedSplashPage);
     const { editor } = await renderCaptivator();
 
     await user.click(
@@ -173,7 +173,7 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
   it("after a confirmed Reset, Captivator opens on the Starter Splash Page when rendered again", async () => {
     const user = userEvent.setup();
     vi.spyOn(window, "confirm").mockReturnValue(true);
-    seedSavedSplashPage(savedSplashPage);
+    await seedSavedSplashPage(savedSplashPage);
     const { editor } = await renderCaptivator();
 
     await user.click(

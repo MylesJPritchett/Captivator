@@ -3,10 +3,12 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   editTextBlock1,
+  failIndexedDbWrites,
   imageDataUrl,
   imageFile,
   pickColour,
   renderCaptivator,
+  storageFull,
 } from "@/app/test-helpers";
 
 /** Saves longer than this fail, as if this browser's storage were full. */
@@ -31,20 +33,9 @@ function savedNote(editor: HTMLElement) {
 
 describe("Captivator: images too large to remember", () => {
   beforeEach(() => {
-    const setItem = Storage.prototype.setItem;
-    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (
-      this: Storage,
-      key: string,
-      value: string,
-    ) {
-      if (value.length > storageLimit) {
-        throw new DOMException(
-          "The quota has been exceeded.",
-          "QuotaExceededError",
-        );
-      }
-      setItem.call(this, key, value);
-    });
+    failIndexedDbWrites((value) =>
+      String(value).length > storageLimit ? storageFull() : undefined,
+    );
   });
 
   afterEach(() => {

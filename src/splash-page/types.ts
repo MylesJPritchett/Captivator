@@ -40,3 +40,17 @@ export type SplashPage = {
   inputFields: InputField[];
   connectButton: ConnectButton;
 };
+
+/** A Splash Page kept in the Library, with the name only the Customer sees. */
+export type LibraryEntry = {
+  id: string;
+  name: string;
+  splashPage: SplashPage;
+};
+
+/** The Customer's saved Splash Pages in this browser. Never empty. */
+export type Library = {
+  splashPages: LibraryEntry[];
+  /** The id of the Open Splash Page, which is always in `splashPages`. */
+  openSplashPageId: string;
+};

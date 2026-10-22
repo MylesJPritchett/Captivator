@@ -1,7 +1,13 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import Home from "@/app/page";
-import { savedSplashPageKey, type SplashPage } from "@/splash-page";
+import { set } from "idb-keyval";
+import { vi } from "vitest";
+import {
+  savedLibraryKey,
+  savedSplashPageKey,
+  type SplashPage,
+} from "@/splash-page";
 
 /** Renders Captivator and returns its Preview and Editor regions. */
 export async function renderCaptivator() {
@@ -50,10 +56,63 @@ export function pickColour(colourInput: HTMLElement, colour: string) {
   fireEvent.change(colourInput, { target: { value: colour } });
 }
 
-/** The localStorage key Captivator remembers the Splash Page under. */
+/** The IndexedDB key Captivator remembers the Library under. */
+export { savedLibraryKey };
+
+/** The localStorage key ADR-0003 remembered the Splash Page under. */
 export { savedSplashPageKey };
 
-/** Seeds a remembered Splash Page, as if saved on an earlier visit. */
-export function seedSavedSplashPage(splashPage: SplashPage) {
-  localStorage.setItem(savedSplashPageKey, JSON.stringify(splashPage));
+/**
+ * Makes IndexedDB writes fail with the error `failure` returns for the value
+ * being written, as a full or blocked store would; writes it returns nothing
+ * for go through. Undo with `vi.restoreAllMocks()`.
+ */
+export function failIndexedDbWrites(
+  failure: (value: unknown) => DOMException | undefined,
+) {
+  const put = IDBObjectStore.prototype.put;
+  vi.spyOn(IDBObjectStore.prototype, "put").mockImplementation(function (
+    this: IDBObjectStore,
+    value: unknown,
+    key?: IDBValidKey,
+  ) {
+    const error = failure(value);
+    if (error) throw error;
+    return put.call(this, value, key);
+  });
+}
+
+/** Makes IndexedDB reads fail as a blocked store would. */
+export function blockIndexedDbReads() {
+  vi.spyOn(IDBObjectStore.prototype, "get").mockImplementation(() => {
+    throw storageBlocked();
+  });
+}
+
+/** What a browser throws when its site storage is blocked. */
+export function storageBlocked() {
+  return new DOMException("The operation is insecure.", "SecurityError");
+}
+
+/** What a browser throws when its site storage is full. */
+export function storageFull() {
+  return new DOMException("The quota has been exceeded.", "QuotaExceededError");
+}
+
+/** Seeds a saved Library value as is, as if saved on an earlier visit. */
+export async function seedSavedLibrary(saved: string) {
+  await set(savedLibraryKey, saved);
+}
+
+/**
+ * Seeds a saved Library holding one open Splash Page, as if saved on an
+ * earlier visit.
+ */
+export async function seedSavedSplashPage(splashPage: SplashPage) {
+  await seedSavedLibrary(
+    JSON.stringify({
+      splashPages: [{ id: "saved", name: "My Splash Page", splashPage }],
+      openSplashPageId: "saved",
+    }),
+  );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { Editor, jumpToEditorArea, jumpToTextBlock } from "@/editor";
 import {
   defaultDevice,
@@ -10,44 +10,62 @@ import {
   type PreviewTarget,
 } from "@/preview";
 import {
-  loadSplashPage,
-  saveSplashPage,
+  loadLibrary,
+  openSplashPage,
+  saveLibrary,
   splashPageReducer,
+  withOpenSplashPage,
+  type Library,
   type SaveResult,
-  type SplashPage,
 } from "@/splash-page";
 
 export default function Home() {
-  // The remembered Splash Page lives in this browser's localStorage, which
-  // only exists after mount (the route is prerendered). Until it's read,
-  // render nothing rather than flash the Starter Splash Page.
-  const [initialSplashPage, setInitialSplashPage] = useState<SplashPage>();
+  // The remembered Library lives in this browser's IndexedDB, which only
+  // exists after mount (the route is prerendered) and is read asynchronously.
+  // Until it's loaded, render nothing rather than flash the Starter Splash
+  // Page.
+  const [initialLibrary, setInitialLibrary] = useState<Library>();
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- reading browser-only storage once after mount
-    setInitialSplashPage(loadSplashPage(localStorage));
+    let mounted = true;
+    void loadLibrary().then((library) => {
+      if (mounted) setInitialLibrary(library);
+    });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return (
     <main className="flex flex-1 flex-col gap-6 p-4 lg:flex-row lg:items-start lg:gap-10 lg:p-8">
-      {initialSplashPage && (
-        <Captivator initialSplashPage={initialSplashPage} />
-      )}
+      {initialLibrary && <Captivator initialLibrary={initialLibrary} />}
     </main>
   );
 }
 
-function Captivator({ initialSplashPage }: { initialSplashPage: SplashPage }) {
+function Captivator({ initialLibrary }: { initialLibrary: Library }) {
   const [splashPage, dispatch] = useReducer(
     splashPageReducer,
-    initialSplashPage,
+    initialLibrary,
+    openSplashPage,
   );
   const [device, setDevice] = useState<Device>(defaultDevice);
 
   const [saveResult, setSaveResult] = useState<SaveResult>("saved");
+  // Saves go through one after another, so the latest Library is the one
+  // remembered, and only the latest save's result is reported (ADR-0004).
+  const saves = useRef<Promise<unknown>>(Promise.resolve());
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- reporting how much of the Splash Page browser-only storage could hold
-    setSaveResult(saveSplashPage(localStorage, splashPage));
-  }, [splashPage]);
+    let latest = true;
+    const library = withOpenSplashPage(initialLibrary, splashPage);
+    const save = saves.current.then(() => saveLibrary(library));
+    saves.current = save;
+    void save.then((result) => {
+      if (latest) setSaveResult(result);
+    });
+    return () => {
+      latest = false;
+    };
+  }, [initialLibrary, splashPage]);
 
   return (
     <>
