@@ -64,6 +64,31 @@ describe("Captivator: images too large to remember", () => {
     });
   });
 
+  it("a Logo too large to remember still shows in the Preview, and is gone after Captivator is rendered again", async () => {
+    const user = userEvent.setup();
+    const { editor, preview } = renderCaptivator();
+
+    await user.upload(
+      within(editor).getByLabelText("Logo image"),
+      largeImageFile("cafe-logo.png"),
+    );
+
+    await waitFor(() =>
+      expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
+    );
+    expect(within(preview).getByRole("img", { name: "Logo" })).toHaveAttribute(
+      "src",
+      largeImageDataUrl,
+    );
+
+    cleanup();
+    const rendered = renderCaptivator();
+
+    expect(
+      within(rendered.preview).queryByRole("img", { name: "Logo" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("telling the Customer their images are too large doesn't move focus", async () => {
     const user = userEvent.setup();
     const { editor } = renderCaptivator();
