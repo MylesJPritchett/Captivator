@@ -2,7 +2,7 @@
 
 import { useReducer, useState } from "react";
 import { Editor } from "@/editor";
-import { defaultDevice, Preview, type Device } from "@/preview";
+import { defaultDevice, DeviceToggle, Preview, type Device } from "@/preview";
 import { splashPageReducer, starterSplashPage } from "@/splash-page";
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
     splashPageReducer,
     starterSplashPage,
   );
-  const [device] = useState<Device>(defaultDevice);
+  const [device, setDevice] = useState<Device>(defaultDevice);
 
   return (
     <main className="flex flex-1 flex-col gap-6 p-4 lg:flex-row lg:items-start lg:gap-10 lg:p-8">
@@ -21,6 +21,7 @@ export default function Home() {
         <h2 id="preview-heading" className="sr-only">
           Preview
         </h2>
+        <DeviceToggle device={device} onChange={setDevice} />
         <Preview splashPage={splashPage} device={device} />
       </section>
 

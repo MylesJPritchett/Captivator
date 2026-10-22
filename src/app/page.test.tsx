@@ -59,3 +59,15 @@ describe("Captivator: Editor and Preview", () => {
     expect(within(preview).queryByText("Free WiFi")).not.toBeInTheDocument();
   });
 });
+
+describe("Captivator: Device toggle", () => {
+  it("the Preview opens on Mobile", () => {
+    const { preview } = renderCaptivator();
+
+    expect(screen.getByRole("radio", { name: "Mobile" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Desktop" })).not.toBeChecked();
+    expect(
+      within(preview).getByRole("figure", { name: "Mobile Preview" }),
+    ).toBeInTheDocument();
+  });
+});
