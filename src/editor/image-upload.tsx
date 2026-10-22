@@ -66,7 +66,7 @@ export function ImageUpload({
         className={`text-sm file:mr-3 file:rounded-md file:border file:border-control-border file:bg-control file:px-3 file:py-2 file:text-sm file:font-medium file:text-foreground hover:file:bg-control-hover ${focusRing}`}
       />
       {error && (
-        <p id={errorId} role="alert" className="text-sm text-red-700">
+        <p id={errorId} role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}

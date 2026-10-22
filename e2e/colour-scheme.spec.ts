@@ -111,6 +111,26 @@ test.describe("with a dark colour scheme", () => {
       expect(contrast(text, background), name).toBeGreaterThanOrEqual(4.5);
     }
   });
+
+  test("the Editor's status and error messages are readable", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const editor = page.getByRole("region", { name: "Editor" });
+    await editor.getByLabel("Logo image").setInputFiles({
+      name: "notes.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from("not an image"),
+    });
+
+    for (const message of [
+      editor.getByText("Your design is saved in this browser."),
+      editor.getByRole("alert"),
+    ]) {
+      const { text, background } = await colours(message);
+      expect(contrast(text, background)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
 });
 
 test("the Preview's Splash Page renders the same whatever the colour scheme", async ({
