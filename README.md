@@ -18,6 +18,8 @@ Show changes instantly in a live preview, with mobile and desktop views. Keep th
 
 It is built in Next.js using typescript.
 
+Live site: <https://captivator.netlify.app/>
+
 ## Getting started
 
 Requires Node 24 (see `.nvmrc`) and pnpm (the version is pinned in `package.json`).
@@ -44,7 +46,7 @@ CI (GitHub Actions) runs format check, lint, typecheck, Vitest and Playwright on
 
 ## Deploying
 
-The site deploys to Netlify. `netlify.toml` sets the build command and Node 24, and Netlify's Next.js runtime does the rest: connect the repo in the Netlify UI and deploy.
+The site deploys to Netlify at <https://captivator.netlify.app/>. `netlify.toml` sets the build command and Node 24, and Netlify's Next.js runtime does the rest: connect the repo in the Netlify UI and deploy.
 
 ## Docs
 
