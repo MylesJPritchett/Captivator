@@ -58,4 +58,22 @@ describe("Captivator: Editor and Preview", () => {
     ).toBeInTheDocument();
     expect(within(preview).queryByText("Free WiFi")).not.toBeInTheDocument();
   });
+
+  it("adding an Input Field in the Editor shows it in the Preview with its type as placeholder", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+
+    await user.selectOptions(
+      within(editor).getByRole("combobox", { name: "Input Field type" }),
+      "Name",
+    );
+    await user.click(
+      within(editor).getByRole("button", { name: "Add Input Field" }),
+    );
+
+    const previewInputFields = within(preview).getAllByRole("textbox");
+    expect(
+      previewInputFields.map((field) => field.getAttribute("placeholder")),
+    ).toEqual(["Email", "Name"]);
+  });
 });
