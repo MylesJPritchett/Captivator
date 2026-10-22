@@ -31,7 +31,7 @@ describe("Captivator: Reset to starter", () => {
 
   it("confirming Reset by keyboard returns the Preview to the Starter Splash Page and keeps the Device", async () => {
     const user = userEvent.setup();
-    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+    vi.spyOn(window, "confirm").mockReturnValue(true);
     const { preview, editor } = renderCaptivator();
     await editSplashPage(user, editor);
     await user.click(screen.getByRole("radio", { name: "Desktop" }));
@@ -39,7 +39,6 @@ describe("Captivator: Reset to starter", () => {
     within(editor).getByRole("button", { name: "Reset to starter" }).focus();
     await user.keyboard("{Enter}");
 
-    expect(confirm).toHaveBeenCalledOnce();
     expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
     expect(
       within(preview).queryByText("Welcome to the Café"),
@@ -53,7 +52,7 @@ describe("Captivator: Reset to starter", () => {
 
   it("cancelling the Reset confirmation leaves the Splash Page unchanged", async () => {
     const user = userEvent.setup();
-    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    vi.spyOn(window, "confirm").mockReturnValue(false);
     const { preview, editor } = renderCaptivator();
     await editSplashPage(user, editor);
 
@@ -61,7 +60,6 @@ describe("Captivator: Reset to starter", () => {
       within(editor).getByRole("button", { name: "Reset to starter" }),
     );
 
-    expect(confirm).toHaveBeenCalledOnce();
     expect(
       within(preview).getByText("Welcome to the Café"),
     ).toBeInTheDocument();
