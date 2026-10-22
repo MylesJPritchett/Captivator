@@ -59,6 +59,21 @@ describe("Captivator: Logo", () => {
     expect(logos[0]).toHaveAttribute("src", "blob:new-logo.png");
   });
 
+  it("the Logo is kept within a fixed maximum size in the Preview", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+
+    await user.upload(
+      within(editor).getByLabelText("Logo image"),
+      imageFile("huge-logo.png"),
+    );
+
+    expect(within(preview).getByRole("img", { name: "Logo" })).toHaveStyle({
+      maxWidth: "200px",
+      maxHeight: "120px",
+    });
+  });
+
   it("removing the Logo in the Editor removes it from the Preview", async () => {
     const user = userEvent.setup();
     const { preview, editor } = renderCaptivator();
