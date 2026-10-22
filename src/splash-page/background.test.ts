@@ -23,4 +23,17 @@ describe("Background", () => {
       imageUrl: "blob:venue",
     });
   });
+
+  it("setting the Background image switches to image and keeps the colour", () => {
+    const splashPage = splashPageReducer(starterSplashPage, {
+      type: "setBackgroundImage",
+      imageUrl: "blob:venue",
+    });
+
+    expect(splashPage.background).toEqual({
+      kind: "image",
+      colour: "#1e3a8a",
+      imageUrl: "blob:venue",
+    });
+  });
 });
