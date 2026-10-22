@@ -44,7 +44,10 @@ export function InputFieldsSection({
       {newType && (
         <div className="flex items-end gap-2">
           <div className="flex flex-1 flex-col gap-1">
-            <label htmlFor="new-input-field-type" className="text-sm font-medium">
+            <label
+              htmlFor="new-input-field-type"
+              className="text-sm font-medium"
+            >
               Input Field type
             </label>
             <select
