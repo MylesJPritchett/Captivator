@@ -53,6 +53,24 @@ async function colours(element: Locator, pseudoElement?: string) {
   }, pseudoElement);
 }
 
+for (const colorScheme of ["light", "dark"] as const) {
+  test(`every Editor button is drawn alike in a ${colorScheme} colour scheme`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme });
+    await page.goto("/");
+    const editor = page.getByRole("region", { name: "Editor" });
+    const addTextBlock = await colours(
+      editor.getByRole("button", { name: "Add Text Block" }),
+    );
+    for (const name of ["Add Input Field", "Reset to starter"]) {
+      expect(await colours(editor.getByRole("button", { name })), name).toEqual(
+        addTextBlock,
+      );
+    }
+  });
+}
+
 test.describe("with a dark colour scheme", () => {
   test.use({ colorScheme: "dark" });
 

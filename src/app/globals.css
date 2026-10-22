@@ -21,10 +21,8 @@
   /* The segmented control's track, and its chosen option on it. */
   --control-track: #e4e4e7;
   --control-selected: #ffffff;
-  /* The one emphasised action, e.g. "Add Input Field". */
+  /* A slider's fill. */
   --primary: #18181b;
-  --primary-hover: #3f3f46;
-  --primary-foreground: #ffffff;
   /* Borders that group controls rather than outline one. */
   --divider: #e4e4e7;
   --muted: #52525b;
@@ -43,8 +41,6 @@
     --control-track: #27272a;
     --control-selected: #52525b;
     --primary: #f4f4f5;
-    --primary-hover: #d4d4d8;
-    --primary-foreground: #18181b;
     --divider: #3f3f46;
     --muted: #a1a1aa;
     --warning: #fbbf24;
@@ -63,8 +59,6 @@
   --color-control-track: var(--control-track);
   --color-control-selected: var(--control-selected);
   --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-foreground: var(--primary-foreground);
   --color-divider: var(--divider);
   --color-muted: var(--muted);
   --color-warning: var(--warning);

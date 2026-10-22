@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { addableInputFieldTypes, type InputFieldType } from "@/splash-page";
-import {
-  fieldClass,
-  outlinedButtonClass,
-  primaryButtonClass,
-} from "./controls";
+import { fieldClass, outlinedButtonClass } from "./controls";
 import { EditorSection } from "./editor-section";
 import type { EditorSectionProps } from "./types";
 
@@ -75,7 +71,7 @@ export function InputFieldsSection({
             onClick={() =>
               dispatch({ type: "addInputField", inputFieldType: newType })
             }
-            className={`px-3 py-2 text-sm font-medium ${primaryButtonClass}`}
+            className={`px-3 py-2 text-sm font-medium ${outlinedButtonClass}`}
           >
             Add Input Field
           </button>
