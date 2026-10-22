@@ -84,4 +84,31 @@ describe("Library", () => {
       { id: "bar", name: "Bar", splashPage: bar },
     ]);
   });
+
+  it("Rename renames only the Open Splash Page, trimming the name", () => {
+    const library = libraryReducer(cafeAndBar, {
+      type: "rename",
+      name: "  Corner Café  ",
+    });
+
+    expect(library).toEqual({
+      ...cafeAndBar,
+      splashPages: [
+        { id: "cafe", name: "Corner Café", splashPage: cafe },
+        { id: "bar", name: "Bar", splashPage: bar },
+      ],
+    });
+  });
+
+  it("renaming the Open Splash Page to a blank name names it Untitled Splash Page", () => {
+    const library = libraryReducer(cafeAndBar, { type: "rename", name: "   " });
+
+    expect(library.splashPages[0].name).toBe("Untitled Splash Page");
+  });
+
+  it("two Splash Pages may share a name", () => {
+    const library = libraryReducer(cafeAndBar, { type: "rename", name: "Bar" });
+
+    expect(library.splashPages.map(({ name }) => name)).toEqual(["Bar", "Bar"]);
+  });
 });
