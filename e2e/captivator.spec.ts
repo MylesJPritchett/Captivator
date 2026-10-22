@@ -44,7 +44,7 @@ test("on wide screens the Library sits left of the Preview, which sits left of t
   page,
   isMobile,
 }) => {
-  test.skip(isMobile, "Narrow screens stack the Library above the Preview");
+  test.skip(isMobile, "Narrow screens hide the Library behind a button");
   await page.goto("/");
 
   const library = await page
