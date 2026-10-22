@@ -62,4 +62,23 @@ describe("Captivator: Background", () => {
       backgroundPosition: "center center",
     });
   });
+
+  it("switching the Background to colour and back to image keeps both without re-uploading", async () => {
+    const user = userEvent.setup();
+    const { editor, background } = renderCaptivator();
+    pickColour(within(editor).getByLabelText("Background colour"), "#10b981");
+    await user.upload(
+      within(editor).getByLabelText("Background image"),
+      imageFile("venue.png"),
+    );
+
+    await user.click(within(editor).getByRole("radio", { name: "Colour" }));
+
+    expect(background().style.backgroundImage).toBe("");
+    expect(background()).toHaveStyle({ backgroundColor: "#10b981" });
+
+    await user.click(within(editor).getByRole("radio", { name: "Image" }));
+
+    expect(background().style.backgroundImage).toBe('url("blob:venue.png")');
+  });
 });
