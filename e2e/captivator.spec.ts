@@ -40,6 +40,30 @@ test("the Preview sits above the Editor on narrow screens and beside it on wide 
   expect(scrollWidth).toBeLessThanOrEqual(page.viewportSize()!.width);
 });
 
+test("on wide screens the Library sits left of the Preview, which sits left of the Editor", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "Narrow screens stack the Library above the Preview");
+  await page.goto("/");
+
+  const library = await page
+    .getByRole("navigation", { name: "Library" })
+    .boundingBox();
+  const preview = await page
+    .getByRole("region", { name: "Preview" })
+    .boundingBox();
+  const editor = await page
+    .getByRole("region", { name: "Editor" })
+    .boundingBox();
+  if (!library || !preview || !editor) {
+    throw new Error("Library, Preview or Editor not rendered");
+  }
+
+  expect(preview.x).toBeGreaterThanOrEqual(library.x + library.width);
+  expect(editor.x).toBeGreaterThanOrEqual(preview.x + preview.width);
+});
+
 test("on a laptop screen the whole Mobile Preview fits beside the Editor without scrolling", async ({
   page,
   isMobile,
