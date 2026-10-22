@@ -32,7 +32,10 @@ export function Preview({ splashPage, device, onJump }: PreviewProps) {
         <div className="m-auto flex w-full max-w-[420px] flex-col items-center gap-4 px-6 py-10 text-center">
           <PreviewLogo logo={splashPage.logo} onClick={() => onJump("logo")} />
           <PreviewTextBlocks textBlocks={splashPage.textBlocks} />
-          <PreviewInputFields inputFields={splashPage.inputFields} />
+          <PreviewInputFields
+            inputFields={splashPage.inputFields}
+            onClick={() => onJump("inputFields")}
+          />
           <PreviewConnectButton connectButton={splashPage.connectButton} />
         </div>
       </div>
