@@ -1,6 +1,11 @@
 "use client";
 
 import { useEffect, useReducer, useState } from "react";
+import {
+  AppearanceToggle,
+  defaultAppearance,
+  type Appearance,
+} from "@/appearance";
 import { Editor, jumpToEditorArea, jumpToTextBlock } from "@/editor";
 import {
   defaultDevice,
@@ -27,12 +32,23 @@ export default function Home() {
     setInitialSplashPage(loadSplashPage(localStorage));
   }, []);
 
+  const [appearance, setAppearance] = useState<Appearance>(defaultAppearance);
+  useEffect(() => {
+    // The global stylesheet's `dark` variant keys off this attribute.
+    document.documentElement.dataset.appearance = appearance;
+  }, [appearance]);
+
   return (
-    <main className="flex flex-1 flex-col gap-6 p-4 lg:flex-row lg:items-start lg:gap-10 lg:p-8">
-      {initialSplashPage && (
-        <Captivator initialSplashPage={initialSplashPage} />
-      )}
-    </main>
+    <>
+      <header className="flex h-14 shrink-0 items-center border-b border-divider px-4 lg:px-8">
+        <AppearanceToggle appearance={appearance} onChange={setAppearance} />
+      </header>
+      <main className="flex flex-1 flex-col gap-6 p-4 lg:flex-row lg:items-start lg:gap-10 lg:p-8">
+        {initialSplashPage && (
+          <Captivator initialSplashPage={initialSplashPage} />
+        )}
+      </main>
+    </>
   );
 }
 

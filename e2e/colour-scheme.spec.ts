@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 /** Relative luminance of a computed `rgb()`/`rgba()` colour, 0 (black) to 1. */
 function luminance(colour: string): number {
@@ -175,7 +175,7 @@ test.describe("with a dark colour scheme", () => {
   });
 });
 
-test("the Preview's Splash Page renders the same whatever the colour scheme", async ({
+test("the Preview's Splash Page renders the same whatever the colour scheme or Appearance", async ({
   page,
 }) => {
   await page.goto("/");
@@ -210,7 +210,12 @@ test("the Preview's Splash Page renders the same whatever the colour scheme", as
     width: Math.floor(box.width) - 2,
     height: Math.floor(box.height) - 2,
   };
-  const shoot = () => page.screenshot({ clip, animations: "disabled" });
+  // Choosing an Appearance scrolls up to the page header; scroll back first.
+  const scrollY = await page.evaluate(() => window.scrollY);
+  const shoot = async () => {
+    await page.evaluate((y) => window.scrollTo(0, y), scrollY);
+    return page.screenshot({ clip, animations: "disabled" });
+  };
 
   await page.emulateMedia({ colorScheme: "light" });
   const light = await shoot();
@@ -218,8 +223,86 @@ test("the Preview's Splash Page renders the same whatever the colour scheme", as
   const dark = await shoot();
 
   expect(dark.equals(light)).toBe(true);
+
+  // Nor does the Customer's Appearance, against either colour scheme.
+  await chooseAppearance(page, "Light");
+  const lightAppearance = await shoot();
+  await page.emulateMedia({ colorScheme: "light" });
+  await chooseAppearance(page, "Dark");
+  const darkAppearance = await shoot();
+
+  expect(lightAppearance.equals(light)).toBe(true);
+  expect(darkAppearance.equals(light)).toBe(true);
   // Playwright hides scrollbars, so the screenshots can't show the Splash
   // Page's own native parts, like its scrollbar. Those follow its declared
   // colour scheme, which must stay light.
   await expect(splashPage).toHaveCSS("color-scheme", "light");
+});
+
+/** The page's and an Editor button's backgrounds, the Editor's text colour. */
+async function editorColours(page: Page) {
+  const editor = page.getByRole("region", { name: "Editor" });
+  const pageBackground = await page
+    .locator("body")
+    .evaluate((body) => getComputedStyle(body).backgroundColor);
+  const button = await colours(
+    editor.getByRole("button", { name: "Add Text Block" }),
+  );
+  const heading = await colours(
+    editor.getByRole("heading", { name: "Editor" }),
+  );
+  return { pageBackground, button: button.background, text: heading.text };
+}
+
+function chooseAppearance(page: Page, name: "Light" | "System" | "Dark") {
+  return page
+    .getByRole("group", { name: "Appearance" })
+    .getByRole("radio", { name })
+    .check();
+}
+
+test("choosing Dark Appearance makes the Editor dark in a light colour scheme", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/");
+
+  await chooseAppearance(page, "Dark");
+
+  const { pageBackground, button, text } = await editorColours(page);
+  expect(luminance(pageBackground)).toBeLessThan(0.1);
+  expect(luminance(button)).toBeLessThan(0.1);
+  expect(luminance(text)).toBeGreaterThan(0.5);
+});
+
+test("choosing Light Appearance makes the Editor light in a dark colour scheme", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/");
+
+  await chooseAppearance(page, "Light");
+
+  const { pageBackground, button, text } = await editorColours(page);
+  expect(luminance(pageBackground)).toBeGreaterThan(0.9);
+  expect(luminance(button)).toBeGreaterThan(0.9);
+  expect(luminance(text)).toBeLessThan(0.1);
+});
+
+test("on System Appearance the Editor follows a change to the colour scheme while open", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/");
+  await chooseAppearance(page, "Dark");
+  await chooseAppearance(page, "System");
+  expect(luminance((await editorColours(page)).pageBackground)).toBeGreaterThan(
+    0.9,
+  );
+
+  await page.emulateMedia({ colorScheme: "dark" });
+
+  expect(luminance((await editorColours(page)).pageBackground)).toBeLessThan(
+    0.1,
+  );
 });
