@@ -84,4 +84,17 @@ describe("Captivator: Delete", () => {
       within(rendered.preview).getByText("Welcome to the Café"),
     ).toBeInTheDocument();
   });
+
+  it("cancelling the Delete confirmation leaves the Library and the Open Splash Page unchanged", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, "confirm").mockReturnValue(false);
+    await seedCafeAndBar();
+    const { editor, preview } = await renderCaptivator();
+
+    await user.click(within(editor).getByRole("button", { name: "Delete" }));
+
+    expect(libraryNames()).toEqual(["Café", "Bar"]);
+    expect(openName()).toEqual(["Bar"]);
+    expect(within(preview).getByText("Happy hour")).toBeInTheDocument();
+  });
 });
