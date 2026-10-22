@@ -1,7 +1,7 @@
-import { screen, within } from "@testing-library/react";
+import { cleanup, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { renderCaptivator } from "@/app/test-helpers";
+import { editTextBlock1, renderCaptivator } from "@/app/test-helpers";
 
 /** The Library, down the left side of the screen. */
 function library() {
@@ -35,5 +35,75 @@ describe("Captivator: the Library", () => {
 
     expect(libraryNames()).toEqual(["My Splash Page", "Untitled Splash Page"]);
     expect(openName()).toEqual(["Untitled Splash Page"]);
+  });
+
+  it("an edit to a new Splash Page is still there after opening the first Splash Page and then the new one again, and the Device stays the same", async () => {
+    const user = userEvent.setup();
+    const { editor, preview } = await renderCaptivator();
+    await user.click(screen.getByRole("radio", { name: "Desktop" }));
+    await user.click(
+      within(library()).getByRole("button", { name: "New Splash Page" }),
+    );
+    await editTextBlock1(user, editor, "Welcome to the Café");
+
+    await user.click(
+      within(library()).getByRole("button", { name: "My Splash Page" }),
+    );
+
+    expect(openName()).toEqual(["My Splash Page"]);
+    expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
+    expect(
+      within(preview).queryByText("Welcome to the Café"),
+    ).not.toBeInTheDocument();
+    expect(
+      within(editor).getByRole("textbox", { name: "Text Block 1 text" }),
+    ).toHaveValue("Free WiFi");
+    expect(screen.getByRole("radio", { name: "Desktop" })).toBeChecked();
+
+    await user.click(
+      within(library()).getByRole("button", { name: "Untitled Splash Page" }),
+    );
+
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
+    expect(within(preview).queryByText("Free WiFi")).not.toBeInTheDocument();
+    expect(
+      within(preview).getByRole("figure", { name: "Desktop Preview" }),
+    ).toBeInTheDocument();
+  });
+
+  it("rendering Captivator again shows the same Library, with the last-opened Splash Page open", async () => {
+    const user = userEvent.setup();
+    const { editor } = await renderCaptivator();
+    await user.click(
+      within(library()).getByRole("button", { name: "New Splash Page" }),
+    );
+    await editTextBlock1(user, editor, "Welcome to the Café");
+    await user.click(
+      within(library()).getByRole("button", { name: "New Splash Page" }),
+    );
+    await user.click(
+      within(library()).getAllByRole("button", {
+        name: "Untitled Splash Page",
+      })[0],
+    );
+
+    cleanup();
+    const { preview } = await renderCaptivator();
+
+    expect(libraryNames()).toEqual([
+      "My Splash Page",
+      "Untitled Splash Page",
+      "Untitled Splash Page",
+    ]);
+    expect(
+      within(library()).getAllByRole("button", {
+        name: "Untitled Splash Page",
+      })[0],
+    ).toHaveAttribute("aria-current", "true");
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
   });
 });
