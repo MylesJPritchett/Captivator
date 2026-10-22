@@ -84,4 +84,18 @@ describe("Captivator: Editor and Preview", () => {
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
+
+  it("removing the only Text Block removes it from the Preview", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+
+    await user.click(
+      within(editor).getByRole("button", { name: "Remove Text Block 1" }),
+    );
+
+    expect(within(preview).queryByText("Free WiFi")).not.toBeInTheDocument();
+    expect(
+      within(editor).queryByRole("textbox", { name: "Text Block 1 text" }),
+    ).not.toBeInTheDocument();
+  });
 });

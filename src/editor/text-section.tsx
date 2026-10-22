@@ -24,6 +24,15 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
               }
               className="rounded-md border border-zinc-300 px-3 py-2"
             />
+            <button
+              type="button"
+              onClick={() =>
+                dispatch({ type: "removeTextBlock", id: textBlock.id })
+              }
+              className="self-start rounded-md border border-zinc-300 px-3 py-1 text-sm hover:bg-zinc-50"
+            >
+              Remove Text Block {index + 1}
+            </button>
           </div>
         );
       })}
