@@ -13,7 +13,7 @@ export function DeviceToggle({ device, onChange }: DeviceToggleProps) {
       {devices.map((option) => (
         <label
           key={option}
-          className="cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium text-zinc-700 has-[:checked]:bg-white has-[:checked]:text-zinc-900 has-[:checked]:shadow has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-blue-600"
+          className="relative cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium text-zinc-700 has-[:checked]:bg-white has-[:checked]:text-zinc-900 has-[:checked]:shadow has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-blue-600"
         >
           <input
             type="radio"
@@ -21,7 +21,7 @@ export function DeviceToggle({ device, onChange }: DeviceToggleProps) {
             value={option}
             checked={device === option}
             onChange={() => onChange(option)}
-            className="sr-only"
+            className="absolute inset-0 cursor-pointer appearance-none rounded-full"
           />
           {option}
         </label>
