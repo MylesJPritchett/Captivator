@@ -99,6 +99,24 @@ describe("Captivator: Editor and Preview", () => {
     });
   });
 
+  it("changing a Text Block's size with its slider resizes it in the Preview and shows the size", () => {
+    const { preview, editor } = renderCaptivator();
+
+    const size = within(editor).getByRole("slider", {
+      name: "Text Block 1 size",
+    });
+    expect(size).toHaveAttribute("min", "12");
+    expect(size).toHaveAttribute("max", "64");
+
+    // user-event can't drag a range slider, so set its value directly.
+    fireEvent.change(size, { target: { value: "48" } });
+
+    expect(within(preview).getByText("Free WiFi")).toHaveStyle({
+      fontSize: "48px",
+    });
+    expect(within(editor).getByText("48px")).toBeInTheDocument();
+  });
+
   it("removing the only Text Block removes it from the Preview", async () => {
     const user = userEvent.setup();
     const { preview, editor } = renderCaptivator();

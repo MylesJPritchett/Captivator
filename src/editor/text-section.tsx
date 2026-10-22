@@ -1,3 +1,4 @@
+import { maxTextBlockSize, minTextBlockSize } from "@/splash-page";
 import { EditorSection } from "./editor-section";
 import type { EditorSectionProps } from "./types";
 
@@ -48,6 +49,36 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
                 }
                 className="h-8 w-12 cursor-pointer rounded border border-zinc-300"
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor={`${idPrefix}-size`}
+                className="text-sm font-medium"
+              >
+                {name} size
+              </label>
+              <input
+                id={`${idPrefix}-size`}
+                type="range"
+                min={minTextBlockSize}
+                max={maxTextBlockSize}
+                step={1}
+                value={textBlock.size}
+                onChange={(event) =>
+                  dispatch({
+                    type: "updateTextBlockSize",
+                    id: textBlock.id,
+                    size: Number(event.target.value),
+                  })
+                }
+                className="flex-1"
+              />
+              <output
+                htmlFor={`${idPrefix}-size`}
+                className="w-12 text-right text-sm tabular-nums"
+              >
+                {textBlock.size}px
+              </output>
             </div>
             <button
               type="button"
