@@ -98,9 +98,9 @@ function isBackground(value: unknown): value is Background {
     isObject(value) &&
     (value.kind === "colour" || value.kind === "image") &&
     isString(value.colour) &&
-    isOptionalString(value.imageUrl) &&
-    // An image Background always has an image to show.
-    (value.kind === "colour" || isString(value.imageUrl))
+    // An image Background may have no image yet: the Customer can switch to
+    // image before uploading one, and the colour shows until they do.
+    isOptionalString(value.imageUrl)
   );
 }
 

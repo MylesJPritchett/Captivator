@@ -100,13 +100,6 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
         inputFields: [{ type: "Email" }, { type: "Email" }],
       }),
     ],
-    [
-      "has an image Background with no image",
-      JSON.stringify({
-        ...savedSplashPage,
-        background: { kind: "image", colour: "#000000" },
-      }),
-    ],
   ])(
     "a saved Splash Page that %s opens the Preview on the Starter Splash Page",
     (_, saved) => {
@@ -141,6 +134,20 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
     expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
     expect(
       within(preview).getByRole("textbox", { name: "Email" }),
+    ).toBeInTheDocument();
+  });
+
+  it("a Background switched to image before uploading one is still remembered after Captivator is rendered again", async () => {
+    const user = userEvent.setup();
+    const { editor } = renderCaptivator();
+    await editTextBlock1(user, editor, "Welcome to the Café");
+    await user.click(within(editor).getByRole("radio", { name: "Image" }));
+
+    cleanup();
+    const { preview } = renderCaptivator();
+
+    expect(
+      within(preview).getByText("Welcome to the Café"),
     ).toBeInTheDocument();
   });
 
