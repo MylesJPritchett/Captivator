@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useId, useReducer, useState } from "react";
 import { Editor, jumpToEditorArea, jumpToTextBlock } from "@/editor";
 import {
   defaultDevice,
@@ -10,6 +10,7 @@ import {
   type PreviewTarget,
 } from "@/preview";
 import { LibraryNav } from "@/library";
+import { focusRing } from "@/ui/focus-ring";
 import {
   libraryReducer,
   loadLibrary,
@@ -49,6 +50,9 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
     ({ id }) => id === library.openSplashPageId,
   );
   const [device, setDevice] = useState<Device>(defaultDevice);
+  // Narrow screens hide the Library behind a button; wide ones always show it.
+  const [libraryShown, setLibraryShown] = useState(false);
+  const libraryId = useId();
 
   const [saveResult, setSaveResult] = useState<SaveResult>("saved");
   useEffect(() => {
@@ -64,8 +68,26 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
 
   return (
     <>
-      <div className="w-full lg:sticky lg:top-8 lg:w-56 lg:shrink-0">
-        <LibraryNav library={library} dispatch={dispatch} />
+      <div className="flex w-full flex-col gap-3 lg:sticky lg:top-8 lg:max-h-[calc(100vh-4rem)] lg:w-56 lg:shrink-0 lg:overflow-y-auto">
+        <button
+          type="button"
+          aria-expanded={libraryShown}
+          aria-controls={libraryId}
+          onClick={() => setLibraryShown((shown) => !shown)}
+          className={`self-start rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-100 lg:hidden ${focusRing}`}
+        >
+          Library
+        </button>
+        <div id={libraryId} className={libraryShown ? "" : "hidden lg:block"}>
+          <LibraryNav
+            library={library}
+            dispatch={(action) => {
+              dispatch(action);
+              // Opening a Splash Page takes the narrow-screen Library away.
+              setLibraryShown(false);
+            }}
+          />
+        </div>
       </div>
 
       <section
