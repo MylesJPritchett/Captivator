@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { cleanup, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { editTextBlock1, renderCaptivator } from "@/app/test-helpers";
@@ -61,5 +61,26 @@ describe("Captivator: Reset to starter", () => {
     ).toBeInTheDocument();
     expect(within(preview).queryByText("Free WiFi")).not.toBeInTheDocument();
     expect(previewInputFieldNames(preview)).toEqual(["Email", "Name"]);
+  });
+
+  it("a confirmed Reset leaves the chosen Appearance unchanged, even after Captivator is rendered again", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    const { editor } = renderCaptivator();
+    const appearance = () => screen.getByRole("group", { name: "Appearance" });
+    await user.click(within(appearance()).getByRole("radio", { name: "Dark" }));
+
+    await user.click(
+      within(editor).getByRole("button", { name: "Reset to starter" }),
+    );
+
+    expect(
+      within(appearance()).getByRole("radio", { name: "Dark" }),
+    ).toBeChecked();
+    cleanup();
+    renderCaptivator();
+    expect(
+      within(appearance()).getByRole("radio", { name: "Dark" }),
+    ).toBeChecked();
   });
 });

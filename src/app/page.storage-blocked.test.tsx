@@ -1,4 +1,4 @@
-import { within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { editTextBlock1, renderCaptivator } from "@/app/test-helpers";
@@ -43,6 +43,28 @@ describe("Captivator: storage blocked in this browser", () => {
     expect(
       within(editor).queryByText("Your design is saved in this browser."),
     ).not.toBeInTheDocument();
+  });
+
+  it("when the Appearance can't be remembered, it opens on System and the Customer can still choose Dark, with no error shown", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw storageBlocked();
+    });
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw storageBlocked();
+    });
+    renderCaptivator();
+    const appearance = screen.getByRole("group", { name: "Appearance" });
+    expect(
+      within(appearance).getByRole("radio", { name: "System" }),
+    ).toBeChecked();
+
+    await user.click(within(appearance).getByRole("radio", { name: "Dark" }));
+
+    expect(
+      within(appearance).getByRole("radio", { name: "Dark" }),
+    ).toBeChecked();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("when storage is too full for even the text and colours, the Customer is told the design can't be saved", () => {
