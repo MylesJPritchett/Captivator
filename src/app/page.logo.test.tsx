@@ -1,13 +1,7 @@
-import { within } from "@testing-library/react";
+import { waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import {
-  imageFile,
-  renderCaptivator,
-  stubObjectUrls,
-} from "@/app/test-helpers";
-
-stubObjectUrls();
+import { imageFile, renderCaptivator, imageDataUrl } from "@/app/test-helpers";
 
 describe("Captivator: Logo", () => {
   it("uploading an image in the Editor shows it as the Logo in the Preview", async () => {
@@ -22,10 +16,9 @@ describe("Captivator: Logo", () => {
       imageFile("cafe-logo.png"),
     );
 
-    expect(within(preview).getByRole("img", { name: "Logo" })).toHaveAttribute(
-      "src",
-      "blob:cafe-logo.png",
-    );
+    expect(
+      await within(preview).findByRole("img", { name: "Logo" }),
+    ).toHaveAttribute("src", imageDataUrl("cafe-logo.png"));
   });
 
   it("uploading another image replaces the Logo in the Preview", async () => {
@@ -36,9 +29,14 @@ describe("Captivator: Logo", () => {
     await user.upload(logoImage, imageFile("old-logo.png"));
     await user.upload(logoImage, imageFile("new-logo.png"));
 
-    const logos = within(preview).getAllByRole("img", { name: "Logo" });
-    expect(logos).toHaveLength(1);
-    expect(logos[0]).toHaveAttribute("src", "blob:new-logo.png");
+    await waitFor(() =>
+      expect(
+        within(preview).getByRole("img", { name: "Logo" }),
+      ).toHaveAttribute("src", imageDataUrl("new-logo.png")),
+    );
+    expect(within(preview).getAllByRole("img", { name: "Logo" })).toHaveLength(
+      1,
+    );
   });
 
   it("the Logo is kept within a fixed maximum size in the Preview", async () => {
@@ -50,7 +48,9 @@ describe("Captivator: Logo", () => {
       imageFile("huge-logo.png"),
     );
 
-    expect(within(preview).getByRole("img", { name: "Logo" })).toHaveStyle({
+    expect(
+      await within(preview).findByRole("img", { name: "Logo" }),
+    ).toHaveStyle({
       maxWidth: "200px",
       maxHeight: "120px",
     });
@@ -68,7 +68,7 @@ describe("Captivator: Logo", () => {
       imageFile("cafe-logo.png"),
     );
     await user.click(
-      within(editor).getByRole("button", { name: "Remove Logo" }),
+      await within(editor).findByRole("button", { name: "Remove Logo" }),
     );
 
     expect(
@@ -85,6 +85,7 @@ describe("Captivator: Logo", () => {
     const { preview, editor } = renderCaptivator();
     const logoImage = within(editor).getByLabelText("Logo image");
     await user.upload(logoImage, imageFile("cafe-logo.png"));
+    await within(preview).findByRole("img", { name: "Logo" });
 
     await user.upload(
       logoImage,
@@ -96,7 +97,7 @@ describe("Captivator: Logo", () => {
     );
     expect(within(preview).getByRole("img", { name: "Logo" })).toHaveAttribute(
       "src",
-      "blob:cafe-logo.png",
+      imageDataUrl("cafe-logo.png"),
     );
   });
 });

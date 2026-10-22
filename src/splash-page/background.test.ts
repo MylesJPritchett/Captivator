@@ -6,7 +6,7 @@ const withImageShowing = {
   background: {
     kind: "image" as const,
     colour: "#1e3a8a",
-    imageUrl: "blob:venue",
+    imageUrl: "data:image/png;base64,dmVudWU=",
   },
 };
 
@@ -20,20 +20,20 @@ describe("Background", () => {
     expect(splashPage.background).toEqual({
       kind: "colour",
       colour: "#10b981",
-      imageUrl: "blob:venue",
+      imageUrl: "data:image/png;base64,dmVudWU=",
     });
   });
 
   it("setting the Background image switches to image and keeps the colour", () => {
     const splashPage = splashPageReducer(starterSplashPage, {
       type: "setBackgroundImage",
-      imageUrl: "blob:venue",
+      imageUrl: "data:image/png;base64,dmVudWU=",
     });
 
     expect(splashPage.background).toEqual({
       kind: "image",
       colour: "#1e3a8a",
-      imageUrl: "blob:venue",
+      imageUrl: "data:image/png;base64,dmVudWU=",
     });
   });
 
@@ -45,7 +45,7 @@ describe("Background", () => {
     expect(showingColour.background).toEqual({
       kind: "colour",
       colour: "#1e3a8a",
-      imageUrl: "blob:venue",
+      imageUrl: "data:image/png;base64,dmVudWU=",
     });
 
     const showingImageAgain = splashPageReducer(showingColour, {
