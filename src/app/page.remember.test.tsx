@@ -167,6 +167,27 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
     ).toBeInTheDocument();
   });
 
+  it("a Splash Page remembered in localStorage is carried over once, then removed from localStorage", async () => {
+    const user = userEvent.setup();
+    localStorage.setItem(savedSplashPageKey, JSON.stringify(savedSplashPage));
+    const { editor } = await renderCaptivator();
+
+    await editTextBlock1(user, editor, "Welcome back");
+    cleanup();
+    const { preview } = await renderCaptivator();
+
+    expect(within(preview).getByText("Welcome back")).toBeInTheDocument();
+    expect(localStorage.getItem(savedSplashPageKey)).toBeNull();
+  });
+
+  it("an unreadable Splash Page remembered in localStorage opens the Preview on the Starter Splash Page", async () => {
+    localStorage.setItem(savedSplashPageKey, "{not json");
+
+    const { preview } = await renderCaptivator();
+
+    expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
+  });
+
   it("a Background switched to image before uploading one is still remembered after Captivator is rendered again", async () => {
     const user = userEvent.setup();
     const { editor } = await renderCaptivator();
