@@ -1,0 +1,87 @@
+import { describe, expect, it } from "vitest";
+import {
+  libraryReducer,
+  starterSplashPage,
+  type Library,
+  type SplashPage,
+} from "@/splash-page";
+
+const cafe: SplashPage = {
+  ...starterSplashPage,
+  textBlocks: [
+    { id: "cafe", text: "Welcome to the Café", colour: "#111827", size: 24 },
+  ],
+};
+
+const bar: SplashPage = {
+  ...starterSplashPage,
+  textBlocks: [{ id: "bar", text: "Happy hour", colour: "#ef4444", size: 30 }],
+};
+
+/** A Library of the Café and Bar Splash Pages, with the Café open. */
+const cafeAndBar: Library = {
+  splashPages: [
+    { id: "cafe", name: "Café", splashPage: cafe },
+    { id: "bar", name: "Bar", splashPage: bar },
+  ],
+  openSplashPageId: "cafe",
+};
+
+describe("Library", () => {
+  it("New adds a Starter Splash Page named Untitled Splash Page at the bottom of the Library and opens it", () => {
+    const library = libraryReducer(cafeAndBar, { type: "new" });
+
+    expect(library.splashPages).toHaveLength(3);
+    expect(library.splashPages.slice(0, 2)).toEqual(cafeAndBar.splashPages);
+    const added = library.splashPages[2];
+    expect(added).toMatchObject({
+      name: "Untitled Splash Page",
+      splashPage: starterSplashPage,
+    });
+    expect(["cafe", "bar"]).not.toContain(added.id);
+    expect(library.openSplashPageId).toBe(added.id);
+  });
+
+  it("Open makes another Splash Page the Open Splash Page and changes no Splash Page", () => {
+    const library = libraryReducer(cafeAndBar, { type: "open", id: "bar" });
+
+    expect(library).toEqual({ ...cafeAndBar, openSplashPageId: "bar" });
+  });
+
+  it("opening a Splash Page that isn't in the Library leaves the Library unchanged", () => {
+    const library = libraryReducer(cafeAndBar, { type: "open", id: "gone" });
+
+    expect(library).toEqual(cafeAndBar);
+  });
+
+  it("a Splash Page action changes only the Open Splash Page", () => {
+    const library = libraryReducer(
+      { ...cafeAndBar, openSplashPageId: "bar" },
+      { type: "setBackgroundColour", colour: "#10b981" },
+    );
+
+    expect(library).toEqual({
+      splashPages: [
+        { id: "cafe", name: "Café", splashPage: cafe },
+        {
+          id: "bar",
+          name: "Bar",
+          splashPage: {
+            ...bar,
+            background: { kind: "colour", colour: "#10b981" },
+          },
+        },
+      ],
+      openSplashPageId: "bar",
+    });
+  });
+
+  it("Reset returns only the Open Splash Page to the Starter Splash Page, and keeps its name", () => {
+    const library = libraryReducer(cafeAndBar, { type: "reset" });
+
+    expect(library.splashPages).toEqual([
+      { id: "cafe", name: "Café", splashPage: starterSplashPage },
+      { id: "bar", name: "Bar", splashPage: bar },
+    ]);
+  });
+});
