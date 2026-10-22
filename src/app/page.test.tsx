@@ -89,10 +89,9 @@ describe("Captivator: Editor and Preview", () => {
     const { preview, editor } = renderCaptivator();
 
     // user-event can't drive a native colour picker, so set its value directly.
-    fireEvent.change(
-      within(editor).getByLabelText("Text Block 1 colour"),
-      { target: { value: "#ff0000" } },
-    );
+    fireEvent.change(within(editor).getByLabelText("Text Block 1 colour"), {
+      target: { value: "#ff0000" },
+    });
 
     expect(within(preview).getByText("Free WiFi")).toHaveStyle({
       color: "#ff0000",
@@ -115,6 +114,18 @@ describe("Captivator: Editor and Preview", () => {
       fontSize: "48px",
     });
     expect(within(editor).getByText("48px")).toBeInTheDocument();
+  });
+
+  it("a Text Block with empty text is left out of the Preview", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+    expect(within(preview).getAllByRole("paragraph")).toHaveLength(1);
+
+    await user.clear(
+      within(editor).getByRole("textbox", { name: "Text Block 1 text" }),
+    );
+
+    expect(within(preview).queryAllByRole("paragraph")).toHaveLength(0);
   });
 
   it("removing the only Text Block removes it from the Preview", async () => {
