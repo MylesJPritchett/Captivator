@@ -31,11 +31,13 @@ export function Preview({ splashPage, device, onClickElement }: PreviewProps) {
 
   return (
     <DeviceFrame device={device}>
-      {/* The Background fills the whole frame, with the content on top. */}
+      {/* The Background fills the whole frame, with the content on top.
+          A Guest sees the Splash Page in their own browser, so it stays in
+          the light scheme whatever the Customer's. */}
       <div
         role="group"
         aria-label="Background"
-        className="flex h-full w-full cursor-pointer overflow-y-auto"
+        className="flex h-full w-full cursor-pointer overflow-y-auto scheme-light"
         style={backgroundStyle(splashPage.background)}
         onClick={clickBackground}
       >

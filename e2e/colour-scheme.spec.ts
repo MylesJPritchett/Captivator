@@ -57,3 +57,52 @@ test.describe("with a dark colour scheme", () => {
     }
   });
 });
+
+test("the Preview's Splash Page renders the same whatever the colour scheme", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const editor = page.getByRole("region", { name: "Editor" });
+  const splashPage = page
+    .getByRole("region", { name: "Preview" })
+    .getByRole("group", { name: "Background" });
+  // The starter Splash Page has an Input Field, which could pick up dark
+  // native styling.
+  await expect(splashPage.getByRole("textbox")).not.toHaveCount(0);
+  // Enough text to overflow the Device, so the Splash Page shows a scrollbar.
+  await editor
+    .getByLabel("Text Block 1 text")
+    .fill("Welcome to our venue, enjoy the free WiFi. ".repeat(12));
+  await editor.getByLabel("Text Block 1 size").fill("64");
+  await expect
+    .poll(() =>
+      splashPage.evaluate(
+        (element) => element.scrollHeight > element.clientHeight,
+      ),
+    )
+    .toBe(true);
+
+  // Inset a little: the box's fractional edges let through the page around
+  // the Device frame, which does follow the colour scheme.
+  await splashPage.scrollIntoViewIfNeeded();
+  const box = await splashPage.boundingBox();
+  if (!box) throw new Error("Splash Page not rendered");
+  const clip = {
+    x: Math.ceil(box.x) + 1,
+    y: Math.ceil(box.y) + 1,
+    width: Math.floor(box.width) - 2,
+    height: Math.floor(box.height) - 2,
+  };
+  const shoot = () => page.screenshot({ clip, animations: "disabled" });
+
+  await page.emulateMedia({ colorScheme: "light" });
+  const light = await shoot();
+  await page.emulateMedia({ colorScheme: "dark" });
+  const dark = await shoot();
+
+  expect(dark.equals(light)).toBe(true);
+  // Playwright hides scrollbars, so the screenshots can't show the Splash
+  // Page's own native parts, like its scrollbar. Those follow its declared
+  // colour scheme, which must stay light.
+  await expect(splashPage).toHaveCSS("color-scheme", "light");
+});
