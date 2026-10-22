@@ -43,6 +43,8 @@ export function jumpToTextBlock(textBlockId: TextBlock["id"]) {
 /**
  * Scrolls `target` into view, smoothly unless the Customer prefers reduced
  * motion, then moves focus to `control` without a second, instant scroll.
+ * The focus ring always shows: browsers otherwise hide it after a mouse click
+ * elsewhere, such as on the Device toggle, and the page may not scroll.
  */
 function jumpTo(target: Element, control: HTMLElement) {
   const reduceMotion = window.matchMedia?.(
@@ -52,5 +54,10 @@ function jumpTo(target: Element, control: HTMLElement) {
     behavior: reduceMotion ? "auto" : "smooth",
     block: "start",
   });
-  control.focus({ preventScroll: true });
+  // `focusVisible` isn't in TypeScript's DOM types yet.
+  const options: FocusOptions & { focusVisible: boolean } = {
+    preventScroll: true,
+    focusVisible: true,
+  };
+  control.focus(options);
 }
