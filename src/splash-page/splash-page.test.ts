@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { splashPageReducer, starterSplashPage } from "@/splash-page";
+import {
+  splashPageReducer,
+  starterSplashPage,
+  type SplashPageAction,
+} from "@/splash-page";
 
 const hexColour = /^#[0-9a-f]{6}$/i;
 
@@ -46,5 +50,36 @@ describe("Text Blocks", () => {
     expect(splashPage.textBlocks[1].size).toBeGreaterThanOrEqual(12);
     expect(splashPage.textBlocks[1].size).toBeLessThanOrEqual(64);
     expect(starterSplashPage.textBlocks).toHaveLength(1);
+  });
+
+  it("removing the last Text Block leaves a Splash Page with no Text Blocks", () => {
+    const splashPage = splashPageReducer(starterSplashPage, {
+      type: "removeTextBlock",
+      id: starterSplashPage.textBlocks[0].id,
+    });
+
+    expect(splashPage.textBlocks).toEqual([]);
+    expect(starterSplashPage.textBlocks).toHaveLength(1);
+  });
+
+  it("removing a Text Block keeps the others in order", () => {
+    const withThree = [
+      { type: "addTextBlock", id: "second" },
+      { type: "addTextBlock", id: "third" },
+    ].reduce(
+      (current, action) =>
+        splashPageReducer(current, action as SplashPageAction),
+      starterSplashPage,
+    );
+
+    const splashPage = splashPageReducer(withThree, {
+      type: "removeTextBlock",
+      id: "second",
+    });
+
+    expect(splashPage.textBlocks.map((textBlock) => textBlock.id)).toEqual([
+      starterSplashPage.textBlocks[0].id,
+      "third",
+    ]);
   });
 });

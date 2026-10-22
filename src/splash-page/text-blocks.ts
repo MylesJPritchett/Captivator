@@ -11,6 +11,10 @@ export type TextBlockAction =
       type: "updateTextBlockText";
       id: string;
       text: string;
+    }
+  | {
+      type: "removeTextBlock";
+      id: string;
     };
 
 const newTextBlock: Omit<TextBlock, "id"> = {
@@ -39,6 +43,13 @@ export function textBlocksReducer(
           textBlock.id === action.id
             ? { ...textBlock, text: action.text }
             : textBlock,
+        ),
+      };
+    case "removeTextBlock":
+      return {
+        ...splashPage,
+        textBlocks: splashPage.textBlocks.filter(
+          (textBlock) => textBlock.id !== action.id,
         ),
       };
     default:
