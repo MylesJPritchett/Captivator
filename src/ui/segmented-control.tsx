@@ -38,7 +38,7 @@ export function SegmentedControl<Value extends string>({
               value={option.value}
               checked={value === option.value}
               onChange={() => onChange(option.value)}
-              className="absolute inset-0 cursor-pointer appearance-none rounded-full"
+              className="absolute inset-0 cursor-pointer appearance-none rounded-full outline-none"
             />
             {option.label}
           </label>

@@ -1,3 +1,4 @@
+import path from "node:path";
 import { expect, test } from "@playwright/test";
 
 test("the Connect Button reads Connect, exactly as written", async ({
@@ -60,6 +61,54 @@ test("on a laptop screen the whole Mobile Preview fits beside the Editor without
   expect(connect.y + connect.height).toBeLessThanOrEqual(768);
   // Still the phone's 375:667 screen inside a 12px bezel.
   expect((mobile.width - 24) / (mobile.height - 24)).toBeCloseTo(375 / 667, 2);
+});
+
+test("every Editor control shows the same visible keyboard focus style as the Device toggle", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const editor = page.getByRole("region", { name: "Editor" });
+  // Upload a Logo so its Remove Logo button is there to reach too.
+  await editor
+    .getByLabel("Logo image")
+    .setInputFiles(path.join(__dirname, "fixtures", "logo.png"));
+
+  // The focus ring of whatever has keyboard focus. A segmented control's
+  // radio is hidden, so its ring is drawn on the radio's label.
+  const focusRing = () =>
+    page.evaluate(() => {
+      const focused = document.activeElement as HTMLElement;
+      const ringed =
+        focused instanceof HTMLInputElement && focused.type === "radio"
+          ? focused.closest("label")!
+          : focused;
+      const style = getComputedStyle(ringed);
+      return {
+        control:
+          focused.getAttribute("aria-label") ??
+          (focused as HTMLInputElement).labels?.[0]?.textContent ??
+          focused.textContent,
+        inEditor: !!focused.closest('[aria-labelledby="editor-heading"]'),
+        isDeviceToggle: (focused as HTMLInputElement).name === "device",
+        ring: `${style.outlineStyle} ${style.outlineWidth} ${style.outlineColor}`,
+      };
+    });
+
+  let deviceToggleRing: string | undefined;
+  const editorRings: { control: string | null; ring: string }[] = [];
+  for (let step = 0; step < 50; step++) {
+    await page.keyboard.press("Tab");
+    const { control, inEditor, isDeviceToggle, ring } = await focusRing();
+    if (isDeviceToggle) deviceToggleRing = ring;
+    if (inEditor) editorRings.push({ control, ring });
+    else if (editorRings.length > 0) break;
+  }
+
+  expect(deviceToggleRing).toMatch(/^solid 2px /);
+  expect(editorRings.length).toBeGreaterThan(10);
+  for (const { control, ring } of editorRings) {
+    expect(ring, `focus style of ${control}`).toBe(deviceToggleRing);
+  }
 });
 
 test("choosing Desktop swaps the tall phone frame for a wide frame with a centred column", async ({

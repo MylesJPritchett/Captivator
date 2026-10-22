@@ -1,4 +1,5 @@
 import type { Colour } from "@/splash-page";
+import { focusRing } from "@/ui/focus-ring";
 
 /** A labelled native colour picker. */
 export function ColourControl({
@@ -22,7 +23,7 @@ export function ColourControl({
         type="color"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-9 w-14 cursor-pointer rounded-md border border-zinc-300"
+        className={`h-9 w-14 cursor-pointer rounded-md border border-zinc-300 ${focusRing}`}
       />
     </div>
   );

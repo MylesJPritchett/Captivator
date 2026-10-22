@@ -1,4 +1,5 @@
 import { maxTextBlockSize, minTextBlockSize } from "@/splash-page";
+import { focusRing } from "@/ui/focus-ring";
 import { ColourControl } from "./colour-control";
 import { EditorSection } from "./editor-section";
 import type { EditorSectionProps } from "./types";
@@ -28,7 +29,7 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
                   text: event.target.value,
                 })
               }
-              className="rounded-md border border-zinc-300 px-3 py-2"
+              className={`rounded-md border border-zinc-300 px-3 py-2 ${focusRing}`}
             />
             <ColourControl
               id={`${idPrefix}-colour`}
@@ -63,7 +64,7 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
                     size: Number(event.target.value),
                   })
                 }
-                className="flex-1"
+                className={`flex-1 ${focusRing}`}
               />
               <output
                 htmlFor={`${idPrefix}-size`}
@@ -77,7 +78,7 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
               onClick={() =>
                 dispatch({ type: "removeTextBlock", id: textBlock.id })
               }
-              className="self-start rounded-md border border-zinc-300 px-3 py-1 text-sm hover:bg-zinc-50"
+              className={`self-start rounded-md border border-zinc-300 px-3 py-1 text-sm hover:bg-zinc-50 ${focusRing}`}
             >
               Remove {name}
             </button>
@@ -89,7 +90,7 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
         onClick={() =>
           dispatch({ type: "addTextBlock", id: crypto.randomUUID() })
         }
-        className="self-start rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-50"
+        className={`self-start rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-50 ${focusRing}`}
       >
         Add Text Block
       </button>

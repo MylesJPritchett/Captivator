@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import type { ImageUrl } from "@/splash-page";
+import { focusRing } from "@/ui/focus-ring";
 
 type ImageUploadProps = {
   /** The visible label, e.g. "Logo image" or "Background image". */
@@ -62,7 +63,7 @@ export function ImageUpload({
           releaseCurrentImage();
           onUpload(URL.createObjectURL(file));
         }}
-        className="text-sm file:mr-3 file:rounded-md file:border file:border-zinc-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium hover:file:bg-zinc-100"
+        className={`text-sm file:mr-3 file:rounded-md file:border file:border-zinc-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium hover:file:bg-zinc-100 ${focusRing}`}
       />
       {error && (
         <p id={errorId} role="alert" className="text-sm text-red-700">
@@ -76,7 +77,7 @@ export function ImageUpload({
             releaseCurrentImage();
             remove.onRemove();
           }}
-          className="mt-2 self-start rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-100"
+          className={`mt-2 self-start rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-100 ${focusRing}`}
         >
           {remove.label}
         </button>
