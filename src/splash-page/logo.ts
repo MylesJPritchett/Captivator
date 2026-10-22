@@ -2,8 +2,7 @@ import type { SplashPageAction } from "./reducer";
 import type { SplashPage } from "./types";
 
 export type LogoAction =
-  | { type: "setLogo"; imageUrl: string }
-  | { type: "removeLogo" };
+  { type: "setLogo"; imageUrl: string } | { type: "removeLogo" };
 
 export function logoReducer(
   splashPage: SplashPage,

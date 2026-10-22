@@ -85,7 +85,9 @@ describe("Captivator: Logo", () => {
       within(editor).getByLabelText("Logo image"),
       imageFile("cafe-logo.png"),
     );
-    await user.click(within(editor).getByRole("button", { name: "Remove Logo" }));
+    await user.click(
+      within(editor).getByRole("button", { name: "Remove Logo" }),
+    );
 
     expect(
       within(preview).queryByRole("img", { name: "Logo" }),
