@@ -1,13 +1,7 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useReducer, useState } from "react";
-import {
-  AppearanceToggle,
-  defaultAppearance,
-  loadAppearance,
-  saveAppearance,
-  type Appearance,
-} from "@/appearance";
+import { useEffect, useReducer, useState } from "react";
+import { AppearanceToggle, useAppearance } from "@/appearance";
 import { Editor, jumpToEditorArea, jumpToTextBlock } from "@/editor";
 import {
   defaultDevice,
@@ -34,32 +28,12 @@ export default function Home() {
     setInitialSplashPage(loadSplashPage(localStorage));
   }, []);
 
-  // The root layout's inline script has already put the remembered Appearance
-  // on <html> before first paint. Read it into state before paint as well, so
-  // the Appearance radio group agrees with it.
-  const [appearance, setAppearance] = useState<Appearance>();
-  useLayoutEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- reading browser-only storage once after mount
-    setAppearance(loadAppearance(localStorage));
-  }, []);
-  useLayoutEffect(() => {
-    // The global stylesheet's `dark` variant keys off this attribute. Setting
-    // it here as well restores it if React resets <html>, as it does on the
-    // development-only Strict Mode remount.
-    if (appearance) document.documentElement.dataset.appearance = appearance;
-  }, [appearance]);
-  function chooseAppearance(chosen: Appearance) {
-    setAppearance(chosen);
-    saveAppearance(localStorage, chosen);
-  }
+  const [appearance, chooseAppearance] = useAppearance();
 
   return (
     <>
       <header className="flex h-14 shrink-0 items-center border-b border-divider px-4 lg:px-8">
-        <AppearanceToggle
-          appearance={appearance ?? defaultAppearance}
-          onChange={chooseAppearance}
-        />
+        <AppearanceToggle appearance={appearance} onChange={chooseAppearance} />
       </header>
       <main className="flex flex-1 flex-col gap-6 p-4 lg:flex-row lg:items-start lg:gap-10 lg:p-8">
         {initialSplashPage && (
