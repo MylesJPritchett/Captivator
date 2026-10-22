@@ -1,12 +1,7 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import {
-  imageFile,
-  pickColour,
-  renderCaptivator,
-  stubObjectUrls,
-} from "@/app/test-helpers";
+import { imageFile, pickColour, renderCaptivator } from "@/app/test-helpers";
 
 describe("Captivator: Editor and Preview", () => {
   it("the Preview shows the starter Splash Page", () => {
@@ -38,8 +33,6 @@ describe("Captivator: Editor and Preview", () => {
   });
 
   describe("with a Logo, Text Blocks, Input Fields and the Connect Button all shown", () => {
-    stubObjectUrls();
-
     it("the Preview's elements are pointer-only: Tab goes from the Device toggle straight to the first Editor control", async () => {
       const user = userEvent.setup();
       const { preview, editor } = renderCaptivator();
@@ -47,7 +40,9 @@ describe("Captivator: Editor and Preview", () => {
         within(editor).getByLabelText("Logo image"),
         imageFile("cafe-logo.png"),
       );
-      expect(within(preview).getByRole("img", { name: "Logo" })).toBeVisible();
+      expect(
+        await within(preview).findByRole("img", { name: "Logo" }),
+      ).toBeVisible();
       expect(within(preview).getByText("Free WiFi")).toBeVisible();
       expect(
         within(preview).getByRole("textbox", { name: "Email" }),
@@ -63,10 +58,12 @@ describe("Captivator: Editor and Preview", () => {
     });
   });
 
-  it("tells the Customer the design isn't saved on refresh", () => {
-    renderCaptivator();
+  it("tells the Customer the design is saved in this browser", () => {
+    const { editor } = renderCaptivator();
 
-    expect(screen.getByText(/not saved/i)).toBeVisible();
+    expect(
+      within(editor).getByText("Your design is saved in this browser."),
+    ).toBeVisible();
   });
 
   it("editing a Text Block's text in the Editor updates the Preview", async () => {

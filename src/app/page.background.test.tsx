@@ -1,14 +1,12 @@
-import { within } from "@testing-library/react";
+import { waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import {
   imageFile,
   pickColour,
   renderCaptivator,
-  stubObjectUrls,
+  imageDataUrl,
 } from "@/app/test-helpers";
-
-stubObjectUrls();
 
 // jsdom's computed style leaves out background images, so image assertions
 // read the Background's inline style.
@@ -31,11 +29,13 @@ describe("Captivator: Background", () => {
       imageFile("venue.png"),
     );
 
-    expect(background().style).toMatchObject({
-      backgroundImage: 'url("blob:venue.png")',
-      backgroundSize: "cover",
-      backgroundPosition: "center center",
-    });
+    await waitFor(() =>
+      expect(background().style).toMatchObject({
+        backgroundImage: `url("${imageDataUrl("venue.png")}")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center center",
+      }),
+    );
   });
 
   it("switching the Background to colour and back to image keeps both without re-uploading", async () => {
@@ -46,6 +46,9 @@ describe("Captivator: Background", () => {
       within(editor).getByLabelText("Background image"),
       imageFile("venue.png"),
     );
+    await waitFor(() =>
+      expect(background().style.backgroundImage).not.toBe(""),
+    );
 
     await user.click(within(editor).getByRole("radio", { name: "Colour" }));
 
@@ -54,7 +57,9 @@ describe("Captivator: Background", () => {
 
     await user.click(within(editor).getByRole("radio", { name: "Image" }));
 
-    expect(background().style.backgroundImage).toBe('url("blob:venue.png")');
+    expect(background().style.backgroundImage).toBe(
+      `url("${imageDataUrl("venue.png")}")`,
+    );
   });
 
   it("switching the Background to image before uploading one leaves the colour showing", async () => {

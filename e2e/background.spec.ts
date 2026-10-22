@@ -23,13 +23,16 @@ test("uploading a real image as the Background renders it filling both Device fr
   await editor.getByLabel("Background image").setInputFiles(venuePhoto);
 
   const background = preview.getByRole("group", { name: "Background" });
-  const imageUrl = await background.evaluate((element) => {
-    const match = /url\("(.+)"\)/.exec(
-      getComputedStyle(element).backgroundImage,
-    );
-    return match?.[1];
-  });
-  expect(imageUrl).toMatch(/^blob:/);
+  const backgroundImageUrl = () =>
+    background.evaluate((element) => {
+      const match = /url\("(.+)"\)/.exec(
+        getComputedStyle(element).backgroundImage,
+      );
+      return match?.[1];
+    });
+  // The image is read as a data URL after upload, so wait for it to arrive.
+  await expect.poll(backgroundImageUrl).toMatch(/^data:image\/png;base64,/);
+  const imageUrl = await backgroundImageUrl();
   // The browser can decode the image behind that URL, so it really renders.
   const naturalWidth = await page.evaluate(async (url) => {
     const image = new Image();

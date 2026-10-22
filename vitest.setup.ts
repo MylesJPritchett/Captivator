@@ -7,4 +7,6 @@ Element.prototype.scrollIntoView ??= () => {};
 
 afterEach(() => {
   cleanup();
+  // Captivator remembers the Splash Page here; don't leak it between tests.
+  localStorage.clear();
 });

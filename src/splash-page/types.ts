@@ -1,7 +1,7 @@
 /** A CSS hex colour, e.g. "#1e3a8a". */
 export type Colour = string;
 
-/** An in-memory object URL for an uploaded image (ADR-0001), e.g. "blob:…". */
+/** An uploaded image as a data URL (ADR-0003), e.g. "data:image/png;base64,…". */
 export type ImageUrl = string;
 
 export type Background = {

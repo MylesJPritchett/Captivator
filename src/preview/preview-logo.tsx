@@ -17,7 +17,7 @@ export function PreviewLogo({
 }) {
   if (!logo) return null;
 
-  // A plain <img>: the Logo is an in-memory object URL, which next/image
+  // A plain <img>: the Logo is a data URL (ADR-0003), which next/image
   // can't optimise.
   return (
     // eslint-disable-next-line @next/next/no-img-element

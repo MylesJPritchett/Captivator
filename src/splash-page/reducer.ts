@@ -5,6 +5,7 @@ import {
 } from "./connect-button";
 import { inputFieldsReducer, type InputFieldAction } from "./input-fields";
 import { logoReducer, type LogoAction } from "./logo";
+import { resetReducer, type ResetAction } from "./reset";
 import { textBlocksReducer, type TextBlockAction } from "./text-blocks";
 import type { SplashPage } from "./types";
 
@@ -17,7 +18,8 @@ export type SplashPageAction =
   | BackgroundAction
   | TextBlockAction
   | InputFieldAction
-  | ConnectButtonAction;
+  | ConnectButtonAction
+  | ResetAction;
 
 type AreaReducer = (
   splashPage: SplashPage,
@@ -30,6 +32,7 @@ const areaReducers: AreaReducer[] = [
   textBlocksReducer,
   inputFieldsReducer,
   connectButtonReducer,
+  resetReducer,
 ];
 
 /**
