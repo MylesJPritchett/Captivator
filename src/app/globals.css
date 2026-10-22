@@ -1,22 +1,40 @@
 @import "tailwindcss";
 
+/*
+ * The one switch for the colour scheme. Everything dark, from `color-scheme`
+ * and the tokens below to `dark:` utilities, keys off this variant. To drive
+ * it from the Customer's choice instead, swap the media query for a selector,
+ * e.g. `&:where([data-appearance="dark"], [data-appearance="dark"] *)`.
+ */
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
 :root {
+  /* Tells the browser to draw native controls in the matching style. */
+  color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
+  --control: #ffffff;
+  --control-hover: #f4f4f5;
+  --control-border: #d4d4d8;
+
+  @variant dark {
+    color-scheme: dark;
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --control: #18181b;
+    --control-hover: #27272a;
+    --control-border: #52525b;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-control: var(--control);
+  --color-control-hover: var(--control-hover);
+  --color-control-border: var(--control-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
