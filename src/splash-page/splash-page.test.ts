@@ -66,6 +66,29 @@ describe("Text Blocks", () => {
     ]);
   });
 
+  it.each([
+    [40, 40],
+    [12, 12],
+    [64, 64],
+    [5, 12],
+    [100, 64],
+  ])(
+    "updating a Text Block's size to %ipx sets it to %ipx (clamped to 12–64px)",
+    (requested, expected) => {
+      const [starterTextBlock] = starterSplashPage.textBlocks;
+
+      const splashPage = splashPageReducer(starterSplashPage, {
+        type: "updateTextBlockSize",
+        id: starterTextBlock.id,
+        size: requested,
+      });
+
+      expect(splashPage.textBlocks).toEqual([
+        { ...starterTextBlock, size: expected },
+      ]);
+    },
+  );
+
   it("removing the last Text Block leaves a Splash Page with no Text Blocks", () => {
     const splashPage = splashPageReducer(starterSplashPage, {
       type: "removeTextBlock",

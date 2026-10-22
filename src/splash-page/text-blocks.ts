@@ -18,9 +18,18 @@ export type TextBlockAction =
       colour: Colour;
     }
   | {
+      type: "updateTextBlockSize";
+      id: string;
+      /** In px; clamped to minTextBlockSize–maxTextBlockSize. */
+      size: number;
+    }
+  | {
       type: "removeTextBlock";
       id: string;
     };
+
+export const minTextBlockSize = 12;
+export const maxTextBlockSize = 64;
 
 const newTextBlock: Omit<TextBlock, "id"> = {
   text: "New text",
@@ -58,6 +67,13 @@ export function textBlocksReducer(
       return updateTextBlock(splashPage, action.id, { text: action.text });
     case "updateTextBlockColour":
       return updateTextBlock(splashPage, action.id, { colour: action.colour });
+    case "updateTextBlockSize":
+      return updateTextBlock(splashPage, action.id, {
+        size: Math.min(
+          maxTextBlockSize,
+          Math.max(minTextBlockSize, action.size),
+        ),
+      });
     case "removeTextBlock":
       return {
         ...splashPage,
