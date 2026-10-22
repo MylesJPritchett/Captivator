@@ -4,7 +4,7 @@
  * The one switch for the colour scheme. Everything dark, from `color-scheme`
  * and the tokens below to `dark:` utilities, keys off this variant. It follows
  * the Customer's Appearance, set as `data-appearance` on `<html>`: "dark"
- * always, "light" never, and otherwise (System) the system colour scheme,
+ * always, "light" never, and "system" (or none yet) the system colour scheme,
  * through the media query so it follows a change while the page is open.
  */
 @custom-variant dark {
