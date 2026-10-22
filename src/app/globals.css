@@ -62,6 +62,14 @@
   }
 }
 
+@theme {
+  /*
+   * The page header's height, as `h-header`. The Mobile Preview's frame
+   * subtracts it too, to fit the viewport beside the Editor.
+   */
+  --spacing-header: 3.5rem;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -21,16 +21,16 @@ export function DeviceFrame({ device, children }: DeviceFrameProps) {
  * Mobile: a phone frame around a screen of about 375×667.
  *
  * Beside the Editor (`lg`), the frame narrows so its full height fits the
- * viewport: 100dvh less 12.5rem (the 3.5rem page header, the page padding,
- * the Device toggle, the gap and the 1.5rem bezel), turned into a width by
- * the screen's 375:667 ratio, plus the bezel again.
+ * viewport: 100dvh less the page header (`--spacing-header`) and 9rem (the
+ * page padding, the Device toggle, the gap and the 1.5rem bezel), turned into
+ * a width by the screen's 375:667 ratio, plus the bezel again.
  */
 function MobileFrame({ children }: { children: ReactNode }) {
   return (
     <div
       role="figure"
       aria-label="Mobile Preview"
-      className="w-full max-w-[399px] rounded-[2.5rem] bg-zinc-900 p-3 shadow-xl lg:max-w-[min(399px,calc((100dvh-12.5rem)*375/667+1.5rem))]"
+      className="w-full max-w-[399px] rounded-[2.5rem] bg-zinc-900 p-3 shadow-xl lg:max-w-[min(399px,calc((100dvh-var(--spacing-header)-9rem)*375/667+1.5rem))]"
     >
       <div className="aspect-[375/667] w-full overflow-hidden rounded-[1.75rem]">
         {children}
