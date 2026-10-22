@@ -46,7 +46,7 @@ export function libraryReducer(
       const splashPages = library.splashPages.filter((_, i) => i !== index);
       return {
         splashPages,
-        openSplashPageId: splashPages[index - 1].id,
+        openSplashPageId: splashPages[Math.max(index - 1, 0)].id,
       };
     }
     default:

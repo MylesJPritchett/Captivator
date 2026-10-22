@@ -96,4 +96,13 @@ describe("Library", () => {
       openSplashPageId: "cafe",
     });
   });
+
+  it("deleting the first Splash Page opens the next one down", () => {
+    const library = libraryReducer(cafeAndBar, { type: "delete" });
+
+    expect(library).toEqual({
+      splashPages: [{ id: "bar", name: "Bar", splashPage: bar }],
+      openSplashPageId: "bar",
+    });
+  });
 });
