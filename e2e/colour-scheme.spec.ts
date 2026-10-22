@@ -17,21 +17,22 @@ function contrast(a: string, b: string): number {
 }
 
 /**
- * The colours an element is drawn in: its text colour, and the first opaque
- * background behind it (its own, else its nearest ancestor's).
+ * The colours an element, or one of its pseudo-elements, is drawn in: its text
+ * colour, and the first opaque background behind it (its own, else its nearest
+ * ancestor's).
  */
-async function colours(element: Locator) {
-  return element.evaluate((start) => {
+async function colours(element: Locator, pseudoElement?: string) {
+  return element.evaluate((start, pseudo) => {
     const isOpaque = (colour: string) =>
       colour !== "transparent" && !/rgba\(.*,\s*0\)$/.test(colour);
-    let background = "rgb(255, 255, 255)";
-    for (let node: Element | null = start; node; node = node.parentElement) {
-      const own = getComputedStyle(node).backgroundColor;
-      if (isOpaque(own)) {
-        background = own;
-        break;
-      }
+    const own = getComputedStyle(start, pseudo);
+    const layers = [own.backgroundColor];
+    // A pseudo-element sits on its element, so walk up from the element.
+    let node: Element | null = pseudo ? start : start.parentElement;
+    for (; node; node = node.parentElement) {
+      layers.push(getComputedStyle(node).backgroundColor);
     }
+    const background = layers.find(isOpaque) ?? "rgb(255, 255, 255)";
     // Tailwind's palette computes to `lab()`/`oklch()`; paint each colour to
     // read it back as sRGB.
     const context = document.createElement("canvas").getContext("2d", {
@@ -44,30 +45,8 @@ async function colours(element: Locator) {
       const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
       return `rgb(${r}, ${g}, ${b})`;
     };
-    return {
-      text: toRgb(getComputedStyle(start).color),
-      background: toRgb(background),
-    };
-  });
-}
-
-/**
- * The colours a file input's button is drawn in: its text colour, and the
- * first opaque background behind it (its own, else its nearest ancestor's).
- */
-async function fileButtonColours(fileInput: Locator) {
-  return fileInput.evaluate((input) => {
-    const button = getComputedStyle(input, "::file-selector-button");
-    const isOpaque = (colour: string) =>
-      colour !== "transparent" && !/rgba\(.*,\s*0\)$/.test(colour);
-    let background = button.backgroundColor;
-    let element: Element | null = input;
-    while (!isOpaque(background) && element) {
-      background = getComputedStyle(element).backgroundColor;
-      element = element.parentElement;
-    }
-    return { text: button.color, background };
-  });
+    return { text: toRgb(own.color), background: toRgb(background) };
+  }, pseudoElement);
 }
 
 test.describe("with a dark colour scheme", () => {
@@ -85,8 +64,9 @@ test.describe("with a dark colour scheme", () => {
 
     const editor = page.getByRole("region", { name: "Editor" });
     for (const label of ["Logo image", "Background image"]) {
-      const { text, background } = await fileButtonColours(
+      const { text, background } = await colours(
         editor.getByLabel(label),
+        "::file-selector-button",
       );
       expect(contrast(text, background), label).toBeGreaterThanOrEqual(4.5);
     }
@@ -96,7 +76,7 @@ test.describe("with a dark colour scheme", () => {
     page,
     isMobile,
   }) => {
-    test.skip(isMobile, "touch Devices have no hover");
+    test.skip(isMobile, "touch screens have no hover");
     await page.goto("/");
     const editor = page.getByRole("region", { name: "Editor" });
     for (const name of [
