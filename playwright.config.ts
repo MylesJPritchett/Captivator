@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3000;
+// Override with PLAYWRIGHT_PORT to avoid reusing another server on :3000.
+const PORT = Number(process.env.PLAYWRIGHT_PORT) || 3000;
 const baseURL = `http://localhost:${PORT}`;
 
 export default defineConfig({
