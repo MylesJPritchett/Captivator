@@ -54,7 +54,9 @@ describe("Captivator: Editor and Preview", () => {
       screen.getByRole("radio", { name: "Mobile" }).focus();
       await user.tab();
 
-      expect(within(editor).getByLabelText("Logo image")).toHaveFocus();
+      expect(
+        within(editor).getByRole("textbox", { name: "Name" }),
+      ).toHaveFocus();
     });
   });
 
