@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import type { UserEvent } from "@testing-library/user-event";
 import Home from "@/app/page";
 import { savedSplashPageKey, type SplashPage } from "@/splash-page";
 
@@ -14,17 +15,30 @@ export function renderCaptivator() {
   };
 }
 
-/** A small PNG file with the given name. Its bytes are its name. */
-export function imageFile(name: string) {
-  return new File([name], name, { type: "image/png" });
+/** A PNG file with the given name. Its bytes are its name unless given. */
+export function imageFile(name: string, bytes = name) {
+  return new File([bytes], name, { type: "image/png" });
 }
 
 /**
- * The data URL the Preview shows once `imageFile(name)` is uploaded, e.g.
- * "data:image/png;base64,dmVudWUucG5n" for "venue.png".
+ * The data URL the Preview shows once a PNG with these bytes is uploaded, e.g.
+ * "data:image/png;base64,dmVudWUucG5n" for `imageFile("venue.png")`.
  */
-export function imageDataUrl(name: string) {
-  return `data:image/png;base64,${btoa(name)}`;
+export function imageDataUrl(bytes: string) {
+  return `data:image/png;base64,${btoa(bytes)}`;
+}
+
+/** Replaces Text Block 1's text in the Editor. */
+export async function editTextBlock1(
+  user: UserEvent,
+  editor: HTMLElement,
+  text: string,
+) {
+  const textBlockText = within(editor).getByRole("textbox", {
+    name: "Text Block 1 text",
+  });
+  await user.clear(textBlockText);
+  await user.type(textBlockText, text);
 }
 
 /**

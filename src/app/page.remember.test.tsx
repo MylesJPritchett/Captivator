@@ -2,6 +2,7 @@ import { cleanup, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  editTextBlock1,
   imageDataUrl,
   renderCaptivator,
   savedSplashPageKey,
@@ -42,11 +43,7 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
   it("an edited Text Block is still shown in the Preview after Captivator is rendered again", async () => {
     const user = userEvent.setup();
     const { editor } = renderCaptivator();
-    const textBlockText = within(editor).getByRole("textbox", {
-      name: "Text Block 1 text",
-    });
-    await user.clear(textBlockText);
-    await user.type(textBlockText, "Welcome to the Café");
+    await editTextBlock1(user, editor, "Welcome to the Café");
 
     cleanup();
     const { preview } = renderCaptivator();

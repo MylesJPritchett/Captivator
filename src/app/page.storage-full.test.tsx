@@ -1,17 +1,21 @@
 import { cleanup, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { imageFile, pickColour, renderCaptivator } from "@/app/test-helpers";
+import {
+  editTextBlock1,
+  imageDataUrl,
+  imageFile,
+  pickColour,
+  renderCaptivator,
+} from "@/app/test-helpers";
 
 /** Saves longer than this fail, as if this browser's storage were full. */
 const storageLimit = 2_000;
 
-/** A PNG file too large to remember within the storage limit. */
-function largeImageFile(name: string) {
-  return new File(["x".repeat(storageLimit)], name, { type: "image/png" });
-}
+/** The bytes of a PNG too large to remember within the storage limit. */
+const largeImageBytes = "x".repeat(storageLimit);
 
-const largeImageDataUrl = `data:image/png;base64,${btoa("x".repeat(storageLimit))}`;
+const largeImageDataUrl = imageDataUrl(largeImageBytes);
 
 const imagesTooLarge =
   "Your images are too large to remember in this browser; text and colours are still saved.";
@@ -53,7 +57,7 @@ describe("Captivator: images too large to remember", () => {
 
     await user.upload(
       within(editor).getByLabelText("Background image"),
-      largeImageFile("venue.png"),
+      imageFile("venue.png", largeImageBytes),
     );
 
     await waitFor(() =>
@@ -70,7 +74,7 @@ describe("Captivator: images too large to remember", () => {
 
     await user.upload(
       within(editor).getByLabelText("Logo image"),
-      largeImageFile("cafe-logo.png"),
+      imageFile("cafe-logo.png", largeImageBytes),
     );
 
     await waitFor(() =>
@@ -94,7 +98,7 @@ describe("Captivator: images too large to remember", () => {
     const { editor } = renderCaptivator();
     const backgroundImage = within(editor).getByLabelText("Background image");
 
-    await user.upload(backgroundImage, largeImageFile("venue.png"));
+    await user.upload(backgroundImage, imageFile("venue.png", largeImageBytes));
 
     await waitFor(() =>
       expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
@@ -106,7 +110,7 @@ describe("Captivator: images too large to remember", () => {
     const user = userEvent.setup();
     const { editor } = renderCaptivator();
     const backgroundImage = within(editor).getByLabelText("Background image");
-    await user.upload(backgroundImage, largeImageFile("venue.png"));
+    await user.upload(backgroundImage, imageFile("venue.png", largeImageBytes));
     await waitFor(() =>
       expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
     );
@@ -126,18 +130,14 @@ describe("Captivator: images too large to remember", () => {
     const { editor } = renderCaptivator();
     await user.upload(
       within(editor).getByLabelText("Logo image"),
-      largeImageFile("cafe-logo.png"),
+      imageFile("cafe-logo.png", largeImageBytes),
     );
     pickColour(within(editor).getByLabelText("Background colour"), "#123456");
     await user.upload(
       within(editor).getByLabelText("Background image"),
-      largeImageFile("venue.png"),
+      imageFile("venue.png", largeImageBytes),
     );
-    const textBlockText = within(editor).getByRole("textbox", {
-      name: "Text Block 1 text",
-    });
-    await user.clear(textBlockText);
-    await user.type(textBlockText, "Welcome to the Café");
+    await editTextBlock1(user, editor, "Welcome to the Café");
     await waitFor(() =>
       expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
     );

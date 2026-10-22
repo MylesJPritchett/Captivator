@@ -1,18 +1,14 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { renderCaptivator } from "@/app/test-helpers";
+import { editTextBlock1, renderCaptivator } from "@/app/test-helpers";
 
 /** Edits the Splash Page away from the Starter Splash Page. */
 async function editSplashPage(
   user: ReturnType<typeof userEvent.setup>,
   editor: HTMLElement,
 ) {
-  const textBlockText = within(editor).getByRole("textbox", {
-    name: "Text Block 1 text",
-  });
-  await user.clear(textBlockText);
-  await user.type(textBlockText, "Welcome to the Café");
+  await editTextBlock1(user, editor, "Welcome to the Café");
   await user.click(
     within(editor).getByRole("button", { name: "Add Input Field" }),
   );

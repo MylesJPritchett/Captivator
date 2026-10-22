@@ -1,7 +1,7 @@
 import { within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { renderCaptivator } from "@/app/test-helpers";
+import { editTextBlock1, renderCaptivator } from "@/app/test-helpers";
 
 /** What a browser throws when its site storage is blocked. */
 function storageBlocked() {
@@ -30,11 +30,7 @@ describe("Captivator: storage blocked in this browser", () => {
     });
     const { preview, editor } = renderCaptivator();
 
-    const textBlockText = within(editor).getByRole("textbox", {
-      name: "Text Block 1 text",
-    });
-    await user.clear(textBlockText);
-    await user.type(textBlockText, "Welcome to the Café");
+    await editTextBlock1(user, editor, "Welcome to the Café");
 
     expect(
       within(preview).getByText("Welcome to the Café"),
