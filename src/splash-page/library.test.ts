@@ -105,4 +105,21 @@ describe("Library", () => {
       openSplashPageId: "bar",
     });
   });
+
+  it("deleting the only Splash Page leaves a single Starter Splash Page named Untitled Splash Page", () => {
+    const library = libraryReducer(
+      {
+        splashPages: [{ id: "cafe", name: "Café", splashPage: cafe }],
+        openSplashPageId: "cafe",
+      },
+      { type: "delete" },
+    );
+
+    expect(library.splashPages).toHaveLength(1);
+    expect(library.splashPages[0]).toMatchObject({
+      name: "Untitled Splash Page",
+      splashPage: starterSplashPage,
+    });
+    expect(library.openSplashPageId).toBe(library.splashPages[0].id);
+  });
 });

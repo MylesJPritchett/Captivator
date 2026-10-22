@@ -44,6 +44,10 @@ export function libraryReducer(
         ({ id }) => id === library.openSplashPageId,
       );
       const splashPages = library.splashPages.filter((_, i) => i !== index);
+      // The Library is never empty.
+      if (splashPages.length === 0) {
+        return libraryReducer({ ...library, splashPages }, { type: "new" });
+      }
       return {
         splashPages,
         openSplashPageId: splashPages[Math.max(index - 1, 0)].id,
