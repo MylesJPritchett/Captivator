@@ -105,12 +105,27 @@ function openEntry(library: Library): LibraryEntry {
  */
 export type SaveResult = "saved" | "saved without images" | "not saved";
 
+/** Every save made so far, settling once the last has gone through. */
+let saves: Promise<unknown> = Promise.resolve();
+
 /**
  * Remembers the whole Library, replacing any earlier one. If storage is full,
  * remembers it without the Open Splash Page's images instead (ADR-0003).
- * Never rejects.
+ * Saves go through one after another in the order they're made, so the
+ * latest Library is the one remembered (ADR-0004). Never rejects.
  */
-export async function saveLibrary(library: Library): Promise<SaveResult> {
+export function saveLibrary(library: Library): Promise<SaveResult> {
+  const save = saves.then(() => writeLibrary(library));
+  saves = save;
+  return save;
+}
+
+/** Settles once every save made so far has gone through. */
+export async function savesSettled(): Promise<void> {
+  await saves;
+}
+
+async function writeLibrary(library: Library): Promise<SaveResult> {
   try {
     await set(savedLibraryKey, JSON.stringify(library));
     return "saved";

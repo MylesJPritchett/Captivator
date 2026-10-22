@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { Editor, jumpToEditorArea, jumpToTextBlock } from "@/editor";
 import {
   defaultDevice,
@@ -51,15 +51,11 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
   const [device, setDevice] = useState<Device>(defaultDevice);
 
   const [saveResult, setSaveResult] = useState<SaveResult>("saved");
-  // Saves go through one after another, so the latest Library is the one
-  // remembered, and only the latest save's result is reported (ADR-0004).
-  const saves = useRef<Promise<unknown>>(Promise.resolve());
   useEffect(() => {
+    // Saves go through in order; report only the latest one's result.
     let latest = true;
     const library = withOpenSplashPage(initialLibrary, splashPage);
-    const save = saves.current.then(() => saveLibrary(library));
-    saves.current = save;
-    void save.then((result) => {
+    void saveLibrary(library).then((result) => {
       if (latest) setSaveResult(result);
     });
     return () => {

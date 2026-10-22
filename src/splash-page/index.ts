@@ -7,6 +7,7 @@ export {
   loadLibrary,
   openSplashPage,
   saveLibrary,
+  savesSettled,
   savedLibraryKey,
   savedSplashPageKey,
   withOpenSplashPage,
