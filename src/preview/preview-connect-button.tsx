@@ -1,10 +1,10 @@
 import type { ConnectButton } from "@/splash-page";
-import { jumpCue } from "./jump-cue";
+import { ClickCatcher } from "./click-catcher";
 
 /**
  * View-only: the Preview's Connect Button does nothing and takes no keyboard
  * focus, yet looks enabled, exactly as a Guest would see it. A wrapper catches
- * the click and jumps to the Editor; it's pointer-only, with no tab stop.
+ * the click and jumps to the Editor.
  */
 export function PreviewConnectButton({
   connectButton,
@@ -14,7 +14,7 @@ export function PreviewConnectButton({
   onClick: () => void;
 }) {
   return (
-    <div onClick={onClick} className={`w-full rounded-full ${jumpCue}`}>
+    <ClickCatcher onClick={onClick}>
       <button
         type="button"
         tabIndex={-1}
@@ -26,6 +26,6 @@ export function PreviewConnectButton({
       >
         Connect
       </button>
-    </div>
+    </ClickCatcher>
   );
 }

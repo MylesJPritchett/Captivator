@@ -39,6 +39,8 @@ export function Preview({ splashPage, device, onClickElement }: PreviewProps) {
         style={backgroundStyle(splashPage.background)}
         onClick={clickBackground}
       >
+        {/* The content column needs the handler too: clicks on its padding
+            and the gaps between elements land on it, not on the Background. */}
         <div
           onClick={clickBackground}
           className="m-auto flex w-full max-w-[420px] flex-col items-center gap-4 px-6 py-10 text-center"
