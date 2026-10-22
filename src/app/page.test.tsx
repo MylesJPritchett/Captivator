@@ -1,15 +1,24 @@
-// PLACEHOLDER: throwaway test proving React Testing Library + jsdom work.
-// Delete this file once the first real Editor + Preview test exists.
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import Home from "@/app/page";
 
-describe("starter home page (placeholder)", () => {
-  it("shows the getting-started heading", () => {
-    render(<Home />);
+function renderCaptivator() {
+  render(<Home />);
+  return {
+    preview: screen.getByRole("region", { name: "Preview" }),
+  };
+}
 
+describe("Captivator: Editor and Preview", () => {
+  it("the Preview shows the starter Splash Page", () => {
+    const { preview } = renderCaptivator();
+
+    expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { level: 1, name: /to get started/i }),
+      within(preview).getByRole("textbox", { name: "Email" }),
+    ).toBeInTheDocument();
+    expect(
+      within(preview).getByRole("button", { name: "Connect" }),
     ).toBeInTheDocument();
   });
 });
