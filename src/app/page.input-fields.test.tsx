@@ -6,7 +6,7 @@ import { renderCaptivator } from "@/app/test-helpers";
 describe("Captivator: Input Fields", () => {
   it("adding an Input Field in the Editor shows it in the Preview with its type as placeholder", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     await user.selectOptions(
       within(editor).getByRole("combobox", { name: "Input Field type" }),
@@ -24,7 +24,7 @@ describe("Captivator: Input Fields", () => {
 
   it("the add Input Field control offers only unused types, and goes once there are two Input Fields", async () => {
     const user = userEvent.setup();
-    const { editor } = renderCaptivator();
+    const { editor } = await renderCaptivator();
 
     const typeOptions = within(
       within(editor).getByRole("combobox", { name: "Input Field type" }),
@@ -48,7 +48,7 @@ describe("Captivator: Input Fields", () => {
 
   it("removing an Input Field in the Editor removes it from the Preview", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     await user.click(
       within(editor).getByRole("button", { name: "Remove Email Input Field" }),
@@ -64,7 +64,7 @@ describe("Captivator: Input Fields", () => {
 describe("Captivator: clicking an Input Field in the Preview", () => {
   it("focuses the first control in the Editor's Input Fields section", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     await user.click(within(preview).getByRole("textbox", { name: "Email" }));
 

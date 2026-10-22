@@ -1,8 +1,13 @@
 "use client";
 
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useId, useReducer, useState } from "react";
 import { AppearanceToggle, useAppearance } from "@/appearance";
-import { Editor, jumpToEditorArea, jumpToTextBlock } from "@/editor";
+import {
+  Editor,
+  focusNameField,
+  jumpToEditorArea,
+  jumpToTextBlock,
+} from "@/editor";
 import {
   defaultDevice,
   DeviceToggle,
@@ -10,22 +15,31 @@ import {
   type Device,
   type PreviewTarget,
 } from "@/preview";
+import { LibraryNav } from "@/library";
+import { secondaryButton } from "@/ui/secondary-button";
 import {
-  loadSplashPage,
-  saveSplashPage,
-  splashPageReducer,
+  libraryReducer,
+  loadLibrary,
+  openEntry,
+  saveLibrary,
+  type Library,
   type SaveResult,
-  type SplashPage,
 } from "@/splash-page";
 
 export default function Home() {
-  // The remembered Splash Page lives in this browser's localStorage, which
-  // only exists after mount (the route is prerendered). Until it's read,
-  // render nothing rather than flash the Starter Splash Page.
-  const [initialSplashPage, setInitialSplashPage] = useState<SplashPage>();
+  // The remembered Library lives in this browser's IndexedDB, which only
+  // exists after mount (the route is prerendered) and is read asynchronously.
+  // Until it's loaded, render nothing rather than flash the Starter Splash
+  // Page.
+  const [initialLibrary, setInitialLibrary] = useState<Library>();
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- reading browser-only storage once after mount
-    setInitialSplashPage(loadSplashPage(localStorage));
+    let mounted = true;
+    void loadLibrary(localStorage).then((library) => {
+      if (mounted) setInitialLibrary(library);
+    });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const [appearance, chooseAppearance] = useAppearance();
@@ -36,29 +50,57 @@ export default function Home() {
         <AppearanceToggle appearance={appearance} onChange={chooseAppearance} />
       </header>
       <main className="flex flex-1 flex-col gap-6 p-4 lg:flex-row lg:items-start lg:gap-10 lg:p-8">
-        {initialSplashPage && (
-          <Captivator initialSplashPage={initialSplashPage} />
-        )}
+        {initialLibrary && <Captivator initialLibrary={initialLibrary} />}
       </main>
     </>
   );
 }
 
-function Captivator({ initialSplashPage }: { initialSplashPage: SplashPage }) {
-  const [splashPage, dispatch] = useReducer(
-    splashPageReducer,
-    initialSplashPage,
-  );
+function Captivator({ initialLibrary }: { initialLibrary: Library }) {
+  const [library, dispatch] = useReducer(libraryReducer, initialLibrary);
+  const open = openEntry(library);
   const [device, setDevice] = useState<Device>(defaultDevice);
+  // Narrow screens hide the Library behind a button; wide ones always show it.
+  const [libraryShown, setLibraryShown] = useState(false);
+  const libraryId = useId();
 
   const [saveResult, setSaveResult] = useState<SaveResult>("saved");
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- reporting how much of the Splash Page browser-only storage could hold
-    setSaveResult(saveSplashPage(localStorage, splashPage));
-  }, [splashPage]);
+    // Saves go through in order; report only the latest one's result.
+    let latest = true;
+    void saveLibrary(library).then((result) => {
+      if (latest) setSaveResult(result);
+    });
+    return () => {
+      latest = false;
+    };
+  }, [library]);
 
   return (
     <>
+      <div className="flex w-full flex-col gap-3 lg:sticky lg:top-8 lg:max-h-[calc(100vh-4rem)] lg:w-56 lg:shrink-0 lg:overflow-y-auto">
+        <button
+          type="button"
+          aria-expanded={libraryShown}
+          aria-controls={libraryId}
+          onClick={() => setLibraryShown((shown) => !shown)}
+          className={`self-start lg:hidden ${secondaryButton}`}
+        >
+          Library
+        </button>
+        <div id={libraryId} className={libraryShown ? "" : "hidden lg:block"}>
+          <LibraryNav
+            library={library}
+            dispatch={(action) => {
+              dispatch(action);
+              // Opening a Splash Page takes the narrow-screen Library away.
+              setLibraryShown(false);
+            }}
+            onNew={focusNameField}
+          />
+        </div>
+      </div>
+
       <section
         aria-labelledby="preview-heading"
         className="flex flex-col items-center gap-4 lg:sticky lg:top-8 lg:flex-1"
@@ -68,7 +110,7 @@ function Captivator({ initialSplashPage }: { initialSplashPage: SplashPage }) {
         </h2>
         <DeviceToggle device={device} onChange={setDevice} />
         <Preview
-          splashPage={splashPage}
+          splashPage={open.splashPage}
           device={device}
           onClickElement={jumpToEditorFor}
         />
@@ -88,7 +130,9 @@ function Captivator({ initialSplashPage }: { initialSplashPage: SplashPage }) {
               lost when you leave.
             </p>
           ) : (
-            <p className="text-muted">Your design is saved in this browser.</p>
+            <p className="text-muted">
+              Your Splash Pages are saved in this browser.
+            </p>
           )}
           {saveResult === "saved without images" && (
             <p className="text-warning">
@@ -97,7 +141,7 @@ function Captivator({ initialSplashPage }: { initialSplashPage: SplashPage }) {
             </p>
           )}
         </div>
-        <Editor splashPage={splashPage} dispatch={dispatch} />
+        <Editor open={open} dispatch={dispatch} />
       </section>
     </>
   );

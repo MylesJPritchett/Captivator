@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { starterSplashPage } from "@/splash-page";
+import { starterLibrary, starterSplashPage } from "@/splash-page";
 
 const hexColour = /^#[0-9a-f]{6}$/i;
 
@@ -13,5 +13,19 @@ describe("starter Splash Page", () => {
     expect(starterSplashPage.connectButton.backgroundColour).toMatch(hexColour);
     expect(starterSplashPage.connectButton.textColour).toMatch(hexColour);
     expect(starterSplashPage.logo).toBeUndefined();
+  });
+});
+
+describe("starter Library", () => {
+  it("holds one Starter Splash Page, named My Splash Page and open", () => {
+    expect(starterLibrary.splashPages).toEqual([
+      expect.objectContaining({
+        name: "My Splash Page",
+        splashPage: starterSplashPage,
+      }),
+    ]);
+    expect(starterLibrary.openSplashPageId).toBe(
+      starterLibrary.splashPages[0].id,
+    );
   });
 });

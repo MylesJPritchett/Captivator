@@ -10,7 +10,7 @@ describe("Captivator: Logo", () => {
 
   it("uploading an image in the Editor shows it as the Logo in the Preview", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     expect(
       within(preview).queryByRole("img", { name: "Logo" }),
     ).not.toBeInTheDocument();
@@ -27,7 +27,7 @@ describe("Captivator: Logo", () => {
 
   it("uploading another image replaces the Logo in the Preview", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     const logoImage = within(editor).getByLabelText("Logo image");
 
     await user.upload(logoImage, imageFile("old-logo.png"));
@@ -45,7 +45,7 @@ describe("Captivator: Logo", () => {
 
   it("the Logo is kept within a fixed maximum size in the Preview", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     await user.upload(
       within(editor).getByLabelText("Logo image"),
@@ -62,7 +62,7 @@ describe("Captivator: Logo", () => {
 
   it("removing the Logo in the Editor removes it from the Preview", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     expect(
       within(editor).queryByRole("button", { name: "Remove Logo" }),
     ).not.toBeInTheDocument();
@@ -86,7 +86,7 @@ describe("Captivator: Logo", () => {
   it("choosing a file that isn't an image shows an error and leaves the Logo unchanged", async () => {
     // Let the Customer pick any file, as a browser's "All files" option does.
     const user = userEvent.setup({ applyAccept: false });
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     const logoImage = within(editor).getByLabelText("Logo image");
     await user.upload(logoImage, imageFile("cafe-logo.png"));
     await within(preview).findByRole("img", { name: "Logo" });
@@ -107,7 +107,7 @@ describe("Captivator: Logo", () => {
 
   it("an image that can't be read shows an error and leaves the Logo unchanged", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     const logoImage = within(editor).getByLabelText("Logo image");
     await user.upload(logoImage, imageFile("cafe-logo.png"));
     await within(preview).findByRole("img", { name: "Logo" });
@@ -135,7 +135,7 @@ describe("Captivator: clicking the Logo in the Preview", () => {
     "on the %s Device, focuses the first control in the Editor's Logo section",
     async (device) => {
       const user = userEvent.setup();
-      const { preview, editor } = renderCaptivator();
+      const { preview, editor } = await renderCaptivator();
       await user.upload(
         within(editor).getByLabelText("Logo image"),
         imageFile("cafe-logo.png"),

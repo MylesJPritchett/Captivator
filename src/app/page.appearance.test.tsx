@@ -10,8 +10,8 @@ import {
 import { savedAppearanceKey } from "@/appearance";
 
 describe("Captivator: Appearance", () => {
-  it("offers Light, System and Dark Appearance, with System chosen by default", () => {
-    renderCaptivator();
+  it("offers Light, System and Dark Appearance, with System chosen by default", async () => {
+    await renderCaptivator();
 
     const [light, system, dark, ...others] =
       within(appearanceGroup()).getAllByRole("radio");
@@ -24,7 +24,7 @@ describe("Captivator: Appearance", () => {
 
   it("the Customer can choose Dark Appearance by keyboard", async () => {
     const user = userEvent.setup();
-    renderCaptivator();
+    await renderCaptivator();
 
     appearanceOption("System").focus();
     await user.keyboard("{ArrowRight}");
@@ -35,11 +35,11 @@ describe("Captivator: Appearance", () => {
 
   it("a chosen Dark Appearance is still chosen after Captivator is rendered again", async () => {
     const user = userEvent.setup();
-    renderCaptivator();
+    await renderCaptivator();
     await chooseAppearance(user, "Dark");
 
     cleanup();
-    renderCaptivator();
+    await renderCaptivator();
 
     expect(appearanceOption("Dark")).toBeChecked();
   });
@@ -49,10 +49,10 @@ describe("Captivator: Appearance", () => {
     ["is empty", ""],
   ])(
     "a remembered Appearance that %s opens on System Appearance",
-    (_, saved) => {
+    async (_, saved) => {
       localStorage.setItem(savedAppearanceKey, saved);
 
-      renderCaptivator();
+      await renderCaptivator();
 
       expect(appearanceOption("System")).toBeChecked();
     },

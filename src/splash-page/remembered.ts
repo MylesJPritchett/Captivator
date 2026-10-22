@@ -1,75 +1,166 @@
+import { get, set } from "idb-keyval";
 import { inputFieldTypes, maxInputFields } from "./input-fields";
-import { starterSplashPage } from "./starter";
+import { libraryOfMySplashPage, starterLibrary } from "./starter";
 import type {
   Background,
   ConnectButton,
   InputField,
+  Library,
+  LibraryEntry,
   SplashPage,
   TextBlock,
 } from "./types";
 
 /**
- * Where the Splash Page is remembered in this browser (ADR-0003). Bump the
- * version whenever the Splash Page's shape changes; older saves are then
- * ignored rather than migrated.
+ * Where ADR-0003 remembered the Splash Page, in this browser's localStorage.
+ * Read only to carry an earlier visit's Splash Page into the Library.
  */
 export const savedSplashPageKey = "captivator.splashPage.v1";
 
 /**
- * The remembered Splash Page, or the Starter Splash Page if there is none or
- * it can't be read.
+ * Where the Library is remembered in this browser's IndexedDB (ADR-0004).
+ * Bump the version whenever the Library's or a Splash Page's shape changes;
+ * older saves are then ignored rather than migrated.
  */
-export function loadSplashPage(storage: Storage): SplashPage {
+export const savedLibraryKey = "captivator.library.v1";
+
+/**
+ * The remembered Library, or a Library holding one Starter Splash Page if
+ * there is none or it can't be read. With no Library saved yet, a Splash Page
+ * ADR-0003 remembered in `legacyStorage` becomes its only Splash Page.
+ * Never rejects.
+ */
+export async function loadLibrary(legacyStorage: Storage): Promise<Library> {
+  lastSaved = undefined;
   try {
-    // Throws if this browser blocks storage.
-    const saved = storage.getItem(savedSplashPageKey);
-    if (saved === null) return starterSplashPage;
-    const parsed: unknown = JSON.parse(saved);
-    return isSplashPage(parsed) ? parsed : starterSplashPage;
+    // Rejects if this browser blocks storage.
+    const saved: unknown = await get(savedLibraryKey);
+    // Awaited so that anything carrying over throws is caught here.
+    if (saved === undefined) return await carryOver(legacyStorage);
+    const parsed = typeof saved === "string" ? parseJson(saved) : undefined;
+    if (!isLibrary(parsed)) return starterLibrary;
+    lastSaved = parsed;
+    return parsed;
   } catch {
-    return starterSplashPage;
+    return starterLibrary;
   }
 }
 
 /**
- * How much of the Splash Page was remembered: all of it; when this browser's
- * storage is full, everything except its Logo and Background image; or, when
- * storage is blocked or even that doesn't fit, nothing.
+ * A Library holding the Splash Page ADR-0003 remembered in `legacyStorage`,
+ * or one Starter Splash Page if there is none or it can't be read. Once the
+ * Library holding it is saved, even without images, the Splash Page is
+ * removed from `legacyStorage`, so it's carried over only once (ADR-0004).
+ */
+async function carryOver(legacyStorage: Storage): Promise<Library> {
+  // Throws if this browser blocks storage.
+  const saved = legacyStorage.getItem(savedSplashPageKey);
+  if (saved === null) return starterLibrary;
+  const parsed = parseJson(saved);
+  if (!isSplashPage(parsed)) return starterLibrary;
+  const library = libraryOfMySplashPage(parsed);
+  if ((await saveLibrary(library)) !== "not saved") {
+    legacyStorage.removeItem(savedSplashPageKey);
+  }
+  return library;
+}
+
+/** `text` parsed as JSON, or undefined if it isn't JSON. */
+function parseJson(text: string): unknown {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * How much of the Library was remembered: all of it; when this browser's
+ * storage is full, everything except the Open Splash Page's Logo and
+ * Background image; or, when storage is blocked or even that doesn't fit,
+ * nothing.
  */
 export type SaveResult = "saved" | "saved without images" | "not saved";
 
+/** Every save made so far, settling once the last has gone through. */
+let saves: Promise<unknown> = Promise.resolve();
+
+/** The Library as last remembered in IndexedDB, once loaded or saved. */
+let lastSaved: Library | undefined;
+
 /**
- * Remembers the whole Splash Page, replacing any earlier one. If storage is
- * full, remembers it without its images instead (ADR-0003). Never throws.
+ * Remembers the whole Library, replacing any earlier one. If storage is full,
+ * remembers it instead without the Open Splash Page's images, and without any
+ * other Splash Page's images that weren't already remembered (ADR-0004).
+ * Saves go through one after another in the order they're made, so the
+ * latest Library is the one remembered (ADR-0004). Never rejects.
  */
-export function saveSplashPage(
-  storage: Storage,
-  splashPage: SplashPage,
-): SaveResult {
+export function saveLibrary(library: Library): Promise<SaveResult> {
+  const save = saves.then(() => writeLibrary(library));
+  saves = save;
+  return save;
+}
+
+/** Settles once every save made so far has gone through, so pending saves can finish. */
+export async function savesSettled(): Promise<void> {
+  await saves;
+}
+
+async function writeLibrary(library: Library): Promise<SaveResult> {
   try {
-    storage.setItem(savedSplashPageKey, JSON.stringify(splashPage));
+    await set(savedLibraryKey, JSON.stringify(library));
+    lastSaved = library;
     return "saved";
   } catch (error) {
     if (!isQuotaExceeded(error)) return "not saved";
   }
   try {
-    storage.setItem(
-      savedSplashPageKey,
-      JSON.stringify(withoutImages(splashPage)),
-    );
+    const fallback = withoutUnsavedImages(library, lastSaved);
+    await set(savedLibraryKey, JSON.stringify(fallback));
+    lastSaved = fallback;
     return "saved without images";
   } catch {
     return "not saved";
   }
 }
 
-/** The Splash Page without its Logo or Background image. */
-function withoutImages(splashPage: SplashPage): SplashPage {
+/**
+ * The Library without the Open Splash Page's images, and without any other
+ * Splash Page's images that `saved` doesn't hold too, so images that never
+ * fitted don't stop the rest being remembered.
+ */
+function withoutUnsavedImages(
+  library: Library,
+  saved: Library | undefined,
+): Library {
+  return {
+    ...library,
+    splashPages: library.splashPages.map((entry) => {
+      const kept =
+        entry.id === library.openSplashPageId
+          ? undefined
+          : saved?.splashPages.find(({ id }) => id === entry.id)?.splashPage;
+      return { ...entry, splashPage: withoutImages(entry.splashPage, kept) };
+    }),
+  };
+}
+
+/**
+ * The Splash Page without its Logo or Background image, except any image
+ * `kept` has too.
+ */
+function withoutImages(splashPage: SplashPage, kept?: SplashPage): SplashPage {
+  const { logo, background } = splashPage;
+  const keepsBackgroundImage =
+    background.imageUrl !== undefined &&
+    background.imageUrl === kept?.background.imageUrl;
   return {
     ...splashPage,
-    logo: undefined,
-    // The colour always sits underneath, so it's what shows instead.
-    background: { kind: "colour", colour: splashPage.background.colour },
+    logo: logo !== undefined && logo === kept?.logo ? logo : undefined,
+    background: keepsBackgroundImage
+      ? background
+      : // The colour always sits underneath, so it's what shows instead.
+        { kind: "colour", colour: background.colour },
   };
 }
 
@@ -152,5 +243,28 @@ function isSplashPage(value: unknown): value is SplashPage {
     value.textBlocks.every(isTextBlock) &&
     isInputFields(value.inputFields) &&
     isConnectButton(value.connectButton)
+  );
+}
+
+function isLibraryEntry(value: unknown): value is LibraryEntry {
+  return (
+    isObject(value) &&
+    isString(value.id) &&
+    isString(value.name) &&
+    isSplashPage(value.splashPage)
+  );
+}
+
+/**
+ * Whether a parsed save has the shape of a Library: never empty, and its Open
+ * Splash Page is one of its Splash Pages.
+ */
+function isLibrary(value: unknown): value is Library {
+  return (
+    isObject(value) &&
+    Array.isArray(value.splashPages) &&
+    value.splashPages.length > 0 &&
+    value.splashPages.every(isLibraryEntry) &&
+    value.splashPages.some(({ id }) => id === value.openSplashPageId)
   );
 }

@@ -1,5 +1,7 @@
 # Remember the Splash Page in localStorage, images as data URLs
 
+_Storage superseded by [ADR-0004](0004-remember-library-in-indexeddb.md): the Library now lives in IndexedDB. The rest of this decision stands._
+
 A Customer's Splash Page, including its uploaded Logo and Background images, is remembered in this browser so that a refresh doesn't lose their work. The whole Splash Page object (ADR-0002) is saved to `localStorage` under a versioned key, and uploaded images are stored in it as data URLs instead of in-memory object URLs. This supersedes ADR-0001's "lost on refresh" and "object URLs" points but keeps its core: no backend, nothing shared between browsers.
 
 ## Considered Options

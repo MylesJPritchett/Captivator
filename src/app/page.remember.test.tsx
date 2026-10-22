@@ -1,13 +1,17 @@
-import { cleanup, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   editTextBlock1,
   imageDataUrl,
   renderCaptivator,
+  savedLibrary,
+  savedLibraryKey,
   savedSplashPageKey,
+  seedSavedLibrary,
   seedSavedSplashPage,
 } from "@/app/test-helpers";
+import Home from "@/app/page";
 import type { SplashPage } from "@/splash-page";
 
 /** A Splash Page far from the Starter Splash Page, images and all. */
@@ -42,11 +46,11 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
 
   it("an edited Text Block is still shown in the Preview after Captivator is rendered again", async () => {
     const user = userEvent.setup();
-    const { editor } = renderCaptivator();
+    const { editor } = await renderCaptivator();
     await editTextBlock1(user, editor, "Welcome to the Café");
 
     cleanup();
-    const { preview } = renderCaptivator();
+    const { preview } = await renderCaptivator();
 
     expect(
       within(preview).getByText("Welcome to the Café"),
@@ -54,10 +58,10 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
     expect(within(preview).queryByText("Free WiFi")).not.toBeInTheDocument();
   });
 
-  it("a saved Splash Page opens in the Preview, including its Logo and Background image", () => {
-    seedSavedSplashPage(savedSplashPage);
+  it("a saved Splash Page opens in the Preview, including its Logo and Background image", async () => {
+    await seedSavedSplashPage(savedSplashPage);
 
-    const { preview, background } = renderCaptivator();
+    const { preview, background } = await renderCaptivator();
 
     expect(within(preview).getByRole("img", { name: "Logo" })).toHaveAttribute(
       "src",
@@ -78,34 +82,44 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
 
   it.each([
     ["isn't JSON", "{not json"],
-    ["isn't a Splash Page", JSON.stringify({ textBlocks: "Free WiFi" })],
+    ["isn't a Library", JSON.stringify({ textBlocks: "Free WiFi" })],
+    [
+      "has no Splash Pages",
+      JSON.stringify({ splashPages: [], openSplashPageId: "saved" }),
+    ],
+    [
+      "has no Splash Page with the open id",
+      savedLibrary(savedSplashPage, { openSplashPageId: "missing" }),
+    ],
     [
       "has a Text Block missing its size",
-      JSON.stringify({
+      savedLibrary({
         ...savedSplashPage,
-        textBlocks: [{ id: "t", text: "Welcome to the Café", colour: "#fff" }],
+        textBlocks: [
+          { id: "t", text: "Welcome to the Café", colour: "#fff" },
+        ] as SplashPage["textBlocks"],
       }),
     ],
     [
       "has more than two Input Fields",
-      JSON.stringify({
+      savedLibrary({
         ...savedSplashPage,
         inputFields: [{ type: "Name" }, { type: "Email" }, { type: "Phone" }],
       }),
     ],
     [
       "has two Input Fields of the same type",
-      JSON.stringify({
+      savedLibrary({
         ...savedSplashPage,
         inputFields: [{ type: "Email" }, { type: "Email" }],
       }),
     ],
   ])(
-    "a saved Splash Page that %s opens the Preview on the Starter Splash Page",
-    (_, saved) => {
-      localStorage.setItem(savedSplashPageKey, saved);
+    "a saved Library that %s opens the Preview on the Starter Splash Page",
+    async (_, saved) => {
+      await seedSavedLibrary(saved);
 
-      const { preview } = renderCaptivator();
+      const { preview } = await renderCaptivator();
 
       expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
       expect(
@@ -114,13 +128,13 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
     },
   );
 
-  it("a Splash Page saved under an older version opens the Preview on the Starter Splash Page", () => {
-    localStorage.setItem(
-      olderVersionKey(savedSplashPageKey),
-      JSON.stringify(savedSplashPage),
+  it("a Library saved under an older version opens the Preview on the Starter Splash Page", async () => {
+    await seedSavedLibrary(
+      savedLibrary(savedSplashPage),
+      olderVersionKey(savedLibraryKey),
     );
 
-    const { preview } = renderCaptivator();
+    const { preview } = await renderCaptivator();
 
     expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
     expect(
@@ -128,8 +142,18 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("with nothing saved, Captivator opens on the Starter Splash Page", () => {
-    const { preview } = renderCaptivator();
+  it("the Starter Splash Page never shows before a saved Splash Page opens", async () => {
+    await seedSavedSplashPage(savedSplashPage);
+
+    render(<Home />);
+
+    expect(screen.queryByText("Free WiFi")).not.toBeInTheDocument();
+    expect(await screen.findByText("Welcome to the Café")).toBeInTheDocument();
+    expect(screen.queryByText("Free WiFi")).not.toBeInTheDocument();
+  });
+
+  it("with nothing saved, Captivator opens on the Starter Splash Page", async () => {
+    const { preview } = await renderCaptivator();
 
     expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
     expect(
@@ -137,14 +161,52 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
     ).toBeInTheDocument();
   });
 
+  it("a Splash Page remembered in localStorage on an earlier visit (ADR-0003) opens in the Preview, images and all", async () => {
+    localStorage.setItem(savedSplashPageKey, JSON.stringify(savedSplashPage));
+
+    const { preview, background } = await renderCaptivator();
+
+    expect(within(preview).getByRole("img", { name: "Logo" })).toHaveAttribute(
+      "src",
+      imageDataUrl("cafe-logo.png"),
+    );
+    expect(background()).toHaveStyle({
+      backgroundImage: `url("${imageDataUrl("venue.png")}")`,
+    });
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
+  });
+
+  it("a Splash Page remembered in localStorage is carried over once, then removed from localStorage", async () => {
+    const user = userEvent.setup();
+    localStorage.setItem(savedSplashPageKey, JSON.stringify(savedSplashPage));
+    const { editor } = await renderCaptivator();
+
+    await editTextBlock1(user, editor, "Welcome back");
+    cleanup();
+    const { preview } = await renderCaptivator();
+
+    expect(within(preview).getByText("Welcome back")).toBeInTheDocument();
+    expect(localStorage.getItem(savedSplashPageKey)).toBeNull();
+  });
+
+  it("an unreadable Splash Page remembered in localStorage opens the Preview on the Starter Splash Page", async () => {
+    localStorage.setItem(savedSplashPageKey, "{not json");
+
+    const { preview } = await renderCaptivator();
+
+    expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
+  });
+
   it("a Background switched to image before uploading one is still remembered after Captivator is rendered again", async () => {
     const user = userEvent.setup();
-    const { editor } = renderCaptivator();
+    const { editor } = await renderCaptivator();
     await editTextBlock1(user, editor, "Welcome to the Café");
     await user.click(within(editor).getByRole("radio", { name: "Image" }));
 
     cleanup();
-    const { preview } = renderCaptivator();
+    const { preview } = await renderCaptivator();
 
     expect(
       within(preview).getByText("Welcome to the Café"),
@@ -153,14 +215,14 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
 
   it("a removed Logo stays removed after Captivator is rendered again", async () => {
     const user = userEvent.setup();
-    seedSavedSplashPage(savedSplashPage);
-    const { editor } = renderCaptivator();
+    await seedSavedSplashPage(savedSplashPage);
+    const { editor } = await renderCaptivator();
 
     await user.click(
       within(editor).getByRole("button", { name: "Remove Logo" }),
     );
     cleanup();
-    const { preview } = renderCaptivator();
+    const { preview } = await renderCaptivator();
 
     expect(
       within(preview).queryByRole("img", { name: "Logo" }),
@@ -173,14 +235,14 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
   it("after a confirmed Reset, Captivator opens on the Starter Splash Page when rendered again", async () => {
     const user = userEvent.setup();
     vi.spyOn(window, "confirm").mockReturnValue(true);
-    seedSavedSplashPage(savedSplashPage);
-    const { editor } = renderCaptivator();
+    await seedSavedSplashPage(savedSplashPage);
+    const { editor } = await renderCaptivator();
 
     await user.click(
       within(editor).getByRole("button", { name: "Reset to starter" }),
     );
     cleanup();
-    const { preview } = renderCaptivator();
+    const { preview } = await renderCaptivator();
 
     expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
     expect(
@@ -190,11 +252,11 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
 
   it("the Device goes back to Mobile when Captivator is rendered again", async () => {
     const user = userEvent.setup();
-    renderCaptivator();
+    await renderCaptivator();
     await user.click(screen.getByRole("radio", { name: "Desktop" }));
 
     cleanup();
-    const { preview } = renderCaptivator();
+    const { preview } = await renderCaptivator();
 
     expect(screen.getByRole("radio", { name: "Mobile" })).toBeChecked();
     expect(

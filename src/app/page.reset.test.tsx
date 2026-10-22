@@ -5,6 +5,7 @@ import {
   appearanceOption,
   chooseAppearance,
   editTextBlock1,
+  library,
   renderCaptivator,
 } from "@/app/test-helpers";
 
@@ -33,7 +34,7 @@ describe("Captivator: Reset to starter", () => {
   it("confirming Reset by keyboard returns the Preview to the Starter Splash Page and keeps the Device", async () => {
     const user = userEvent.setup();
     vi.spyOn(window, "confirm").mockReturnValue(true);
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     await editSplashPage(user, editor);
     await user.click(screen.getByRole("radio", { name: "Desktop" }));
 
@@ -54,7 +55,7 @@ describe("Captivator: Reset to starter", () => {
   it("cancelling the Reset confirmation leaves the Splash Page unchanged", async () => {
     const user = userEvent.setup();
     vi.spyOn(window, "confirm").mockReturnValue(false);
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     await editSplashPage(user, editor);
 
     await user.click(
@@ -68,10 +69,33 @@ describe("Captivator: Reset to starter", () => {
     expect(previewInputFieldNames(preview)).toEqual(["Email", "Name"]);
   });
 
+  it("Reset returns only the Open Splash Page to the Starter Splash Page", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    const { preview, editor } = await renderCaptivator();
+    await editTextBlock1(user, editor, "Welcome to the Café");
+    await user.click(
+      within(library()).getByRole("button", { name: "New Splash Page" }),
+    );
+    await editTextBlock1(user, editor, "Happy hour");
+
+    await user.click(
+      within(editor).getByRole("button", { name: "Reset to starter" }),
+    );
+    expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
+    await user.click(
+      within(library()).getByRole("button", { name: "My Splash Page" }),
+    );
+
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
+  });
+
   it("a confirmed Reset leaves the chosen Appearance unchanged, even after Captivator is rendered again", async () => {
     const user = userEvent.setup();
     vi.spyOn(window, "confirm").mockReturnValue(true);
-    const { editor } = renderCaptivator();
+    const { editor } = await renderCaptivator();
     await chooseAppearance(user, "Dark");
 
     await user.click(
@@ -80,7 +104,7 @@ describe("Captivator: Reset to starter", () => {
 
     expect(appearanceOption("Dark")).toBeChecked();
     cleanup();
-    renderCaptivator();
+    await renderCaptivator();
     expect(appearanceOption("Dark")).toBeChecked();
   });
 });

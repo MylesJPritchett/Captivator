@@ -12,8 +12,8 @@ import {
 // read the Background's inline style.
 
 describe("Captivator: Background", () => {
-  it("changing the Background colour in the Editor updates the Preview", () => {
-    const { editor, background } = renderCaptivator();
+  it("changing the Background colour in the Editor updates the Preview", async () => {
+    const { editor, background } = await renderCaptivator();
 
     pickColour(within(editor).getByLabelText("Background colour"), "#10b981");
 
@@ -22,7 +22,7 @@ describe("Captivator: Background", () => {
 
   it("uploading a Background image in the Editor shows it covering the Preview", async () => {
     const user = userEvent.setup();
-    const { editor, background } = renderCaptivator();
+    const { editor, background } = await renderCaptivator();
 
     await user.upload(
       within(editor).getByLabelText("Background image"),
@@ -40,7 +40,7 @@ describe("Captivator: Background", () => {
 
   it("switching the Background to colour and back to image keeps both without re-uploading", async () => {
     const user = userEvent.setup();
-    const { editor, background } = renderCaptivator();
+    const { editor, background } = await renderCaptivator();
     pickColour(within(editor).getByLabelText("Background colour"), "#10b981");
     await user.upload(
       within(editor).getByLabelText("Background image"),
@@ -64,7 +64,7 @@ describe("Captivator: Background", () => {
 
   it("switching the Background to image before uploading one leaves the colour showing", async () => {
     const user = userEvent.setup();
-    const { editor, background } = renderCaptivator();
+    const { editor, background } = await renderCaptivator();
 
     await user.click(within(editor).getByRole("radio", { name: "Image" }));
 
@@ -75,7 +75,7 @@ describe("Captivator: Background", () => {
   it("choosing a Background file that isn't an image shows an error and leaves the Preview unchanged", async () => {
     // Let the Customer pick any file, as a browser's "All files" option does.
     const user = userEvent.setup({ applyAccept: false });
-    const { editor, background } = renderCaptivator();
+    const { editor, background } = await renderCaptivator();
 
     await user.upload(
       within(editor).getByLabelText("Background image"),
@@ -93,7 +93,7 @@ describe("Captivator: Background", () => {
 describe("Captivator: clicking the Background in the Preview", () => {
   it("away from other elements, focuses the first control in the Editor's Background section", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     await user.click(
       within(preview).getByRole("group", { name: "Background" }),
@@ -104,7 +104,7 @@ describe("Captivator: clicking the Background in the Preview", () => {
 
   it("with the Background set to an image, focuses the checked option, where Tab would land", async () => {
     const user = userEvent.setup();
-    const { editor, background } = renderCaptivator();
+    const { editor, background } = await renderCaptivator();
     await user.upload(
       within(editor).getByLabelText("Background image"),
       imageFile("venue.png"),
@@ -120,7 +120,7 @@ describe("Captivator: clicking the Background in the Preview", () => {
 
   it("clicking the Logo on the Background still focuses the Editor's Logo section", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     await user.upload(
       within(editor).getByLabelText("Logo image"),
       imageFile("cafe-logo.png"),

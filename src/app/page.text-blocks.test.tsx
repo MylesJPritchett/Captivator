@@ -6,7 +6,7 @@ import { renderCaptivator } from "@/app/test-helpers";
 describe("Captivator: clicking a Text Block in the Preview", () => {
   it("focuses that Text Block's text input in the Editor", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
 
     await user.click(within(preview).getByText("Free WiFi"));
 
@@ -17,7 +17,7 @@ describe("Captivator: clicking a Text Block in the Preview", () => {
 
   it("with two Text Blocks, clicking the second focuses the second Text Block's text input", async () => {
     const user = userEvent.setup();
-    const { preview, editor } = renderCaptivator();
+    const { preview, editor } = await renderCaptivator();
     await user.click(
       within(editor).getByRole("button", { name: "Add Text Block" }),
     );

@@ -1,13 +1,17 @@
-import { cleanup, waitFor, within } from "@testing-library/react";
+import { act, cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   editTextBlock1,
+  failIndexedDbWrites,
   imageDataUrl,
   imageFile,
   pickColour,
   renderCaptivator,
+  savedSplashPageKey,
+  storageFull,
 } from "@/app/test-helpers";
+import { savesSettled, starterSplashPage } from "@/splash-page";
 
 /** Saves longer than this fail, as if this browser's storage were full. */
 const storageLimit = 2_000;
@@ -31,20 +35,9 @@ function savedNote(editor: HTMLElement) {
 
 describe("Captivator: images too large to remember", () => {
   beforeEach(() => {
-    const setItem = Storage.prototype.setItem;
-    vi.spyOn(Storage.prototype, "setItem").mockImplementation(function (
-      this: Storage,
-      key: string,
-      value: string,
-    ) {
-      if (value.length > storageLimit) {
-        throw new DOMException(
-          "The quota has been exceeded.",
-          "QuotaExceededError",
-        );
-      }
-      setItem.call(this, key, value);
-    });
+    failIndexedDbWrites((value) =>
+      String(value).length > storageLimit ? storageFull() : undefined,
+    );
   });
 
   afterEach(() => {
@@ -53,7 +46,7 @@ describe("Captivator: images too large to remember", () => {
 
   it("uploading a Background image too large to remember tells the Customer, and the Preview still shows it", async () => {
     const user = userEvent.setup();
-    const { editor, background } = renderCaptivator();
+    const { editor, background } = await renderCaptivator();
 
     await user.upload(
       within(editor).getByLabelText("Background image"),
@@ -70,7 +63,7 @@ describe("Captivator: images too large to remember", () => {
 
   it("a Logo too large to remember still shows in the Preview, and is gone after Captivator is rendered again", async () => {
     const user = userEvent.setup();
-    const { editor, preview } = renderCaptivator();
+    const { editor, preview } = await renderCaptivator();
 
     await user.upload(
       within(editor).getByLabelText("Logo image"),
@@ -86,7 +79,7 @@ describe("Captivator: images too large to remember", () => {
     );
 
     cleanup();
-    const rendered = renderCaptivator();
+    const rendered = await renderCaptivator();
 
     expect(
       within(rendered.preview).queryByRole("img", { name: "Logo" }),
@@ -95,7 +88,7 @@ describe("Captivator: images too large to remember", () => {
 
   it("telling the Customer their images are too large doesn't move focus", async () => {
     const user = userEvent.setup();
-    const { editor } = renderCaptivator();
+    const { editor } = await renderCaptivator();
     const backgroundImage = within(editor).getByLabelText("Background image");
 
     await user.upload(backgroundImage, imageFile("venue.png", largeImageBytes));
@@ -108,7 +101,7 @@ describe("Captivator: images too large to remember", () => {
 
   it("replacing a Background image too large to remember with one that fits clears the message", async () => {
     const user = userEvent.setup();
-    const { editor } = renderCaptivator();
+    const { editor } = await renderCaptivator();
     const backgroundImage = within(editor).getByLabelText("Background image");
     await user.upload(backgroundImage, imageFile("venue.png", largeImageBytes));
     await waitFor(() =>
@@ -121,13 +114,42 @@ describe("Captivator: images too large to remember", () => {
       expect(savedNote(editor)).not.toHaveTextContent(imagesTooLarge),
     );
     expect(savedNote(editor)).toHaveTextContent(
-      "Your design is saved in this browser.",
+      "Your Splash Pages are saved in this browser.",
+    );
+  });
+
+  it("when the Open Splash Page's images are too large to remember, the other Splash Pages keep theirs after Captivator is rendered again", async () => {
+    const user = userEvent.setup();
+    const { editor } = await renderCaptivator();
+    await user.upload(
+      within(editor).getByLabelText("Logo image"),
+      imageFile("cafe-logo.png"),
+    );
+    await user.click(screen.getByRole("button", { name: "New Splash Page" }));
+    await user.upload(
+      within(editor).getByLabelText("Background image"),
+      imageFile("venue.png", largeImageBytes),
+    );
+    await waitFor(() =>
+      expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
+    );
+
+    cleanup();
+    const { preview, background } = await renderCaptivator();
+    expect(background()).not.toHaveStyle({
+      backgroundImage: `url("${largeImageDataUrl}")`,
+    });
+    await user.click(screen.getByRole("button", { name: "My Splash Page" }));
+
+    expect(within(preview).getByRole("img", { name: "Logo" })).toHaveAttribute(
+      "src",
+      imageDataUrl("cafe-logo.png"),
     );
   });
 
   it("after images too large to remember, rendering Captivator again shows the text and colours without the images", async () => {
     const user = userEvent.setup();
-    const { editor } = renderCaptivator();
+    const { editor } = await renderCaptivator();
     await user.upload(
       within(editor).getByLabelText("Logo image"),
       imageFile("cafe-logo.png", largeImageBytes),
@@ -143,7 +165,7 @@ describe("Captivator: images too large to remember", () => {
     );
 
     cleanup();
-    const { preview, background } = renderCaptivator();
+    const { preview, background } = await renderCaptivator();
 
     expect(
       within(preview).getByText("Welcome to the Café"),
@@ -155,5 +177,50 @@ describe("Captivator: images too large to remember", () => {
     expect(background()).not.toHaveStyle({
       backgroundImage: `url("${largeImageDataUrl}")`,
     });
+  });
+
+  it("a Splash Page remembered in localStorage with images too large to remember is still carried over once, then removed from localStorage", async () => {
+    localStorage.setItem(
+      savedSplashPageKey,
+      JSON.stringify({
+        ...starterSplashPage,
+        background: {
+          kind: "image",
+          colour: "#123456",
+          imageUrl: largeImageDataUrl,
+        },
+      }),
+    );
+
+    await renderCaptivator();
+
+    expect(localStorage.getItem(savedSplashPageKey)).toBeNull();
+  });
+
+  it("after one Splash Page's images are too large to remember, editing another Splash Page is still saved", async () => {
+    const user = userEvent.setup();
+    const { editor } = await renderCaptivator();
+    await user.click(screen.getByRole("button", { name: "New Splash Page" }));
+    await user.click(screen.getByRole("button", { name: "My Splash Page" }));
+    await user.upload(
+      within(editor).getByLabelText("Background image"),
+      imageFile("venue.png", largeImageBytes),
+    );
+    await waitFor(() =>
+      expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Untitled Splash Page" }),
+    );
+    await editTextBlock1(user, editor, "Welcome to the Café");
+    await act(() => savesSettled());
+
+    expect(savedNote(editor)).toHaveTextContent(imagesTooLarge);
+    cleanup();
+    const { preview } = await renderCaptivator();
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
   });
 });
