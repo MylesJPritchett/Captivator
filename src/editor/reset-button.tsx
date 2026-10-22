@@ -1,4 +1,4 @@
-import { buttonClass } from "@/ui/controls";
+import { outlinedButtonClass } from "./controls";
 import type { EditorSectionProps } from "./types";
 
 /** Returns the Splash Page to the Starter Splash Page once confirmed. */
@@ -17,7 +17,7 @@ export function ResetButton({
           dispatch({ type: "reset" });
         }
       }}
-      className={`self-start px-3 py-2 text-sm font-medium ${buttonClass}`}
+      className={`self-start px-3 py-2 text-sm font-medium ${outlinedButtonClass}`}
     >
       Reset to starter
     </button>

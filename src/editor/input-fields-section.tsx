@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { addableInputFieldTypes, type InputFieldType } from "@/splash-page";
-import { buttonClass, fieldClass, primaryButtonClass } from "@/ui/controls";
+import {
+  fieldClass,
+  outlinedButtonClass,
+  primaryButtonClass,
+} from "./controls";
 import { EditorSection } from "./editor-section";
 import type { EditorSectionProps } from "./types";
 
@@ -34,7 +38,7 @@ export function InputFieldsSection({
                     inputFieldType: inputField.type,
                   })
                 }
-                className={`px-2 py-1 text-sm ${buttonClass}`}
+                className={`px-2 py-1 text-sm ${outlinedButtonClass}`}
               >
                 Remove
               </button>

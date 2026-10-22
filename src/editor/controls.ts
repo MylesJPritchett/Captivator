@@ -1,4 +1,4 @@
-import { focusRing } from "./focus-ring";
+import { focusRing } from "@/ui/focus-ring";
 
 /*
  * Colour and state styles shared by the Editor's controls, drawn from the
@@ -7,7 +7,7 @@ import { focusRing } from "./focus-ring";
  */
 
 /** An outlined button: Add, Remove, Reset. */
-export const buttonClass = `rounded-md border border-control-border bg-control text-foreground hover:bg-control-hover disabled:cursor-not-allowed disabled:border-divider disabled:bg-control disabled:text-control-disabled ${focusRing}`;
+export const outlinedButtonClass = `rounded-md border border-control-border bg-control text-foreground hover:bg-control-hover disabled:cursor-not-allowed disabled:border-divider disabled:text-control-disabled ${focusRing}`;
 
 /** The filled button for the one emphasised action in a group. */
 export const primaryButtonClass = `rounded-md bg-primary text-primary-foreground hover:bg-primary-hover ${focusRing}`;
