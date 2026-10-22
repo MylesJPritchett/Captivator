@@ -166,7 +166,7 @@ test.describe("with a dark colour scheme", () => {
     });
 
     for (const message of [
-      editor.getByText("Your design is saved in this browser."),
+      editor.getByText("Your Splash Pages are saved in this browser."),
       editor.getByRole("alert"),
     ]) {
       const { text, background } = await colours(message);
