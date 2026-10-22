@@ -1,8 +1,25 @@
-import type { SplashPage } from "./types";
+import type { SplashPageAction } from "./reducer";
+import type { Colour, SplashPage } from "./types";
 
-// No Connect Button actions yet. Replace `never` with a union of Connect Button actions.
-export type ConnectButtonAction = never;
+export type ConnectButtonAction = {
+  type: "setConnectButtonBackgroundColour";
+  colour: Colour;
+};
 
-export function connectButtonReducer(splashPage: SplashPage): SplashPage {
-  return splashPage;
+export function connectButtonReducer(
+  splashPage: SplashPage,
+  action: SplashPageAction,
+): SplashPage {
+  switch (action.type) {
+    case "setConnectButtonBackgroundColour":
+      return {
+        ...splashPage,
+        connectButton: {
+          ...splashPage.connectButton,
+          backgroundColour: action.colour,
+        },
+      };
+    default:
+      return splashPage;
+  }
 }
