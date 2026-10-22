@@ -37,10 +37,12 @@ describe("Captivator: Editor and Preview", () => {
     expect(preview).not.toContainElement(document.activeElement as HTMLElement);
   });
 
-  it("tells the Customer the design isn't saved on refresh", () => {
-    renderCaptivator();
+  it("tells the Customer the design is saved in this browser", () => {
+    const { editor } = renderCaptivator();
 
-    expect(screen.getByText(/not saved/i)).toBeVisible();
+    expect(
+      within(editor).getByText("Your design is saved in this browser."),
+    ).toBeVisible();
   });
 
   it("editing a Text Block's text in the Editor updates the Preview", async () => {

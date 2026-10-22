@@ -61,8 +61,7 @@ function Captivator({ initialSplashPage }: { initialSplashPage: SplashPage }) {
           Editor
         </h2>
         <p className="text-sm text-zinc-600">
-          Your design is not saved. Refreshing the page starts again from the
-          starter Splash Page.
+          Your design is saved in this browser.
         </p>
         <Editor splashPage={splashPage} dispatch={dispatch} />
       </section>
