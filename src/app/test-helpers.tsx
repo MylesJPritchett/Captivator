@@ -6,6 +6,7 @@ import { vi } from "vitest";
 import {
   savedLibraryKey,
   savedSplashPageKey,
+  starterSplashPage,
   type Library,
   type SplashPage,
 } from "@/splash-page";
@@ -121,6 +122,54 @@ export function savedLibrary(
     openSplashPageId: "saved",
     ...overrides,
   });
+}
+
+/** A Café Splash Page, unlike the Starter Splash Page only in its Text Block. */
+export const cafe: SplashPage = {
+  ...starterSplashPage,
+  textBlocks: [
+    { id: "cafe", text: "Welcome to the Café", colour: "#111827", size: 24 },
+  ],
+};
+
+/** A Bar Splash Page, unlike the Starter Splash Page only in its Text Block. */
+export const bar: SplashPage = {
+  ...starterSplashPage,
+  textBlocks: [{ id: "bar", text: "Happy hour", colour: "#ef4444", size: 30 }],
+};
+
+/** Seeds a saved Library of the Café and Bar Splash Pages, with the Bar open. */
+export async function seedCafeAndBar() {
+  await seedSavedLibrary(
+    savedLibrary(cafe, {
+      splashPages: [
+        { id: "cafe", name: "Café", splashPage: cafe },
+        { id: "bar", name: "Bar", splashPage: bar },
+      ],
+      openSplashPageId: "bar",
+    }),
+  );
+}
+
+/** The Library, down the left side of the screen. */
+export function library() {
+  return screen.getByRole("navigation", { name: "Library" });
+}
+
+/** The names on the Library's Splash Page buttons, in order. */
+export function libraryNames() {
+  return within(library())
+    .getAllByRole("button")
+    .map((button) => button.textContent)
+    .filter((name) => name !== "New Splash Page");
+}
+
+/** The names of the Splash Pages the Library marks as open. */
+export function openName() {
+  return within(library())
+    .getAllByRole("button")
+    .filter((button) => button.getAttribute("aria-current") === "true")
+    .map((button) => button.textContent);
 }
 
 /**

@@ -1,7 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { editTextBlock1, renderCaptivator } from "@/app/test-helpers";
+import { editTextBlock1, library, renderCaptivator } from "@/app/test-helpers";
 
 /** Edits the Splash Page away from the Starter Splash Page. */
 async function editSplashPage(
@@ -67,10 +67,9 @@ describe("Captivator: Reset to starter", () => {
     const user = userEvent.setup();
     vi.spyOn(window, "confirm").mockReturnValue(true);
     const { preview, editor } = await renderCaptivator();
-    const library = screen.getByRole("navigation", { name: "Library" });
     await editTextBlock1(user, editor, "Welcome to the Café");
     await user.click(
-      within(library).getByRole("button", { name: "New Splash Page" }),
+      within(library()).getByRole("button", { name: "New Splash Page" }),
     );
     await editTextBlock1(user, editor, "Happy hour");
 
@@ -79,7 +78,7 @@ describe("Captivator: Reset to starter", () => {
     );
     expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
     await user.click(
-      within(library).getByRole("button", { name: "My Splash Page" }),
+      within(library()).getByRole("button", { name: "My Splash Page" }),
     );
 
     expect(
