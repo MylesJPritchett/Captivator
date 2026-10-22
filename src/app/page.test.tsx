@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import Home from "@/app/page";
@@ -83,6 +83,20 @@ describe("Captivator: Editor and Preview", () => {
       freeWifi.compareDocumentPosition(signIn) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+  });
+
+  it("changing a Text Block's colour in the Editor recolours it in the Preview", () => {
+    const { preview, editor } = renderCaptivator();
+
+    // user-event can't drive a native colour picker, so set its value directly.
+    fireEvent.change(
+      within(editor).getByLabelText("Text Block 1 colour"),
+      { target: { value: "#ff0000" } },
+    );
+
+    expect(within(preview).getByText("Free WiFi")).toHaveStyle({
+      color: "#ff0000",
+    });
   });
 
   it("removing the only Text Block removes it from the Preview", async () => {
