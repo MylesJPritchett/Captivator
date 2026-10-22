@@ -62,4 +62,28 @@ describe("Captivator: Reset to starter", () => {
     expect(within(preview).queryByText("Free WiFi")).not.toBeInTheDocument();
     expect(previewInputFieldNames(preview)).toEqual(["Email", "Name"]);
   });
+
+  it("Reset returns only the Open Splash Page to the Starter Splash Page", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    const { preview, editor } = await renderCaptivator();
+    const library = screen.getByRole("navigation", { name: "Library" });
+    await editTextBlock1(user, editor, "Welcome to the Café");
+    await user.click(
+      within(library).getByRole("button", { name: "New Splash Page" }),
+    );
+    await editTextBlock1(user, editor, "Happy hour");
+
+    await user.click(
+      within(editor).getByRole("button", { name: "Reset to starter" }),
+    );
+    expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
+    await user.click(
+      within(library).getByRole("button", { name: "My Splash Page" }),
+    );
+
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
+  });
 });
