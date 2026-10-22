@@ -19,9 +19,10 @@ const storageKey = "captivator.splashPage.v1";
  * it can't be read.
  */
 export function loadSplashPage(storage: Storage): SplashPage {
-  const saved = storage.getItem(storageKey);
-  if (saved === null) return starterSplashPage;
   try {
+    // Throws if this browser blocks storage.
+    const saved = storage.getItem(storageKey);
+    if (saved === null) return starterSplashPage;
     const parsed: unknown = JSON.parse(saved);
     return isSplashPage(parsed) ? parsed : starterSplashPage;
   } catch {
@@ -30,14 +31,15 @@ export function loadSplashPage(storage: Storage): SplashPage {
 }
 
 /**
- * How much of the Splash Page was remembered: all of it, or, when this
- * browser's storage is full, everything except its Logo and Background image.
+ * How much of the Splash Page was remembered: all of it; when this browser's
+ * storage is full, everything except its Logo and Background image; or, when
+ * storage is blocked or even that doesn't fit, nothing.
  */
-export type SaveResult = "saved" | "saved without images";
+export type SaveResult = "saved" | "saved without images" | "not saved";
 
 /**
  * Remembers the whole Splash Page, replacing any earlier one. If storage is
- * full, remembers it without its images instead (ADR-0003).
+ * full, remembers it without its images instead (ADR-0003). Never throws.
  */
 export function saveSplashPage(
   storage: Storage,
@@ -47,9 +49,13 @@ export function saveSplashPage(
     storage.setItem(storageKey, JSON.stringify(splashPage));
     return "saved";
   } catch (error) {
-    if (!isQuotaExceeded(error)) throw error;
+    if (!isQuotaExceeded(error)) return "not saved";
+  }
+  try {
     storage.setItem(storageKey, JSON.stringify(withoutImages(splashPage)));
     return "saved without images";
+  } catch {
+    return "not saved";
   }
 }
 

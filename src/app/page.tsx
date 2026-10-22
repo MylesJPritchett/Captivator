@@ -64,7 +64,16 @@ function Captivator({ initialSplashPage }: { initialSplashPage: SplashPage }) {
           Editor
         </h2>
         <div role="status" className="flex flex-col gap-1 text-sm">
-          <p className="text-zinc-600">Your design is saved in this browser.</p>
+          {saveResult === "not saved" ? (
+            <p className="text-amber-800">
+              Your design can&apos;t be saved in this browser, so it will be
+              lost when you leave.
+            </p>
+          ) : (
+            <p className="text-zinc-600">
+              Your design is saved in this browser.
+            </p>
+          )}
           {saveResult === "saved without images" && (
             <p className="text-amber-800">
               Your images are too large to remember in this browser; text and
