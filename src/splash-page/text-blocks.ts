@@ -14,7 +14,7 @@ export type TextBlockAction =
     };
 
 const newTextBlock: Omit<TextBlock, "id"> = {
-  text: "",
+  text: "New text",
   colour: "#ffffff",
   size: 20,
 };

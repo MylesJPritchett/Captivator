@@ -58,4 +58,30 @@ describe("Captivator: Editor and Preview", () => {
     ).toBeInTheDocument();
     expect(within(preview).queryByText("Free WiFi")).not.toBeInTheDocument();
   });
+
+  it("adding a Text Block in the Editor shows it in the Preview after the existing ones", async () => {
+    const user = userEvent.setup();
+    const { preview, editor } = renderCaptivator();
+
+    await user.click(
+      within(editor).getByRole("button", { name: "Add Text Block" }),
+    );
+    const secondText = within(editor).getByRole("textbox", {
+      name: "Text Block 2 text",
+    });
+    expect(secondText).not.toHaveValue("");
+    expect(
+      within(preview).getByText((secondText as HTMLInputElement).value),
+    ).toBeInTheDocument();
+
+    await user.clear(secondText);
+    await user.type(secondText, "Sign in below");
+
+    const freeWifi = within(preview).getByText("Free WiFi");
+    const signIn = within(preview).getByText("Sign in below");
+    expect(
+      freeWifi.compareDocumentPosition(signIn) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
 });

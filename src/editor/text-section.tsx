@@ -27,6 +27,15 @@ export function TextSection({ splashPage, dispatch }: EditorSectionProps) {
           </div>
         );
       })}
+      <button
+        type="button"
+        onClick={() =>
+          dispatch({ type: "addTextBlock", id: crypto.randomUUID() })
+        }
+        className="self-start rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-50"
+      >
+        Add Text Block
+      </button>
     </EditorSection>
   );
 }
