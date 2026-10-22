@@ -33,3 +33,17 @@ describe("Text Blocks", () => {
     expect(starterSplashPage.textBlocks[0].text).toBe("Free WiFi");
   });
 });
+
+describe("Input Fields", () => {
+  it("adding an Input Field of an unused type appends it", () => {
+    const splashPage = splashPageReducer(starterSplashPage, {
+      type: "addInputField",
+      inputFieldType: "Name",
+    });
+
+    expect(splashPage.inputFields).toEqual([
+      { type: "Email" },
+      { type: "Name" },
+    ]);
+  });
+});
