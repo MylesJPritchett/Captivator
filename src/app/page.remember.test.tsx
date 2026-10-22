@@ -1,4 +1,4 @@
-import { cleanup, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
@@ -11,6 +11,7 @@ import {
   seedSavedLibrary,
   seedSavedSplashPage,
 } from "@/app/test-helpers";
+import Home from "@/app/page";
 import type { SplashPage } from "@/splash-page";
 
 /** A Splash Page far from the Starter Splash Page, images and all. */
@@ -139,6 +140,16 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
     expect(
       within(preview).queryByText("Welcome to the Café"),
     ).not.toBeInTheDocument();
+  });
+
+  it("the Starter Splash Page never shows before a saved Splash Page opens", async () => {
+    await seedSavedSplashPage(savedSplashPage);
+
+    render(<Home />);
+
+    expect(screen.queryByText("Free WiFi")).not.toBeInTheDocument();
+    expect(await screen.findByText("Welcome to the Café")).toBeInTheDocument();
+    expect(screen.queryByText("Free WiFi")).not.toBeInTheDocument();
   });
 
   it("with nothing saved, Captivator opens on the Starter Splash Page", async () => {
