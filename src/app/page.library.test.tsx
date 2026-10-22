@@ -119,4 +119,53 @@ describe("Captivator: the Library", () => {
     expect(libraryNames()).toEqual(["Corner Café"]);
     expect(openName()).toEqual(["Corner Café"]);
   });
+
+  it("clearing the Name field names the Splash Page Untitled Splash Page, which the Name field shows once the Customer moves on", async () => {
+    const user = userEvent.setup();
+    const { editor } = await renderCaptivator();
+    const name = within(editor).getByRole("textbox", { name: "Name" });
+
+    await user.clear(name);
+
+    expect(name).toHaveValue("");
+    expect(libraryNames()).toEqual(["Untitled Splash Page"]);
+
+    await user.tab();
+
+    expect(name).toHaveValue("Untitled Splash Page");
+  });
+
+  it("opening another Splash Page shows its name in the Name field", async () => {
+    const user = userEvent.setup();
+    const { editor } = await renderCaptivator();
+    await user.click(
+      within(library()).getByRole("button", { name: "New Splash Page" }),
+    );
+    const name = within(editor).getByRole("textbox", { name: "Name" });
+    await user.type(name, " Bar");
+
+    await user.click(
+      within(library()).getByRole("button", { name: "My Splash Page" }),
+    );
+
+    expect(name).toHaveValue("My Splash Page");
+    expect(libraryNames()).toEqual([
+      "My Splash Page",
+      "Untitled Splash Page Bar",
+    ]);
+  });
+
+  it("the open Splash Page's name never appears in the Preview", async () => {
+    const user = userEvent.setup();
+    const { editor, preview } = await renderCaptivator();
+    const name = within(editor).getByRole("textbox", { name: "Name" });
+
+    await user.clear(name);
+    await user.type(name, "Corner Café");
+
+    expect(within(preview).queryByText(/Corner Café/)).not.toBeInTheDocument();
+    expect(
+      within(preview).queryByText(/My Splash Page/),
+    ).not.toBeInTheDocument();
+  });
 });
