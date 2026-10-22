@@ -19,7 +19,10 @@ type PreviewProps = {
 export function Preview({ splashPage, device }: PreviewProps) {
   return (
     <DeviceFrame device={device}>
+      {/* The Background fills the whole frame, with the content on top. */}
       <div
+        role="group"
+        aria-label="Background"
         className="flex h-full w-full overflow-y-auto"
         style={backgroundStyle(splashPage.background)}
       >
