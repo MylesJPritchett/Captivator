@@ -1,5 +1,18 @@
 import { expect, test } from "@playwright/test";
 
+test("the Connect Button reads Connect, exactly as written", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  // innerText includes CSS text transforms, so this is what a Guest reads.
+  await expect(
+    page
+      .getByRole("region", { name: "Preview" })
+      .getByRole("button", { name: "Connect" }),
+  ).toHaveText("Connect", { useInnerText: true });
+});
+
 test("the Preview sits above the Editor on narrow screens and beside it on wide ones", async ({
   page,
   isMobile,

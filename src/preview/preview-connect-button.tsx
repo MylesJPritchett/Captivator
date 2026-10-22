@@ -10,7 +10,7 @@ export function PreviewConnectButton({
     <button
       type="button"
       disabled
-      className="w-full rounded-full px-5 py-3 text-base font-semibold uppercase"
+      className="w-full rounded-full px-5 py-3 text-base font-semibold"
       style={{
         backgroundColor: connectButton.backgroundColour,
         color: connectButton.textColour,
