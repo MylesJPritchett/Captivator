@@ -36,7 +36,10 @@ export function Preview({ splashPage, device, onJump }: PreviewProps) {
             inputFields={splashPage.inputFields}
             onClick={() => onJump("inputFields")}
           />
-          <PreviewConnectButton connectButton={splashPage.connectButton} />
+          <PreviewConnectButton
+            connectButton={splashPage.connectButton}
+            onClick={() => onJump("connectButton")}
+          />
         </div>
       </div>
     </DeviceFrame>
