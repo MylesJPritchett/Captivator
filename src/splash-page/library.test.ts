@@ -118,4 +118,42 @@ describe("Library", () => {
     expect(["cafe", "bar"]).not.toContain(copy.id);
     expect(library.openSplashPageId).toBe(copy.id);
   });
+
+  it("Delete removes the Open Splash Page and opens the Splash Page just above it", () => {
+    const library = libraryReducer(
+      { ...cafeAndBar, openSplashPageId: "bar" },
+      { type: "delete" },
+    );
+
+    expect(library).toEqual({
+      splashPages: [{ id: "cafe", name: "Café", splashPage: cafe }],
+      openSplashPageId: "cafe",
+    });
+  });
+
+  it("deleting the first Splash Page opens the next one down", () => {
+    const library = libraryReducer(cafeAndBar, { type: "delete" });
+
+    expect(library).toEqual({
+      splashPages: [{ id: "bar", name: "Bar", splashPage: bar }],
+      openSplashPageId: "bar",
+    });
+  });
+
+  it("deleting the only Splash Page leaves a single Starter Splash Page named Untitled Splash Page", () => {
+    const library = libraryReducer(
+      {
+        splashPages: [{ id: "cafe", name: "Café", splashPage: cafe }],
+        openSplashPageId: "cafe",
+      },
+      { type: "delete" },
+    );
+
+    expect(library.splashPages).toHaveLength(1);
+    expect(library.splashPages[0]).toMatchObject({
+      name: "Untitled Splash Page",
+      splashPage: starterSplashPage,
+    });
+    expect(library.openSplashPageId).toBe(library.splashPages[0].id);
+  });
 });

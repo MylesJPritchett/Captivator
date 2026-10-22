@@ -10,6 +10,7 @@ export type LibraryAction =
   | { type: "new" }
   | { type: "open"; id: string }
   | { type: "duplicate" }
+  | { type: "delete" }
   | SplashPageAction;
 
 /** The name a new Splash Page starts with. */
@@ -48,6 +49,20 @@ export function libraryReducer(
           { id, name: `Copy of ${open.name}`, splashPage: open.splashPage },
         ],
         openSplashPageId: id,
+      };
+    }
+    case "delete": {
+      const index = library.splashPages.findIndex(
+        ({ id }) => id === library.openSplashPageId,
+      );
+      const splashPages = library.splashPages.filter((_, i) => i !== index);
+      // The Library is never empty.
+      if (splashPages.length === 0) {
+        return libraryReducer({ ...library, splashPages }, { type: "new" });
+      }
+      return {
+        splashPages,
+        openSplashPageId: splashPages[Math.max(index - 1, 0)].id,
       };
     }
     default:
