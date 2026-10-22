@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import Home from "@/app/page";
+import type { SplashPage } from "@/splash-page";
 
 /** Renders Captivator and returns its Preview and Editor regions. */
 export function renderCaptivator() {
@@ -32,4 +33,12 @@ export function imageDataUrl(name: string) {
  */
 export function pickColour(colourInput: HTMLElement, colour: string) {
   fireEvent.change(colourInput, { target: { value: colour } });
+}
+
+/** The localStorage key Captivator remembers the Splash Page under. */
+export const savedSplashPageKey = "captivator.splashPage.v1";
+
+/** Seeds a remembered Splash Page, as if saved on an earlier visit. */
+export function seedSavedSplashPage(splashPage: SplashPage) {
+  localStorage.setItem(savedSplashPageKey, JSON.stringify(splashPage));
 }
