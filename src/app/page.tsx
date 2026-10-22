@@ -14,6 +14,7 @@ import {
   libraryReducer,
   loadLibrary,
   openSplashPage,
+  openSplashPageName,
   saveLibrary,
   type Library,
   type SaveResult,
@@ -105,7 +106,11 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
             </p>
           )}
         </div>
-        <Editor splashPage={splashPage} dispatch={dispatch} />
+        <Editor
+          name={openSplashPageName(library)}
+          splashPage={splashPage}
+          dispatch={dispatch}
+        />
       </section>
     </>
   );

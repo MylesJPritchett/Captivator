@@ -1,7 +1,13 @@
 export * from "./types";
 export { starterSplashPage, starterLibrary } from "./starter";
 export { splashPageReducer, type SplashPageAction } from "./reducer";
-export { libraryReducer, openSplashPage, type LibraryAction } from "./library";
+export {
+  libraryReducer,
+  openSplashPage,
+  openSplashPageName,
+  splashPageName,
+  type LibraryAction,
+} from "./library";
 export { minTextBlockSize, maxTextBlockSize } from "./text-blocks";
 export { addableInputFieldTypes } from "./input-fields";
 export {

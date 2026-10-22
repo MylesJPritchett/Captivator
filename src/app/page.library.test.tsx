@@ -106,4 +106,17 @@ describe("Captivator: the Library", () => {
       within(preview).getByText("Welcome to the Café"),
     ).toBeInTheDocument();
   });
+
+  it("the Name field shows the open Splash Page's name, and renaming it there shows the new name in the Library", async () => {
+    const user = userEvent.setup();
+    const { editor } = await renderCaptivator();
+    const name = within(editor).getByRole("textbox", { name: "Name" });
+    expect(name).toHaveValue("My Splash Page");
+
+    await user.clear(name);
+    await user.type(name, "Corner Café");
+
+    expect(libraryNames()).toEqual(["Corner Café"]);
+    expect(openName()).toEqual(["Corner Café"]);
+  });
 });

@@ -40,7 +40,7 @@ export function libraryReducer(
         ? { ...library, openSplashPageId: action.id }
         : library;
     case "rename": {
-      const name = action.name.trim() || untitledSplashPageName;
+      const name = splashPageName(action.name);
       return {
         ...library,
         splashPages: library.splashPages.map((entry) =>
@@ -56,13 +56,31 @@ export function libraryReducer(
   }
 }
 
+/**
+ * The name a Splash Page gets when the Customer types `typed`: trimmed, and
+ * Untitled Splash Page if blank. Two Splash Pages may share a name.
+ */
+export function splashPageName(typed: string): string {
+  return typed.trim() || untitledSplashPageName;
+}
+
 /** The Splash Page the Editor and Preview are showing. */
 export function openSplashPage(library: Library): SplashPage {
+  return openEntry(library).splashPage;
+}
+
+/** The name of the Open Splash Page, shown in the Library and the Editor. */
+export function openSplashPageName(library: Library): string {
+  return openEntry(library).name;
+}
+
+/** The Library's entry for the Open Splash Page. */
+function openEntry(library: Library) {
   const entry = library.splashPages.find(
     ({ id }) => id === library.openSplashPageId,
   );
   if (!entry) throw new Error("The Library has no Open Splash Page");
-  return entry.splashPage;
+  return entry;
 }
 
 /** The Library with the Open Splash Page replaced by `splashPage`. */

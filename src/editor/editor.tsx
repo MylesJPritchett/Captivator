@@ -2,17 +2,22 @@ import { BackgroundSection } from "./background-section";
 import { ConnectButtonSection } from "./connect-button-section";
 import { InputFieldsSection } from "./input-fields-section";
 import { LogoSection } from "./logo-section";
+import { NameField } from "./name-field";
 import { ResetButton } from "./reset-button";
 import { TextSection } from "./text-section";
 import type { EditorSectionProps } from "./types";
 
 /**
- * The Editor: one section per glossary area. Each section lives in its own
- * file and owns its controls.
+ * The Editor: the Open Splash Page's name, then one section per glossary
+ * area. Each section lives in its own file and owns its controls.
  */
-export function Editor(props: EditorSectionProps) {
+export function Editor({
+  name,
+  ...props
+}: EditorSectionProps & { name: string }) {
   return (
     <div className="flex flex-col gap-4">
+      <NameField name={name} dispatch={props.dispatch} />
       <LogoSection {...props} />
       <BackgroundSection {...props} />
       <TextSection {...props} />
