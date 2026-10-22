@@ -59,11 +59,12 @@ Test only at these three seams. Don't add others without agreeing it with the de
 
 Module layout. Each area (Logo, Background, Text Blocks, Input Fields, Connect Button) has its own file in each of the first three:
 
-- `src/splash-page/`: the Splash Page type, the starter Splash Page, and the reducer, which combines one reducer per area
+- `src/splash-page/`: the Splash Page and Library types, the starter Splash Page, the Splash Page reducer, which combines one reducer per area, and the Library reducer (`library.ts`), which owns the Library's own actions and passes every other action to the Splash Page reducer for the Open Splash Page; plus remembering the Library (`remembered.ts`)
 - `src/editor/`: one Editor section per area, which dispatches actions; shared `ImageUpload` and `ColourControl`
 - `src/preview/`: renders a Splash Page for a given Device; the Device toggle and frames
+- `src/library/`: the Library list, with its New Splash Page button
 - `src/ui/`: pieces shared by the Editor and the Preview (segmented control, focus ring)
-- `src/app/page.tsx`: the single route, holding reducer and Device state and wiring the Editor and Preview together
+- `src/app/page.tsx`: the single route, holding the Library reducer and Device state and wiring the Library, Editor and Preview together
 
 ## Agent skills
 
