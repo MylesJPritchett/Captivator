@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   imageDataUrl,
   renderCaptivator,
+  savedSplashPageKey,
   seedSavedSplashPage,
 } from "@/app/test-helpers";
 import type { SplashPage } from "@/splash-page";
@@ -68,4 +69,28 @@ describe("Captivator: remembering the Splash Page in this browser", () => {
     ).toBeInTheDocument();
     expect(within(preview).queryByText("Free WiFi")).not.toBeInTheDocument();
   });
+
+  it.each([
+    ["isn't JSON", "{not json"],
+    ["isn't a Splash Page", JSON.stringify({ textBlocks: "Free WiFi" })],
+    [
+      "has a Text Block missing its size",
+      JSON.stringify({
+        ...savedSplashPage,
+        textBlocks: [{ id: "t", text: "Welcome to the Café", colour: "#fff" }],
+      }),
+    ],
+  ])(
+    "a saved Splash Page that %s opens the Preview on the Starter Splash Page",
+    (_, saved) => {
+      localStorage.setItem(savedSplashPageKey, saved);
+
+      const { preview } = renderCaptivator();
+
+      expect(within(preview).getByText("Free WiFi")).toBeInTheDocument();
+      expect(
+        within(preview).queryByRole("img", { name: "Logo" }),
+      ).not.toBeInTheDocument();
+    },
+  );
 });
