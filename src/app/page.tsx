@@ -15,7 +15,7 @@ import {
   type PreviewTarget,
 } from "@/preview";
 import { LibraryNav } from "@/library";
-import { focusRing } from "@/ui/focus-ring";
+import { secondaryButton } from "@/ui/secondary-button";
 import {
   libraryReducer,
   loadLibrary,
@@ -76,7 +76,7 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
           aria-expanded={libraryShown}
           aria-controls={libraryId}
           onClick={() => setLibraryShown((shown) => !shown)}
-          className={`self-start rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-100 lg:hidden ${focusRing}`}
+          className={`self-start lg:hidden ${secondaryButton}`}
         >
           Library
         </button>

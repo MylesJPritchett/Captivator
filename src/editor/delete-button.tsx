@@ -1,4 +1,4 @@
-import { focusRing } from "@/ui/focus-ring";
+import { secondaryButton } from "@/ui/secondary-button";
 import type { EditorSectionProps } from "./types";
 
 /** Deletes the Open Splash Page, called `name`, once confirmed. */
@@ -14,7 +14,7 @@ export function DeleteButton({
           dispatch({ type: "delete" });
         }
       }}
-      className={`rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-100 ${focusRing}`}
+      className={secondaryButton}
     >
       Delete
     </button>

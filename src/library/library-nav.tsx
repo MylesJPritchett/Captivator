@@ -1,6 +1,7 @@
 import type { Dispatch } from "react";
 import type { Library, LibraryAction } from "@/splash-page";
 import { focusRing } from "@/ui/focus-ring";
+import { secondaryButton } from "@/ui/secondary-button";
 
 /**
  * The Library down the left side of the screen: a button to start a new
@@ -25,7 +26,7 @@ export function LibraryNav({
           dispatch({ type: "new" });
           onNew();
         }}
-        className={`rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-100 ${focusRing}`}
+        className={secondaryButton}
       >
         New Splash Page
       </button>
