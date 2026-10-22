@@ -1,7 +1,6 @@
 import { splashPageReducer, type SplashPageAction } from "./reducer";
-import { openSplashPage, withOpenSplashPage } from "./remembered";
 import { starterSplashPage } from "./starter";
-import type { Library } from "./types";
+import type { Library, SplashPage } from "./types";
 
 /**
  * Every change to the Library. Any action other than the Library's own is a
@@ -45,6 +44,28 @@ export function libraryReducer(
         splashPageReducer(openSplashPage(library), action),
       );
   }
+}
+
+/** The Splash Page the Editor and Preview are showing. */
+export function openSplashPage(library: Library): SplashPage {
+  const entry = library.splashPages.find(
+    ({ id }) => id === library.openSplashPageId,
+  );
+  if (!entry) throw new Error("The Library has no Open Splash Page");
+  return entry.splashPage;
+}
+
+/** The Library with the Open Splash Page replaced by `splashPage`. */
+export function withOpenSplashPage(
+  library: Library,
+  splashPage: SplashPage,
+): Library {
+  return {
+    ...library,
+    splashPages: library.splashPages.map((entry) =>
+      entry.id === library.openSplashPageId ? { ...entry, splashPage } : entry,
+    ),
+  };
 }
 
 /** An id no Splash Page in the Library has. */

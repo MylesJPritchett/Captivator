@@ -1,5 +1,6 @@
 import { get, set } from "idb-keyval";
 import { inputFieldTypes, maxInputFields } from "./input-fields";
+import { openSplashPage, withOpenSplashPage } from "./library";
 import { libraryOf, starterLibrary } from "./starter";
 import type {
   Background,
@@ -69,32 +70,6 @@ function parseJson(text: string): unknown {
   } catch {
     return undefined;
   }
-}
-
-/** The Splash Page the Editor and Preview are showing. */
-export function openSplashPage(library: Library): SplashPage {
-  return openEntry(library).splashPage;
-}
-
-/** The Library with the Open Splash Page replaced by `splashPage`. */
-export function withOpenSplashPage(
-  library: Library,
-  splashPage: SplashPage,
-): Library {
-  return {
-    ...library,
-    splashPages: library.splashPages.map((entry) =>
-      entry.id === library.openSplashPageId ? { ...entry, splashPage } : entry,
-    ),
-  };
-}
-
-function openEntry(library: Library): LibraryEntry {
-  const entry = library.splashPages.find(
-    ({ id }) => id === library.openSplashPageId,
-  );
-  if (!entry) throw new Error("The Library has no Open Splash Page");
-  return entry;
 }
 
 /**
