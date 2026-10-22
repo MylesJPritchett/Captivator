@@ -11,6 +11,6 @@ A Customer can keep several Splash Pages in a Library, so the roughly 5MB `local
 ## Consequences
 
 - Loading and saving are asynchronous. Writes go through in the order they're made, so the latest Library wins.
-- Running out of space is now rare rather than impossible, so ADR-0003's "saved without images" fallback stays.
+- Running out of space is now rare rather than impossible, so ADR-0003's "saved without images" fallback stays. It drops the Open Splash Page's Logo and Background image; every other Splash Page keeps its images only if they were already saved, so images that never fitted don't stop the rest being saved.
 - Tests use `fake-indexeddb`. A full or blocked store is simulated by making IndexedDB writes fail, instead of stubbing `Storage`.
 - One-off exception to "no migrations": the first time it loads, a Splash Page remembered under ADR-0003's `localStorage` key becomes the Library's only Splash Page, named "My Splash Page", and the old key is removed.

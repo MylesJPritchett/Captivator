@@ -1,6 +1,5 @@
 import { get, set } from "idb-keyval";
 import { inputFieldTypes, maxInputFields } from "./input-fields";
-import { openSplashPage, withOpenSplashPage } from "./library";
 import { libraryOf, starterLibrary } from "./starter";
 import type {
   Background,
@@ -32,13 +31,16 @@ export const savedLibraryKey = "captivator.library.v1";
  * Never rejects.
  */
 export async function loadLibrary(legacyStorage: Storage): Promise<Library> {
+  lastSaved = undefined;
   try {
     // Rejects if this browser blocks storage.
     const saved: unknown = await get(savedLibraryKey);
     // Awaited so that anything carrying over throws is caught here.
     if (saved === undefined) return await carryOver(legacyStorage);
     const parsed = typeof saved === "string" ? parseJson(saved) : undefined;
-    return isLibrary(parsed) ? parsed : starterLibrary;
+    if (!isLibrary(parsed)) return starterLibrary;
+    lastSaved = parsed;
+    return parsed;
   } catch {
     return starterLibrary;
   }
@@ -83,9 +85,13 @@ export type SaveResult = "saved" | "saved without images" | "not saved";
 /** Every save made so far, settling once the last has gone through. */
 let saves: Promise<unknown> = Promise.resolve();
 
+/** The Library as last remembered in IndexedDB, once loaded or saved. */
+let lastSaved: Library | undefined;
+
 /**
  * Remembers the whole Library, replacing any earlier one. If storage is full,
- * remembers it without the Open Splash Page's images instead (ADR-0003).
+ * remembers it instead without the Open Splash Page's images, and without any
+ * other Splash Page's images that weren't already remembered (ADR-0004).
  * Saves go through one after another in the order they're made, so the
  * latest Library is the one remembered (ADR-0004). Never rejects.
  */
@@ -95,7 +101,7 @@ export function saveLibrary(library: Library): Promise<SaveResult> {
   return save;
 }
 
-/** Settles once every save made so far has gone through. */
+/** Settles once every save made so far has gone through, so pending saves can finish. */
 export async function savesSettled(): Promise<void> {
   await saves;
 }
@@ -103,29 +109,58 @@ export async function savesSettled(): Promise<void> {
 async function writeLibrary(library: Library): Promise<SaveResult> {
   try {
     await set(savedLibraryKey, JSON.stringify(library));
+    lastSaved = library;
     return "saved";
   } catch (error) {
     if (!isQuotaExceeded(error)) return "not saved";
   }
   try {
-    const splashPage = withoutImages(openSplashPage(library));
-    await set(
-      savedLibraryKey,
-      JSON.stringify(withOpenSplashPage(library, splashPage)),
-    );
+    const fallback = withoutUnsavedImages(library, lastSaved);
+    await set(savedLibraryKey, JSON.stringify(fallback));
+    lastSaved = fallback;
     return "saved without images";
   } catch {
     return "not saved";
   }
 }
 
-/** The Splash Page without its Logo or Background image. */
-function withoutImages(splashPage: SplashPage): SplashPage {
+/**
+ * The Library without the Open Splash Page's images, and without any other
+ * Splash Page's images that `saved` doesn't hold too, so images that never
+ * fitted don't stop the rest being remembered.
+ */
+function withoutUnsavedImages(
+  library: Library,
+  saved: Library | undefined,
+): Library {
+  return {
+    ...library,
+    splashPages: library.splashPages.map((entry) => {
+      const kept =
+        entry.id === library.openSplashPageId
+          ? undefined
+          : saved?.splashPages.find(({ id }) => id === entry.id)?.splashPage;
+      return { ...entry, splashPage: withoutImages(entry.splashPage, kept) };
+    }),
+  };
+}
+
+/**
+ * The Splash Page without its Logo or Background image, except any image
+ * `kept` has too.
+ */
+function withoutImages(splashPage: SplashPage, kept?: SplashPage): SplashPage {
+  const { logo, background } = splashPage;
+  const keepsBackgroundImage =
+    background.imageUrl !== undefined &&
+    background.imageUrl === kept?.background.imageUrl;
   return {
     ...splashPage,
-    logo: undefined,
-    // The colour always sits underneath, so it's what shows instead.
-    background: { kind: "colour", colour: splashPage.background.colour },
+    logo: logo !== undefined && logo === kept?.logo ? logo : undefined,
+    background: keepsBackgroundImage
+      ? background
+      : // The colour always sits underneath, so it's what shows instead.
+        { kind: "colour", colour: background.colour },
   };
 }
 

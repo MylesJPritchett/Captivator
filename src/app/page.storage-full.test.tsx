@@ -1,4 +1,4 @@
-import { cleanup, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -10,6 +10,7 @@ import {
   renderCaptivator,
   storageFull,
 } from "@/app/test-helpers";
+import { savesSettled } from "@/splash-page";
 
 /** Saves longer than this fail, as if this browser's storage were full. */
 const storageLimit = 2_000;
@@ -175,5 +176,32 @@ describe("Captivator: images too large to remember", () => {
     expect(background()).not.toHaveStyle({
       backgroundImage: `url("${largeImageDataUrl}")`,
     });
+  });
+
+  it("after one Splash Page's images are too large to remember, editing another Splash Page is still saved", async () => {
+    const user = userEvent.setup();
+    const { editor } = await renderCaptivator();
+    await user.click(screen.getByRole("button", { name: "New Splash Page" }));
+    await user.click(screen.getByRole("button", { name: "My Splash Page" }));
+    await user.upload(
+      within(editor).getByLabelText("Background image"),
+      imageFile("venue.png", largeImageBytes),
+    );
+    await waitFor(() =>
+      expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Untitled Splash Page" }),
+    );
+    await editTextBlock1(user, editor, "Welcome to the Café");
+    await act(() => savesSettled());
+
+    expect(savedNote(editor)).toHaveTextContent(imagesTooLarge);
+    cleanup();
+    const { preview } = await renderCaptivator();
+    expect(
+      within(preview).getByText("Welcome to the Café"),
+    ).toBeInTheDocument();
   });
 });
