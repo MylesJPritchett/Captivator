@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useReducer, useState } from "react";
+import { AppearanceToggle, useAppearance } from "@/appearance";
 import {
   Editor,
   focusNameField,
@@ -41,10 +42,17 @@ export default function Home() {
     };
   }, []);
 
+  const [appearance, chooseAppearance] = useAppearance();
+
   return (
-    <main className="flex flex-1 flex-col gap-6 p-4 lg:flex-row lg:items-start lg:gap-10 lg:p-8">
-      {initialLibrary && <Captivator initialLibrary={initialLibrary} />}
-    </main>
+    <>
+      <header className="flex h-header shrink-0 items-center border-b border-divider px-4 lg:px-8">
+        <AppearanceToggle appearance={appearance} onChange={chooseAppearance} />
+      </header>
+      <main className="flex flex-1 flex-col gap-6 p-4 lg:flex-row lg:items-start lg:gap-10 lg:p-8">
+        {initialLibrary && <Captivator initialLibrary={initialLibrary} />}
+      </main>
+    </>
   );
 }
 
@@ -117,17 +125,17 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
         </h2>
         <div role="status" className="flex flex-col gap-1 text-sm">
           {saveResult === "not saved" ? (
-            <p className="text-amber-800">
+            <p className="text-warning">
               Your design can&apos;t be saved in this browser, so it will be
               lost when you leave.
             </p>
           ) : (
-            <p className="text-zinc-600">
+            <p className="text-muted">
               Your Splash Pages are saved in this browser.
             </p>
           )}
           {saveResult === "saved without images" && (
-            <p className="text-amber-800">
+            <p className="text-warning">
               Your images are too large to remember in this browser; text and
               colours are still saved.
             </p>

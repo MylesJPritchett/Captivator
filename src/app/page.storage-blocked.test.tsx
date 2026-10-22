@@ -1,8 +1,10 @@
-import { waitFor, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  appearanceOption,
   blockIndexedDbReads,
+  chooseAppearance,
   editTextBlock1,
   failIndexedDbWrites,
   renderCaptivator,
@@ -44,6 +46,23 @@ describe("Captivator: storage blocked in this browser", () => {
         "Your Splash Pages are saved in this browser.",
       ),
     ).not.toBeInTheDocument();
+  });
+
+  it("when the Appearance can't be remembered, it opens on System and the Customer can still choose Dark, with no error shown", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw storageBlocked();
+    });
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw storageBlocked();
+    });
+    await renderCaptivator();
+    expect(appearanceOption("System")).toBeChecked();
+
+    await chooseAppearance(user, "Dark");
+
+    expect(appearanceOption("Dark")).toBeChecked();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("when storage is too full for even the text and colours, the Customer is told the design can't be saved", async () => {

@@ -39,9 +39,9 @@ export function LibraryNav({
                 type="button"
                 aria-current={open ? "true" : undefined}
                 onClick={() => dispatch({ type: "open", id })}
-                className={`w-full truncate rounded-md border-l-4 px-3 py-2 text-left text-sm hover:bg-zinc-100 ${
+                className={`w-full truncate rounded-md border-l-4 px-3 py-2 text-left text-sm hover:bg-control-hover ${
                   // The open Splash Page is bold with a bar, not only coloured.
-                  open ? "border-blue-600 font-bold" : "border-transparent"
+                  open ? "border-focus font-bold" : "border-transparent"
                 } ${focusRing}`}
               >
                 {name}

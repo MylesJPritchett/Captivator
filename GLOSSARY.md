@@ -63,3 +63,7 @@ _Avoid_: Canvas, mockup, render
 **Device**:
 The screen size the Preview simulates: Mobile or Desktop. The Customer toggles between them; the Preview shows one at a time.
 _Avoid_: Viewport, breakpoint, mode
+
+**Appearance**:
+Whether the tool shows Light, Dark, or follows the Customer's System setting. Changes how the Editor looks to the Customer, never the Splash Page in the Preview, and isn't part of the Splash Page.
+_Avoid_: Theme, dark mode, colour mode

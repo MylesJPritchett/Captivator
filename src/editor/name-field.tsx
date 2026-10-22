@@ -1,6 +1,6 @@
 import { useState, type Dispatch } from "react";
 import { splashPageName, type LibraryAction } from "@/splash-page";
-import { focusRing } from "@/ui/focus-ring";
+import { fieldClass } from "./controls";
 
 /** The id of the Splash Page name field, so focus can be moved to it. */
 export const nameFieldId = "splash-page-name";
@@ -44,7 +44,7 @@ export function NameField({
           dispatch({ type: "rename", name: event.target.value });
         }}
         onBlur={() => setDraft({ splashPageId, text: name })}
-        className={`rounded-md border border-zinc-300 px-3 py-2 ${focusRing}`}
+        className={`px-3 py-2 ${fieldClass}`}
       />
     </div>
   );

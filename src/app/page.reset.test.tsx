@@ -1,7 +1,13 @@
-import { screen, within } from "@testing-library/react";
+import { cleanup, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { editTextBlock1, library, renderCaptivator } from "@/app/test-helpers";
+import {
+  appearanceOption,
+  chooseAppearance,
+  editTextBlock1,
+  library,
+  renderCaptivator,
+} from "@/app/test-helpers";
 
 /** Edits the Splash Page away from the Starter Splash Page. */
 async function editSplashPage(
@@ -84,5 +90,21 @@ describe("Captivator: Reset to starter", () => {
     expect(
       within(preview).getByText("Welcome to the Café"),
     ).toBeInTheDocument();
+  });
+
+  it("a confirmed Reset leaves the chosen Appearance unchanged, even after Captivator is rendered again", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    const { editor } = await renderCaptivator();
+    await chooseAppearance(user, "Dark");
+
+    await user.click(
+      within(editor).getByRole("button", { name: "Reset to starter" }),
+    );
+
+    expect(appearanceOption("Dark")).toBeChecked();
+    cleanup();
+    await renderCaptivator();
+    expect(appearanceOption("Dark")).toBeChecked();
   });
 });

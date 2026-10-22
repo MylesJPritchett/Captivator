@@ -1,22 +1,92 @@
 @import "tailwindcss";
 
+/*
+ * The one switch for the colour scheme. Everything dark, from `color-scheme`
+ * and the tokens below to `dark:` utilities, keys off this variant. It follows
+ * the Customer's Appearance, set as `data-appearance` on `<html>`: "dark"
+ * always, "light" never, and "system" (or none yet) the system colour scheme,
+ * through the media query so it follows a change while the page is open.
+ */
+@custom-variant dark {
+  &:where([data-appearance="dark"], [data-appearance="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(
+      :root:not([data-appearance="light"]),
+      :root:not([data-appearance="light"]) *
+    ) {
+      @slot;
+    }
+  }
+}
+
 :root {
+  /* Tells the browser to draw native controls in the matching style. */
+  color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
+  --control: #ffffff;
+  --control-hover: #f4f4f5;
+  --control-border: #d4d4d8;
+  /* Text on a disabled control: dimmer than normal, still legible. */
+  --control-disabled: #71717a;
+  /* The segmented control's track, and its chosen option on it. */
+  --control-track: #e4e4e7;
+  --control-selected: #ffffff;
+  /* A slider's fill. */
+  --primary: #18181b;
+  /* Borders that group controls rather than outline one. */
+  --divider: #e4e4e7;
+  --muted: #52525b;
+  --warning: #92400e;
+  --danger: #b91c1c;
+  --focus: #2563eb;
+
+  @variant dark {
+    color-scheme: dark;
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --control: #18181b;
+    --control-hover: #3f3f46;
+    --control-border: #71717a;
+    --control-disabled: #8b8b94;
+    --control-track: #27272a;
+    --control-selected: #52525b;
+    --primary: #f4f4f5;
+    --divider: #3f3f46;
+    --muted: #a1a1aa;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --focus: #60a5fa;
+  }
+}
+
+@theme {
+  /*
+   * The page header's height, as `h-header`. The Mobile Preview's frame
+   * subtracts it too, to fit the viewport beside the Editor.
+   */
+  --spacing-header: 3.5rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-control: var(--control);
+  --color-control-hover: var(--control-hover);
+  --color-control-border: var(--control-border);
+  --color-control-disabled: var(--control-disabled);
+  --color-control-track: var(--control-track);
+  --color-control-selected: var(--control-selected);
+  --color-primary: var(--primary);
+  --color-divider: var(--divider);
+  --color-muted: var(--muted);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-focus: var(--focus);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

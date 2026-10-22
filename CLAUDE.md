@@ -48,7 +48,7 @@ Test only at these three seams. Don't add others without agreeing it with the de
 - Query by role or label (`getByRole`, `getByLabelText`); act with `@testing-library/user-event`. user-event can't drive native colour or range inputs; set those with `fireEvent.change` (`pickColour` for colours). Fall back to text only when no role or label fits.
 - Use `GLOSSARY.md` terms in test names and code: Splash Page, Logo, Background, Text Block, Input Field, Connect Button, Editor, Preview, Device, Customer, Guest. Avoid the listed aliases.
 - Unit and component tests sit next to their source as `*.test.ts(x)`. E2E tests go in `e2e/*.spec.ts`. The two runners ignore each other's files.
-- Reducer tests: `src/splash-page/<area>.test.ts`. Editor + Preview tests: `src/app/page.<area>.test.tsx`, with page-wide behaviour in `page.test.tsx`. Share setup through `src/app/test-helpers.tsx` (`renderCaptivator`, `stubObjectUrls`, `imageFile`, `pickColour`).
+- Reducer tests: `src/splash-page/<area>.test.ts`. Editor + Preview tests: `src/app/page.<area>.test.tsx`, with page-wide behaviour in `page.test.tsx`. Share setup through `src/app/test-helpers.tsx` (`renderCaptivator`, `stubObjectUrls`, `imageFile`, `pickColour`, `chooseAppearance`).
 - jest-dom matchers and RTL cleanup are registered globally in `vitest.setup.ts`; don't repeat them per file.
 
 ### Architecture
@@ -63,8 +63,9 @@ Module layout. Each area (Logo, Background, Text Blocks, Input Fields, Connect B
 - `src/editor/`: one Editor section per area, which dispatches actions; shared `ImageUpload` and `ColourControl`
 - `src/preview/`: renders a Splash Page for a given Device; the Device toggle and frames
 - `src/library/`: the Library list, with its New Splash Page button
+- `src/appearance/`: the Customer's Appearance, which isn't part of the Splash Page: the `useAppearance` hook, the Appearance toggle, and the inline script that applies it before first paint
 - `src/ui/`: pieces shared by the Editor and the Preview (segmented control, focus ring, secondary button style)
-- `src/app/page.tsx`: the single route, holding the Library reducer and Device state and wiring the Library, Editor and Preview together
+- `src/app/page.tsx`: the single route, holding the Library reducer and Device state and wiring the Library, Editor, Preview and Appearance together
 
 ## Agent skills
 
