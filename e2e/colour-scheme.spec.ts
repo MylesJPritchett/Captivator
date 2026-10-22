@@ -306,3 +306,36 @@ test("on System Appearance the Editor follows a change to the colour scheme whil
     0.1,
   );
 });
+
+for (const [chosen, colorScheme] of [
+  ["Dark", "light"],
+  ["Light", "dark"],
+] as const) {
+  test(`a chosen ${chosen} Appearance survives a reload, applied before Captivator's scripts run`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme });
+    await page.goto("/");
+    await chooseAppearance(page, chosen);
+    const { pageBackground } = await editorColours(page);
+
+    await page.reload();
+
+    await expect(
+      page
+        .getByRole("group", { name: "Appearance" })
+        .getByRole("radio", { name: chosen }),
+    ).toBeChecked();
+    expect((await editorColours(page)).pageBackground).toBe(pageBackground);
+
+    // With Captivator's scripts blocked, only the server's HTML and its inline
+    // script run: what shows then is what's painted before hydration, so a
+    // match here means no flash of the other colour scheme.
+    await page.route("**/_next/static/**/*.js", (route) => route.abort());
+    await page.reload();
+    const firstPaintBackground = await page
+      .locator("body")
+      .evaluate((body) => getComputedStyle(body).backgroundColor);
+    expect(firstPaintBackground).toBe(pageBackground);
+  });
+}

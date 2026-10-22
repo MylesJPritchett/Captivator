@@ -1,7 +1,8 @@
-import { screen, within } from "@testing-library/react";
+import { cleanup, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { renderCaptivator } from "@/app/test-helpers";
+import { rememberedAppearanceKey } from "@/appearance";
 
 function appearance() {
   return screen.getByRole("group", { name: "Appearance" });
@@ -36,4 +37,33 @@ describe("Captivator: Appearance", () => {
       within(appearance()).getByRole("radio", { name: "System" }),
     ).not.toBeChecked();
   });
+
+  it("a chosen Dark Appearance is still chosen after Captivator is rendered again", async () => {
+    const user = userEvent.setup();
+    renderCaptivator();
+    await user.click(within(appearance()).getByRole("radio", { name: "Dark" }));
+
+    cleanup();
+    renderCaptivator();
+
+    expect(
+      within(appearance()).getByRole("radio", { name: "Dark" }),
+    ).toBeChecked();
+  });
+
+  it.each([
+    ["isn't an Appearance", "purple"],
+    ["is empty", ""],
+  ])(
+    "a remembered Appearance that %s opens on System Appearance",
+    (_, saved) => {
+      localStorage.setItem(rememberedAppearanceKey, saved);
+
+      renderCaptivator();
+
+      expect(
+        within(appearance()).getByRole("radio", { name: "System" }),
+      ).toBeChecked();
+    },
+  );
 });
