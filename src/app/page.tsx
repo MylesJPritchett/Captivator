@@ -45,6 +45,9 @@ export default function Home() {
 function Captivator({ initialLibrary }: { initialLibrary: Library }) {
   const [library, dispatch] = useReducer(libraryReducer, initialLibrary);
   const splashPage = openSplashPage(library);
+  const openEntry = library.splashPages.find(
+    ({ id }) => id === library.openSplashPageId,
+  );
   const [device, setDevice] = useState<Device>(defaultDevice);
 
   const [saveResult, setSaveResult] = useState<SaveResult>("saved");
@@ -105,7 +108,11 @@ function Captivator({ initialLibrary }: { initialLibrary: Library }) {
             </p>
           )}
         </div>
-        <Editor splashPage={splashPage} dispatch={dispatch} />
+        <Editor
+          name={openEntry?.name ?? ""}
+          splashPage={splashPage}
+          dispatch={dispatch}
+        />
       </section>
     </>
   );
