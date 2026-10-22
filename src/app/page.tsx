@@ -1,11 +1,15 @@
 "use client";
 
 import { useReducer, useState } from "react";
+import { Editor } from "@/editor";
 import { defaultDevice, Preview, type Device } from "@/preview";
 import { splashPageReducer, starterSplashPage } from "@/splash-page";
 
 export default function Home() {
-  const [splashPage] = useReducer(splashPageReducer, starterSplashPage);
+  const [splashPage, dispatch] = useReducer(
+    splashPageReducer,
+    starterSplashPage,
+  );
   const [device] = useState<Device>(defaultDevice);
 
   return (
@@ -18,6 +22,16 @@ export default function Home() {
           Preview
         </h2>
         <Preview splashPage={splashPage} device={device} />
+      </section>
+
+      <section
+        aria-labelledby="editor-heading"
+        className="flex w-full flex-col gap-4 lg:max-w-md"
+      >
+        <h2 id="editor-heading" className="text-2xl font-bold">
+          Editor
+        </h2>
+        <Editor splashPage={splashPage} dispatch={dispatch} />
       </section>
     </main>
   );
