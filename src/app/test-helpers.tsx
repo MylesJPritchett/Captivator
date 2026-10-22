@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { afterEach, beforeEach } from "vitest";
 import Home from "@/app/page";
 
 /** Renders Captivator and returns its Preview and Editor regions. */
@@ -14,26 +13,17 @@ export function renderCaptivator() {
   };
 }
 
-/**
- * jsdom has no object URLs, so give each uploaded file a predictable one
- * (`blob:<file name>`). Call at the top of a test file.
- */
-export function stubObjectUrls() {
-  const originalCreateObjectURL = URL.createObjectURL;
-  const originalRevokeObjectURL = URL.revokeObjectURL;
-  beforeEach(() => {
-    URL.createObjectURL = (file: Blob) => `blob:${(file as File).name}`;
-    URL.revokeObjectURL = () => {};
-  });
-  afterEach(() => {
-    URL.createObjectURL = originalCreateObjectURL;
-    URL.revokeObjectURL = originalRevokeObjectURL;
-  });
+/** A small PNG file with the given name. Its bytes are its name. */
+export function imageFile(name: string) {
+  return new File([name], name, { type: "image/png" });
 }
 
-/** A small PNG file with the given name. */
-export function imageFile(name: string) {
-  return new File(["fake image"], name, { type: "image/png" });
+/**
+ * The data URL the Preview shows once `imageFile(name)` is uploaded, e.g.
+ * "data:image/png;base64,dmVudWUucG5n" for "venue.png".
+ */
+export function imageDataUrl(name: string) {
+  return `data:image/png;base64,${btoa(name)}`;
 }
 
 /**
