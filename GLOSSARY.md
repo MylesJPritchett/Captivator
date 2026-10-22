@@ -15,8 +15,16 @@ _Avoid_: Visitor, end user, user
 ## The design
 
 **Splash Page**:
-The branded page a Guest sees when joining the WiFi; the thing a Customer designs.
+The branded page a Guest sees when joining the WiFi; the thing a Customer designs. Each has a name the Customer chooses; only the Customer sees it, and Reset keeps it.
 _Avoid_: Captive portal, landing page, template
+
+**Library**:
+The Customer's saved Splash Pages in this browser. Never empty.
+_Avoid_: Gallery, collection, saved pages, projects
+
+**Open Splash Page**:
+The one Splash Page from the Library that the Editor and Preview are showing.
+_Avoid_: Current page, active page, selected page
 
 **Starter Splash Page**:
 The ready-made Splash Page the Editor opens on, and what Reset returns to.
