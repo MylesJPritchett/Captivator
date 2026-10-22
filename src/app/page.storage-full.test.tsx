@@ -1,4 +1,4 @@
-import { cleanup, waitFor, within } from "@testing-library/react";
+import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -113,6 +113,35 @@ describe("Captivator: images too large to remember", () => {
     );
     expect(savedNote(editor)).toHaveTextContent(
       "Your Splash Pages are saved in this browser.",
+    );
+  });
+
+  it("when the Open Splash Page's images are too large to remember, the other Splash Pages keep theirs after Captivator is rendered again", async () => {
+    const user = userEvent.setup();
+    const { editor } = await renderCaptivator();
+    await user.upload(
+      within(editor).getByLabelText("Logo image"),
+      imageFile("cafe-logo.png"),
+    );
+    await user.click(screen.getByRole("button", { name: "New Splash Page" }));
+    await user.upload(
+      within(editor).getByLabelText("Background image"),
+      imageFile("venue.png", largeImageBytes),
+    );
+    await waitFor(() =>
+      expect(savedNote(editor)).toHaveTextContent(imagesTooLarge),
+    );
+
+    cleanup();
+    const { preview, background } = await renderCaptivator();
+    expect(background()).not.toHaveStyle({
+      backgroundImage: `url("${largeImageDataUrl}")`,
+    });
+    await user.click(screen.getByRole("button", { name: "My Splash Page" }));
+
+    expect(within(preview).getByRole("img", { name: "Logo" })).toHaveAttribute(
+      "src",
+      imageDataUrl("cafe-logo.png"),
     );
   });
 
